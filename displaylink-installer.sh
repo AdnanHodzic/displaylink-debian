@@ -5,6 +5,7 @@
 # with Debian Stretch on Linux kernel 4.2.*
 #
 # Copyleft: Adnan Hodzic <adnan@hodzic.org>
+# License: GPLv3
 
 SELF=$0
 COREDIR=/usr/lib/displaylink

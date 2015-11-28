@@ -1,4 +1,9 @@
 #!/bin/bash
+#
+# DisplayLink driver installer for Debian (Stretch)
+#
+# Copyleft: Adnan Hodzic <adnan@hodzic.org>
+# License: GPLv3
 
 driver_dir=1.0.138
 mkdir -p $driver_dir
