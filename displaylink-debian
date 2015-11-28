@@ -4,8 +4,8 @@ driver_dir=1.0.138
 mkdir -p $driver_dir
 
 install(){
-#echo -e "\nDownloading DisplayLink Ubuntu driver:"
-#wget http://downloads.displaylink.com/publicsoftware/DisplayLink-Ubuntu-1.0.138.zip
+echo -e "\nDownloading DisplayLink Ubuntu driver:"
+wget http://downloads.displaylink.com/publicsoftware/DisplayLink-Ubuntu-1.0.138.zip
 
 # prep
 echo -e "\nPrepring for install ...\n"
@@ -33,6 +33,15 @@ echo -e "\Uninstalling ...\n"
 cd $driver_dir/displaylink-driver-1.0.138 && sudo ./displaylink-installer.sh uninstall
 sudo rmmod evdi
 
+# clean-up
+# ToDo: 
+# find and display dir/file for cleanup
+# after confirmation delete them
+#
+#echo -e "Performing clean-up"
+#rm -r $driver_dir
+#rm DisplayLink-Ubuntu-1.0.138.zip
+
 echo -e "\nUninstall complete\n"
 }
 
@@ -45,16 +54,12 @@ Select a key: [i/u]: " answer
 
 if [[ $answer == [Ii] ]];
 then
-	echo "HAHA"
 	install
 elif [[ $answer == [Uu] ]];
 then
-	echo "nah"
 	uninstall
 else
 	echo -e "\nWrong key, aborting ...\n"
+	exit 1
 fi
 
-
-
-# clean-up
