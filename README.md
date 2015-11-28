@@ -12,7 +12,7 @@ DisplayLink driver installer for Debian (Stretch)
 
 How? Just run the script! (as regular user)
 
-`./displaylink-debian`
+`./displaylink-debian.sh`
 
 but first make sure following dependencies are installed:
 
@@ -22,7 +22,7 @@ but first make sure following dependencies are installed:
 
 ##### displaylink-debian.sh
 
-* [Downloads original DisplayLink Ubuntu driver] (http://www.displaylink.com/downloads/ubuntu.php>, modifies its) installer script and performs the install/uninstall.
+* [Downloads original DisplayLink Ubuntu driver] (http://www.displaylink.com/downloads/ubuntu.php>),  modifies its installer script for Debian and performs the install/uninstall.
 
 ##### displaylink-installer.sh
 
