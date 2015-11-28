@@ -1,12 +1,16 @@
 # displaylink-debian
 DisplayLink driver installer for Debian (Stretch)
 
+#### Problem
+[DisplayLink](http://www.displaylink.com/) releases its drivers only for Ubuntu, and latest kernel they support is 3.19. 
+
+
 #### displaylink-debian
 
-* Allows you to seamlessly install and uninstall DisplayLink drivers. 
+* Allows you to seamlessly install and uninstall DisplayLink drivers on Debian with 4.2 kernel.
 
 
-Just run the script! (as regular user)
+How? Just run the script! (as regular user)
 
 `./displaylink-debian`
 
