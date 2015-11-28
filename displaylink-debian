@@ -24,6 +24,17 @@ cd $driver_dir/displaylink-driver-1.0.138 && sudo ./displaylink-installer.sh ins
 echo -e "\nInstall complete\n"
 }
 
+# uninstall
+uninstall(){
+
+# ToDo: add confirmation before uninstalling?
+echo -e "\Uninstalling ...\n"
+
+cd $driver_dir/displaylink-driver-1.0.138 && sudo ./displaylink-installer.sh uninstall
+sudo rmmod evdi
+
+echo -e "\nUninstall complete\n"
+}
 
 echo -e "\nDisplayLink driver for Debian Stretch (kernel 4.2)\n"
 
@@ -39,10 +50,11 @@ then
 elif [[ $answer == [Uu] ]];
 then
 	echo "nah"
-	exit 1
+	uninstall
+else
+	echo -e "\nWrong key, aborting ...\n"
 fi
 
 
-# user chooses install/uninstall
-# uninstall
+
 # clean-up
