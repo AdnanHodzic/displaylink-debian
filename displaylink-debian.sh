@@ -13,7 +13,7 @@ distro_check(){
 # RedHat
 if [ -f /etc/redhat-release ];
 then
-	echo "It's Redhat yo"
+	echo "This is a Redhat based distro ..."
 	# ToDo:
 	# Add platform type message for RedHat
 	exit 1
@@ -26,11 +26,12 @@ platform="$(lsb_release -ics | sed '$!s/$/ /' | tr -d '\n')"
 
 # Unsupported platform message
 message(){
-echo -e "\n------------------------------------------------\n"
-echo -e "\"displaylink-debian\" doesn't work with:"
-echo -e "$platform\n\n"
-echo -e "Feel free to extend it on: https://goo.gl/6soXDE"
-echo -e "----------------------------------------\n"
+echo -e "\n------------------------------------------------------\n"
+echo -e "Unsuported platform: $platform"
+echo -e ""
+echo -e "This tool is Open Source and feel free to extend it"
+echo -e "GitHub repo: https://goo.gl/6soXDE"
+echo -e "------------------------------------------------------\n"
 }
 
 # Ubuntu
@@ -89,7 +90,7 @@ echo -e "\nInstall complete\n"
 uninstall(){
 
 # ToDo: add confirmation before uninstalling?
-echo -e "\Uninstalling ...\n"
+echo -e "\nUninstalling ...\n"
 
 cd $driver_dir/displaylink-driver-1.0.138 && sudo ./displaylink-installer.sh uninstall
 sudo rmmod evdi
