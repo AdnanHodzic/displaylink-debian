@@ -34,7 +34,7 @@ echo -e "Unsuported platform: $platform"
 echo -e ""
 echo -e "This tool is Open Source and feel free to extend it"
 echo -e "GitHub repo: https://goo.gl/6soXDE"
-echo -e "------------------------------------------------------\n"
+echo -e "\n------------------------------------------------------\n"
 }
 
 # Ubuntu
@@ -123,8 +123,8 @@ then
 	install
 elif [[ $answer == [Uu] ]];
 then
+	distro_check
 	uninstall
-	#post
 else
 	echo -e "\nWrong key, aborting ...\n"
 	exit 1
