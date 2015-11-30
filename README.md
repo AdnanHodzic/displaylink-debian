@@ -28,3 +28,7 @@ but first make sure following dependencies are installed:
 
 * Supported platforms are: 
   * Debian: Jessie/Stretch/Sid regardless of which kernel version you're using.
+
+
+#### Discussion
+Blog post: [Kernel agnostic, DisplayLink Debian GNU/Linux driver installer (Jessie/Stretch/Sid)](http://foolcontrol.org/?p=1777)
