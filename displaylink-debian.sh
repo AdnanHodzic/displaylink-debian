@@ -5,7 +5,8 @@
 # Copyleft: Adnan Hodzic <adnan@hodzic.org>
 # License: GPLv3
 
-driver_dir=1.0.138
+version=1.0.335
+driver_dir=$version
 
 # ToDo: add dependency check on:
 # unzip linux-headers-$(uname -r) dkms lsb-release
@@ -61,27 +62,27 @@ fi
 
 install(){
 echo -e "\nDownloading DisplayLink Ubuntu driver:"
-wget http://downloads.displaylink.com/publicsoftware/DisplayLink-Ubuntu-1.0.138.zip
-
+wget -c http://downloads.displaylink.com/publicsoftware/DisplayLink_Ubuntu_${version}.zip
 # prep
 mkdir $driver_dir
 echo -e "\nPrepring for install ...\n"
-unzip -d $driver_dir DisplayLink-Ubuntu-1.0.138.zip
-chmod +x $driver_dir/displaylink-driver-1.0.138.run
-./$driver_dir/displaylink-driver-1.0.138.run --keep --noexec
-mv displaylink-driver-1.0.138/ $driver_dir/displaylink-driver-1.0.138
+test -d $driver_dir && /bin/rm -Rf $driver_dir
+unzip -d $driver_dir DisplayLink_Ubuntu_${version}.zip
+chmod +x $driver_dir/displaylink-driver-${version}.run
+./$driver_dir/displaylink-driver-${version}.run --keep --noexec
+mv displaylink-driver-${version}/ $driver_dir/displaylink-driver-${version}
 
 # modify displaylink-installer.sh
-sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=systemd/g" $driver_dir/displaylink-driver-1.0.138/displaylink-installer.sh
-sed -i "s/"179"/"17e9"/g" $driver_dir/displaylink-driver-1.0.138/displaylink-installer.sh
-sed -i "s/detect_distro/#detect_distro/g" $driver_dir/displaylink-driver-1.0.138/displaylink-installer.sh 
-sed -i "s/#detect_distro()/detect_distro()/g" $driver_dir/displaylink-driver-1.0.138/displaylink-installer.sh 
-sed -i "s/check_requirements/#check_requirements/g" $driver_dir/displaylink-driver-1.0.138/displaylink-installer.sh
-sed -i "s/#check_requirements()/check_requirements()/g" $driver_dir/displaylink-driver-1.0.138/displaylink-installer.sh
+sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=systemd/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
+sed -i "s/"179"/"17e9"/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
+sed -i "s/detect_distro/#detect_distro/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh 
+sed -i "s/#detect_distro()/detect_distro()/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh 
+sed -i "s/check_requirements/#check_requirements/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
+sed -i "s/#check_requirements()/check_requirements()/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 
 # install
 echo -e "\nInstalling ... \n"
-cd $driver_dir/displaylink-driver-1.0.138 && sudo ./displaylink-installer.sh install
+cd $driver_dir/displaylink-driver-${version} && sudo ./displaylink-installer.sh install
 
 echo -e "\nInstall complete\n"
 }
@@ -92,21 +93,21 @@ uninstall(){
 # ToDo: add confirmation before uninstalling?
 echo -e "\nUninstalling ...\n"
 
-cd $driver_dir/displaylink-driver-1.0.138 && sudo ./displaylink-installer.sh uninstall
+cd $driver_dir/displaylink-driver-${version} && sudo ./displaylink-installer.sh uninstall
 sudo rmmod evdi
 
 # cleanup
 # Todo: add confirmation before removing
 cd -
 rm -r $driver_dir
-rm DisplayLink-Ubuntu-1.0.138.zip
+rm DisplayLink_Ubuntu_${version}.zip
 
 echo -e "\nUninstall complete\n"
 }
 
 post(){
 eval $(rm -r $driver_dir)
-eval $(rm DisplayLink-Ubuntu-1.0.138.zip)
+eval $(rm DisplayLink_Ubuntu_${version}.zip)
 }
 
 echo -e "\nDisplayLink driver for Debian GNU/Linux\n"
