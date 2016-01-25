@@ -40,8 +40,13 @@ echo -e "\n------------------------------------------------------\n"
 # Ubuntu
 if [ $lsb == "Ubuntu" ];
 then
+	if [ $codename == "vivid" ] || [ $codename == "wily" ] || [ $codename == "xenial" ];
+	then
+		echo -e "\nPlatform requirements satisfied, proceeding ...\n"
+	else
 		message
 		exit 1
+	fi
 # Debian
 elif [ $lsb == "Debian" ];
 then
