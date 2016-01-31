@@ -30,6 +30,9 @@ but first make sure following dependencies are installed:
   * Debian: Jessie/Stretch/Sid (regardless of which kernel version you're using.)
   * Ubuntu >= 15.04 <= 16.04 (regardless of which kernel version you're using.)
 
+#### Post install Guide
+
+Please refer to [Post Install Guide](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md) for further reference.
 
 #### Discussion
 Blog post: [Kernel agnostic, DisplayLink Debian GNU/Linux driver installer (Jessie/Stretch/Sid)](http://foolcontrol.org/?p=1777)
