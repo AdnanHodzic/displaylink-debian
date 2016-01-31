@@ -60,13 +60,7 @@ Make sure to install it first: ```sudo apt-get install arandr```
 
 ### Automated configuration
 
-Since, hotplug doesn't work (on Debian) and every time you connect your computer to Displaylink you'll need to re-configure your displays.
-
-I've set-up couple of aliases which help me accomplish this in semi-automated manner.
-
-Every time I connect my computer to DisplayLink.
-
-Since hotplug doesn't work and every time you connect your computer to Displaylink you'll need to re-configure your displays.
+Since hotplug doesn't work (on Debian) and every time you connect your computer to Displaylink you'll need to re-configure your displays.
 
 I've set-up couple of [aliases](http://www.linfo.org/alias.html) which help me accomplish this in semi-automated manner.
 
