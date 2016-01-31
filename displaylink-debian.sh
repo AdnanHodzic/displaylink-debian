@@ -89,7 +89,7 @@ sed -i "s/#check_requirements()/check_requirements()/g" $driver_dir/displaylink-
 echo -e "\nInstalling ... \n"
 cd $driver_dir/displaylink-driver-${version} && sudo ./displaylink-installer.sh install
 
-echo -e "\nInstall complete\n"
+echo -e "\nInstall complete, please reboot to apply the changes\n"
 }
 
 # uninstall
