@@ -2,7 +2,7 @@
 DisplayLink driver installer for Debian GNU/Linux and Ubuntu.
 
 #### Problem
-[DisplayLink](http://www.displaylink.com/) releases its drivers only for Ubuntu, and latest kernel version they support is 3.19. 
+[DisplayLink](http://www.displaylink.com/) releases its drivers only for Ubuntu 14.04, and latest kernel version they support is 3.19. 
 
 
 #### displaylink-debian
