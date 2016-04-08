@@ -14,10 +14,6 @@ How? Just run the script! (as regular user)
 
 `./displaylink-debian.sh`
 
-but first make sure following dependencies are installed:
-
-`apt-get install unzip linux-headers-$(uname -r) dkms lsb-release`
-
 #### Technical
 
 ##### displaylink-debian.sh
