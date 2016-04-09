@@ -8,8 +8,33 @@
 version=1.0.335
 driver_dir=$version
 
-# ToDo: add dependency check on:
-# unzip linux-headers-$(uname -r) dkms lsb-release
+# Dependencies
+deps=(unzip linux-headers-$(uname -r) dkms lsb-release)
+
+dep_check() {
+   echo "Checking dependencies..."
+   for dep in ${deps[@]}
+   do
+      if ! dpkg -s $dep > /dev/null 2>&1
+      then
+	 read -p "$dep not found! Install? [y/N] " response
+	 response=${response,,} # tolower
+	 if [[ $response =~ ^(yes|y)$ ]]
+	 then
+	    if ! sudo apt-get install $dep
+	    then
+	       echo "$dep installation failed.  Aborting."
+	       exit 1
+	    fi
+	 else
+	    echo "Cannot continue without $dep.  Aborting."
+	    exit 1
+	 fi
+      else
+	 echo "$dep is installed"
+      fi
+   done
+}
 
 distro_check(){
 
@@ -21,6 +46,9 @@ then
 	# Add platform type message for RedHat
 	exit 1
 else
+
+# Confirm dependencies are in place
+dep_check
 
 # Checker parameters 
 lsb="$(lsb_release -is)"
