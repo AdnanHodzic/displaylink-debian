@@ -66,31 +66,62 @@ echo -e "\n------------------------------------------------------\n"
 }
 
 # Ubuntu
-if [ $lsb == "Ubuntu" ];
+if [ "$lsb" == "Ubuntu" ];
 then
-	if [ $codename == "vivid" ] || [ $codename == "wily" ] || [ $codename == "xenial" ];
+	if [ $codename == "trusty" ] || [ $codename == "vivid" ] || [ $codename == "wily" ] || [ $codename == "xenial" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ...\n"
 	else
 		message
 		exit 1
 	fi
+# Elementary
+elif [ "$lsb" == "elementary OS" ];
+then
+    if [ $codename == "freya" ];
+    then 
+		echo -e "\nPlatform requirements satisfied, proceeding ...\n"
+    else
+        message
+        exit 1
+    fi
 # Debian
-elif [ $lsb == "Debian" ];
+elif [ "$lsb" == "Debian" ];
 then
 	if [ $codename == "jessie" ] || [ $codename == "stretch" ] || [ $codename == "sid" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ...\n"
-		#exit 1
 	else
-	message	
-	exit 1
+        message	
+        exit 1
 	fi
 else
 	message
 	exit 1
 fi
 fi
+}
+
+sysinitdaemon_get(){
+
+sysinitdaemon="systemd"
+
+if [ "$lsb" == "Ubuntu" ];
+then
+	if [ $codename == "trusty" ];
+	then
+        sysinitdaemon="upstart"
+	fi
+# Elementary
+elif [ "$lsb" == "elementary OS" ];
+then
+    if [ $codename == "freya" ];
+    then 
+        sysinitdaemon="upstart"
+    fi
+fi
+
+echo $sysinitdaemon
 }
 
 install(){
@@ -105,8 +136,11 @@ chmod +x $driver_dir/displaylink-driver-${version}.run
 ./$driver_dir/displaylink-driver-${version}.run --keep --noexec
 mv displaylink-driver-${version}/ $driver_dir/displaylink-driver-${version}
 
+# get sysinitdaemon
+sysinitdaemon=$(sysinitdaemon_get)
+
 # modify displaylink-installer.sh
-sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=systemd/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
+sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$sysinitdaemon/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 sed -i "s/"179"/"17e9"/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 sed -i "s/detect_distro/#detect_distro/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh 
 sed -i "s/#detect_distro()/detect_distro()/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh 
