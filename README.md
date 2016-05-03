@@ -25,6 +25,7 @@ How? Just run the script! (as regular user)
 * Supported platforms are: 
   * Debian: Jessie/Stretch/Sid (regardless of which kernel version you're using.)
   * Ubuntu >= 15.04 <= 16.04 (regardless of which kernel version you're using.)
+  * Ubuntu >= 14.04 and Elementary OS (kernel >= 3.16 and Xorg >= 1.16.)
 
 #### Post installation Guide
 
