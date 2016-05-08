@@ -157,17 +157,16 @@ echo -e "\nInstall complete, please reboot to apply the changes\n"
 # uninstall
 uninstall(){
 
-# ToDo: add confirmation before uninstalling?
 echo -e "\nUninstalling ...\n"
 
-cd $driver_dir/displaylink-driver-${version} && sudo ./displaylink-installer.sh uninstall
+sudo displaylink-installer uninstall
 sudo rmmod evdi
 
-# cleanup
-# Todo: add confirmation before removing
-cd -
-rm -r $driver_dir
-rm DisplayLink_Ubuntu_${version}.zip
+# ToDo: make clean-up a seperate step
+# add confirmation before removing
+#cd -
+#rm -r $driver_dir
+#rm DisplayLink_Ubuntu_${version}.zip
 
 echo -e "\nUninstall complete\n"
 }
