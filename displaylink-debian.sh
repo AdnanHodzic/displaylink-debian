@@ -136,6 +136,14 @@ chmod +x $driver_dir/displaylink-driver-${version}.run
 ./$driver_dir/displaylink-driver-${version}.run --keep --noexec
 mv displaylink-driver-${version}/ $driver_dir/displaylink-driver-${version}
 
+# patch the kernel 4.5.0 driver source
+mkdir evdi-${version}
+cd evdi-${version}
+tar -zxvf ../$driver_dir/displaylink-driver-${version}/evdi-${version}-src.tar.gz
+patch -p0 < ../evdi-${version}-linux-4.5.0.patch
+tar -zcf ../$driver_dir/displaylink-driver-${version}/evdi-${version}-src.tar.gz ./
+cd ..
+
 # get sysinitdaemon
 sysinitdaemon=$(sysinitdaemon_get)
 
