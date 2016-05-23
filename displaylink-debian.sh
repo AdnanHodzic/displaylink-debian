@@ -1,6 +1,7 @@
 #!/bin/bash
 #
-# DisplayLink driver installer for Debian GNU/Linux
+# DisplayLink driver installer for Linux
+# Supported platforms: Debian GNU/Linux, Ubuntu, Elementary OS
 #
 # Copyleft: Adnan Hodzic <adnan@hodzic.org>
 # License: GPLv3
