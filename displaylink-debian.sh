@@ -5,7 +5,7 @@
 # Copyleft: Adnan Hodzic <adnan@hodzic.org>
 # License: GPLv3
 
-version=1.0.335
+version=1.1.62
 driver_dir=$version
 
 # Dependencies
@@ -126,7 +126,8 @@ echo $sysinitdaemon
 
 install(){
 echo -e "\nDownloading DisplayLink Ubuntu driver:"
-wget -c http://downloads.displaylink.com/publicsoftware/DisplayLink_Ubuntu_${version}.zip
+dlurl="http://www.displaylink.com/downloads/file?id=607"
+wget -O DisplayLink_Ubuntu_${version}.zip $dlurl
 # prep
 mkdir $driver_dir
 echo -e "\nPrepring for install ...\n"
@@ -137,12 +138,12 @@ chmod +x $driver_dir/displaylink-driver-${version}.run
 mv displaylink-driver-${version}/ $driver_dir/displaylink-driver-${version}
 
 # patch the kernel 4.5.0 driver source
-mkdir evdi-${version}
-cd evdi-${version}
-tar -zxvf ../$driver_dir/displaylink-driver-${version}/evdi-${version}-src.tar.gz
-patch -p0 < ../evdi-${version}-linux-4.5.0.patch
-tar -zcf ../$driver_dir/displaylink-driver-${version}/evdi-${version}-src.tar.gz ./
-cd ..
+#mkdir evdi-${version}
+#cd evdi-${version}
+#tar -zxvf ../$driver_dir/displaylink-driver-${version}/evdi-${version}-src.tar.gz
+#patch -p0 < ../evdi-${version}-linux-4.5.0.patch
+#tar -zcf ../$driver_dir/displaylink-driver-${version}/evdi-${version}-src.tar.gz ./
+#cd ..
 
 # get sysinitdaemon
 sysinitdaemon=$(sysinitdaemon_get)
