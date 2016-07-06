@@ -79,8 +79,8 @@ then
 # Elementary
 elif [ "$lsb" == "elementary OS" ];
 then
-    if [ $codename == "freya" ];
-    then 
+    if [ $codename == "freya" ] || [ $codename == "loki" ];
+    then
 		echo -e "\nPlatform requirements satisfied, proceeding ...\n"
     else
         message
