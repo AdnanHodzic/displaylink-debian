@@ -90,3 +90,4 @@ Note, in case you're editting ```~/.bashrc```, make sure you run ```source ~/.ba
 
 * Monitor ```dmesg``` output while plugging in Displaylink
 * Monitor ```/var/log/displaylink/DisplayLinkManager.log``` file
+* displaylink.service fails to start? Make sure [UEFI is disabled](https://github.com/AdnanHodzic/displaylink-debian/issues/15)
