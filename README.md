@@ -26,7 +26,7 @@ How? Just run the script! (as regular user)
 
   * Debian: Jessie 8.0/Stretch 9.0/Sid (unstable)
   * Ubuntu: >= 14.04 <= 16.04
-  * Elementary OS: Freya
+  * Elementary OS: Freya/Loki
 
   Regardless of which kernel version you're using.
 
