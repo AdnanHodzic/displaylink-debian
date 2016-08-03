@@ -76,8 +76,8 @@ then
 		message
 		exit 1
 	fi
-# Elementary
-elif [ "$lsb" == "elementary OS" ];
+# elementary OS
+elif [ "$lsb" == "elementary OS" ] || [ "$lsb" == "elementary" ];
 then
     if [ $codename == "freya" ] || [ $codename == "loki" ];
     then
