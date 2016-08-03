@@ -7,7 +7,7 @@ DisplayLink driver installer for Debian GNU/Linux, Ubuntu and Elementary OS.
 
 #### displaylink-debian
 
-* Allows you to seamlessly install/uninstall DisplayLink drivers on Debian GNU/Linux, Ubuntu and Elementary OS.
+* Allows you to seamlessly install/uninstall DisplayLink drivers on Debian GNU/Linux, Ubuntu and elementary OS.
 
 
 How? Just run the script! (as regular user)
