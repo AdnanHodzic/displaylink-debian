@@ -211,7 +211,14 @@ uninstall(){
 echo -e "\nUninstalling ...\n"
 
 sudo displaylink-installer uninstall
-sudo rmmod evdi
+
+# double check if evdi module is loaded, if yes remove it
+evdi_module="evdi"
+
+if lsmod | grep "$evdi_module" &> /dev/null ; then
+	echo "Removing $evdi_module module"
+	sudo rmmod evdi
+fi
 }
 
 post(){
