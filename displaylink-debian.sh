@@ -6,7 +6,7 @@
 # Copyleft: Adnan Hodzic <adnan@hodzic.org>
 # License: GPLv3
 
-version=1.1.62
+version=1.2.58
 driver_dir=$version
 
 # Dependencies
@@ -127,7 +127,7 @@ echo $sysinitdaemon
 
 install(){
 echo -e "\nDownloading DisplayLink Ubuntu driver:"
-dlurl="http://www.displaylink.com/downloads/file?id=607"
+dlurl="http://www.displaylink.com/downloads/file?id=701"
 wget -O DisplayLink_Ubuntu_${version}.zip $dlurl
 # prep
 mkdir $driver_dir
