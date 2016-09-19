@@ -1,7 +1,9 @@
 #!/bin/bash
 #
 # DisplayLink driver installer for Linux
-# Supported platforms: Debian GNU/Linux, Ubuntu, Elementary OS
+# Supported platforms: Debian GNU/Linux, Ubuntu, Elementary OS, Mint
+#
+# Blog post: http://foolcontrol.org/?p=1777
 #
 # Copyleft: Adnan Hodzic <adnan@hodzic.org>
 # License: GPLv3
@@ -13,28 +15,28 @@ driver_dir=$version
 deps=(unzip linux-headers-$(uname -r) dkms lsb-release)
 
 dep_check() {
-   echo "Checking dependencies..."
-   for dep in ${deps[@]}
-   do
-      if ! dpkg -s $dep > /dev/null 2>&1
-      then
-	 read -p "$dep not found! Install? [y/N] " response
-	 response=${response,,} # tolower
-	 if [[ $response =~ ^(yes|y)$ ]]
-	 then
-	    if ! sudo apt-get install $dep
-	    then
-	       echo "$dep installation failed.  Aborting."
-	       exit 1
-	    fi
-	 else
-	    echo "Cannot continue without $dep.  Aborting."
-	    exit 1
-	 fi
-      else
-	 echo "$dep is installed"
-      fi
-   done
+echo "Checking dependencies..."
+for dep in ${deps[@]}
+do
+	if ! dpkg -s $dep > /dev/null 2>&1
+	then
+		read -p "$dep not found! Install? [y/N] " response
+		response=${response,,} # tolower
+		if [[ $response =~ ^(yes|y)$ ]]
+		then
+			if ! sudo apt-get install $dep
+			then
+				echo "$dep installation failed.  Aborting."
+				exit 1
+			fi
+		else
+			echo "Cannot continue without $dep.  Aborting."
+		exit 1
+		fi
+	else
+		echo "$dep is installed"
+	fi
+done
 }
 
 distro_check(){
@@ -79,13 +81,13 @@ then
 # elementary OS
 elif [ "$lsb" == "elementary OS" ] || [ "$lsb" == "elementary" ];
 then
-    if [ $codename == "freya" ] || [ $codename == "loki" ];
-    then
+	if [ $codename == "freya" ] || [ $codename == "loki" ];
+	then
 		echo -e "\nPlatform requirements satisfied, proceeding ...\n"
-    else
-        message
-        exit 1
-    fi
+	else
+		message
+		exit 1
+	fi
 # Debian
 elif [ "$lsb" == "Debian" ];
 then
@@ -93,8 +95,18 @@ then
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ...\n"
 	else
-        message	
-        exit 1
+		message
+		exit 1
+	fi
+# Mint
+elif [ "$lsb" == "LinuxMint" ];
+then
+	if [ $codename == "sarah" ] || [ $codename == "rosa" ] || [ $codename == "petra" ] || [ $codename == "olivia" ];
+	then
+		echo -e "\nPlatform requirements satisfied, proceeding ...\n"
+	else
+		message
+		exit 1
 	fi
 else
 	message
