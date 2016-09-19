@@ -221,11 +221,6 @@ if lsmod | grep "$evdi_module" &> /dev/null ; then
 fi
 }
 
-post(){
-eval $(rm -r $driver_dir)
-eval $(rm DisplayLink_Ubuntu_${version}.zip)
-}
-
 echo -e "\nDisplayLink driver for Debian GNU/Linux\n"
 
 read -p "[I]nstall
