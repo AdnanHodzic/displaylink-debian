@@ -152,21 +152,14 @@ sep="\n---------------------------------------------------------------------\n"
 echo -e $sep
 }
 
-install_clean_up(){
+clean_up(){
 # remove obsolete/redundant files which can only hamper reinstalls
+
+echo -e "\nPerforming clean-up\n"
 
 # go back to displaylink-debian
 cd - &> /dev/null
 
-if [ -f "DisplayLink_Ubuntu_$version.zip" ]
-then
-	echo "Removing redundant: \"DisplayLink_Ubuntu_$version.zip\" file"
-	rm "DisplayLink_Ubuntu_$version.zip"
-fi
-}
-
-uninstall_clean_up(){
-# remove obsolete/redundant files
 if [ -f "DisplayLink_Ubuntu_$version.zip" ]
 then
 	echo "Removing redundant: \"DisplayLink_Ubuntu_$version.zip\" file"
@@ -246,22 +239,22 @@ if [[ $answer == [Ii] ]];
 then
 	distro_check
 	install
-	install_clean_up
+	clean_up
 	echo -e "\nInstall complete, please reboot to apply the changes\n"
 elif [[ $answer == [Uu] ]];
 then
 	distro_check
 	uninstall
-	uninstall_clean_up
+	clean_up
 	echo -e "\nUninstall complete\n"
 elif [[ $answer == [Rr] ]];
 then
 	distro_check
 	uninstall
-	uninstall_clean_up
+	clean_up
 	distro_check
 	install
-	install_clean_up
+	clean_up
 	echo -e "\nRe-install complete, please reboot to apply the changes"
 	separator
 elif [[ $answer == [Qq] ]];
