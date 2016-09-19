@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # DisplayLink driver installer for Linux
-# Supported platforms: Debian GNU/Linux, Ubuntu, Elementary OS, Mint
+# Supported platforms: Debian GNU/Linux, Ubuntu, Elementary OS, Mint, Kali
 #
 # Blog post: http://foolcontrol.org/?p=1777
 #
@@ -60,12 +60,12 @@ platform="$(lsb_release -ics | sed '$!s/$/ /' | tr -d '\n')"
 
 # Unsupported platform message
 message(){
-echo -e "\n------------------------------------------------------\n"
+echo -e "\n---------------------------------------------------------------\n"
 echo -e "Unsuported platform: $platform"
 echo -e ""
 echo -e "This tool is Open Source and feel free to extend it"
-echo -e "GitHub repo: https://goo.gl/6soXDE"
-echo -e "\n------------------------------------------------------\n"
+echo -e "GitHub repo: https://github.com/AdnanHodzic/displaylink-debian/"
+echo -e "\n---------------------------------------------------------------\n"
 }
 
 # Ubuntu
@@ -102,6 +102,16 @@ then
 elif [ "$lsb" == "LinuxMint" ];
 then
 	if [ $codename == "sarah" ] || [ $codename == "rosa" ] || [ $codename == "petra" ] || [ $codename == "olivia" ];
+	then
+		echo -e "\nPlatform requirements satisfied, proceeding ...\n"
+	else
+		message
+		exit 1
+	fi
+# Kali
+elif [ "$lsb" == "Kali" ];
+then
+	if [ $codename == "kali-rolling" ] || [ $codename == "2016.2" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ...\n"
 	else
