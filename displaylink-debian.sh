@@ -147,6 +147,11 @@ fi
 echo $sysinitdaemon
 }
 
+separator(){
+sep="\n---------------------------------------------------------------------"
+echo -e $sep
+}
+
 install_clean_up(){
 # remove obsolete/redundant files which can only hamper reinstalls
 
@@ -174,7 +179,6 @@ then
 	rm -r $driver_dir
 fi
 }
-
 
 install(){
 echo -e "\nDownloading DisplayLink Ubuntu driver:"
@@ -221,8 +225,16 @@ if lsmod | grep "$evdi_module" &> /dev/null ; then
 fi
 }
 
-echo -e "\nDisplayLink driver for Debian GNU/Linux\n"
-
+echo -e "\n--------------------------- displaylink-debian ----------------------------"
+echo -e "\nDisplayLink driver installer for Debian based Linux distributions:\n"
+#echo -e "Works on:"
+#echo -e "Debian GNU/Linux, Ubuntu, Elementary OS, Mint, Kali Linux\n"
+echo -e "* Debian GNU/Linux"
+echo -e "* Ubuntu"
+echo -e "* Elementary OS"
+echo -e "* Linux Mint"
+echo -e "* Kali Linux"
+echo -e "\nOptions:\n"
 read -p "[I]nstall
 [U]ninstall
 
