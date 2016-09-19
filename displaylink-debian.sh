@@ -149,19 +149,23 @@ echo $sysinitdaemon
 
 install_clean_up(){
 # remove obsolete/redundant files which can only hamper reinstalls
-if [ -f DisplayLink_Ubuntu_$version.zip ]
+
+# go back to displaylink-debian
+cd - &> /dev/null
+
+if [ -f "DisplayLink_Ubuntu_$version.zip" ]
 then
 	echo "Removing redundant: \"DisplayLink_Ubuntu_$version.zip\" file"
-	rm DisplayLink_Ubuntu_$version.zip
+	rm "DisplayLink_Ubuntu_$version.zip"
 fi
 }
 
 uninstall_clean_up(){
 # remove obsolete/redundant files
-if [ -f DisplayLink_Ubuntu_$version.zip ]
+if [ -f "DisplayLink_Ubuntu_$version.zip" ]
 then
 	echo "Removing redundant: \"DisplayLink_Ubuntu_$version.zip\" file"
-	rm DisplayLink_Ubuntu_$version.zip
+	rm "DisplayLink_Ubuntu_$version.zip"
 fi
 
 if [ -d $driver_dir ]
