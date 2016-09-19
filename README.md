@@ -1,5 +1,5 @@
 # displaylink-debian
-DisplayLink driver installer for Debian GNU/Linux, Ubuntu and Elementary OS.
+DisplayLink driver installer for Debian GNU/Linux, Ubuntu, Elementary OS, Mint and Kali Linux.
 
 #### Problem
 [DisplayLink](http://www.displaylink.com/) releases its drivers only for Ubuntu 14.04, and latest kernel version they support is 3.19.
@@ -7,7 +7,7 @@ DisplayLink driver installer for Debian GNU/Linux, Ubuntu and Elementary OS.
 
 #### displaylink-debian
 
-* Allows you to seamlessly install/uninstall DisplayLink drivers on Debian GNU/Linux, Ubuntu, elementary OS, Mint and Kali.
+* Allows you to seamlessly install/uninstall DisplayLink drivers on Debian GNU/Linux, Ubuntu and elementary OS.
 
 
 How? Just run the script! (as regular user)
@@ -24,11 +24,11 @@ How? Just run the script! (as regular user)
 
 * Supported platforms are:
 
-Debian: Jessie 8.0/Stretch 9.0/Sid (unstable)
-Ubuntu: 14.04 Trusty/15.04 Vivid/15.10 Wily/16.04 Xenial/16.10 Yakkety
-elementary OS: O.3 Freya/0.4 Loki
-Mint: 15 Olivia/16 Petra/17.3 Rosa/18 Sarah
-Kali: 2016.2/kali-rolling
+  * Debian: Jessie 8.0/Stretch 9.0/Sid (unstable)
+  * Ubuntu: 14.04 Trusty/15.04 Vivid/15.10 Wily/16.04 Xenial/16.10 Yakkety
+  * elementary OS: O.3 Freya/0.4 Loki
+  * Mint: 15 Olivia/16 Petra/17.3 Rosa/18 Sarah
+  * Kali: 2016.2/kali-rolling
 
   Regardless of which kernel version you're using.
 
