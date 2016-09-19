@@ -147,6 +147,31 @@ fi
 echo $sysinitdaemon
 }
 
+install_clean_up(){
+# remove obsolete/redundant files which can only hamper reinstalls
+if [ -f DisplayLink_Ubuntu_$version.zip ]
+then
+	echo "Removing redundant: \"DisplayLink_Ubuntu_$version.zip\" file"
+	rm DisplayLink_Ubuntu_$version.zip
+fi
+}
+
+uninstall_clean_up(){
+# remove obsolete/redundant files
+if [ -f DisplayLink_Ubuntu_$version.zip ]
+then
+	echo "Removing redundant: \"DisplayLink_Ubuntu_$version.zip\" file"
+	rm DisplayLink_Ubuntu_$version.zip
+fi
+
+if [ -d $driver_dir ]
+then
+	echo "Removing redundant: \"$driver_dir\" directory"
+	rm -r $driver_dir
+fi
+}
+
+
 install(){
 echo -e "\nDownloading DisplayLink Ubuntu driver:"
 dlurl="http://www.displaylink.com/downloads/file?id=701"
@@ -166,16 +191,14 @@ sysinitdaemon=$(sysinitdaemon_get)
 # modify displaylink-installer.sh
 sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$sysinitdaemon/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 sed -i "s/"179"/"17e9"/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
-sed -i "s/detect_distro/#detect_distro/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh 
-sed -i "s/#detect_distro()/detect_distro()/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh 
-sed -i "s/check_requirements/#check_requirements/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
-sed -i "s/#check_requirements()/check_requirements()/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
+sed -i "s/detect_distro/detect_distro/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh 
+sed -i "s/detect_distro()/detect_distro()/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh 
+sed -i "s/check_requirements/check_requirements/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
+sed -i "s/check_requirements()/check_requirements()/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 
 # install
 echo -e "\nInstalling ... \n"
 cd $driver_dir/displaylink-driver-${version} && sudo ./displaylink-installer.sh install
-
-echo -e "\nInstall complete, please reboot to apply the changes\n"
 }
 
 # uninstall
@@ -185,14 +208,6 @@ echo -e "\nUninstalling ...\n"
 
 sudo displaylink-installer uninstall
 sudo rmmod evdi
-
-# ToDo: make clean-up a seperate step
-# add confirmation before removing
-#cd -
-#rm -r $driver_dir
-#rm DisplayLink_Ubuntu_${version}.zip
-
-echo -e "\nUninstall complete\n"
 }
 
 post(){
@@ -211,10 +226,14 @@ if [[ $answer == [Ii] ]];
 then
 	distro_check
 	install
+	install_clean_up
+	echo -e "\nInstall complete, please reboot to apply the changes\n"
 elif [[ $answer == [Uu] ]];
 then
 	distro_check
 	uninstall
+	uninstall_clean_up
+	echo -e "\nUninstall complete\n"
 else
 	echo -e "\nWrong key, aborting ...\n"
 	exit 1
