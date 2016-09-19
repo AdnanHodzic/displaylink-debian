@@ -148,7 +148,7 @@ echo $sysinitdaemon
 }
 
 separator(){
-sep="\n---------------------------------------------------------------------"
+sep="\n---------------------------------------------------------------------\n"
 echo -e $sep
 }
 
@@ -237,8 +237,10 @@ echo -e "* Kali Linux"
 echo -e "\nOptions:\n"
 read -p "[I]nstall
 [U]ninstall
+[R]e-install
+[Q]uit
 
-Select a key: [i/u]: " answer
+Select a key: [i/u/r/q]: " answer
 
 if [[ $answer == [Ii] ]];
 then
@@ -252,6 +254,20 @@ then
 	uninstall
 	uninstall_clean_up
 	echo -e "\nUninstall complete\n"
+elif [[ $answer == [Rr] ]];
+then
+	distro_check
+	uninstall
+	uninstall_clean_up
+	distro_check
+	install
+	install_clean_up
+	echo -e "\nRe-install complete, please reboot to apply the changes"
+	separator
+elif [[ $answer == [Qq] ]];
+then
+	separator
+	exit 0
 else
 	echo -e "\nWrong key, aborting ...\n"
 	exit 1
