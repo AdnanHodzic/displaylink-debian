@@ -7,15 +7,15 @@
 
 * After reboot, make sure dispaylink is running, i.e:
 
-  ```systemctl status displaylink.service```
+  ```systemctl status dlm.service```
   
   If it's not running, start it by running:
   
-  ```systemctl start displaylink.service```
+  ```systemctl start dlm.service```
   
   To start automatically at boot run:
   
-  ```systemctl enable displaylink.service```
+  ```systemctl enable dlm.service```
 
 ### Setting provider sources
 
