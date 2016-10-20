@@ -11,6 +11,22 @@
 version=1.2.65
 driver_dir=$version
 
+separator(){
+sep="\n-------------------------------------------------------------------"
+echo -e $sep
+}
+
+root_check(){
+# root check
+if (( $EUID != 0 ));
+then
+	separator
+	echo -e "\nMust be run as root (i.e: 'sudo $0')."
+	separator
+	exit 1
+fi
+}
+
 # Dependencies
 deps=(unzip linux-headers-$(uname -r) dkms lsb-release)
 
@@ -147,11 +163,6 @@ fi
 echo $sysinitdaemon
 }
 
-separator(){
-sep="\n---------------------------------------------------------------------\n"
-echo -e $sep
-}
-
 clean_up(){
 # remove obsolete/redundant files which can only hamper reinstalls
 
@@ -222,10 +233,10 @@ if lsmod | grep "$evdi_module" &> /dev/null ; then
 fi
 }
 
+root_check
+
 echo -e "\n--------------------------- displaylink-debian ----------------------------"
 echo -e "\nDisplayLink driver installer for Debian based Linux distributions:\n"
-#echo -e "Works on:"
-#echo -e "Debian GNU/Linux, Ubuntu, Elementary OS, Mint, Kali Linux\n"
 echo -e "* Debian GNU/Linux"
 echo -e "* Ubuntu"
 echo -e "* Elementary OS"
