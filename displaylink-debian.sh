@@ -40,7 +40,7 @@ do
 		response=${response,,} # tolower
 		if [[ $response =~ ^(yes|y)$ ]]
 		then
-			if ! sudo apt-get install $dep
+			if ! apt-get install $dep
 			then
 				echo "$dep installation failed.  Aborting."
 				exit 1
@@ -214,7 +214,7 @@ fi
 
 # install
 echo -e "\nInstalling ... \n"
-cd $driver_dir/displaylink-driver-${version} && sudo ./displaylink-installer.sh install
+cd $driver_dir/displaylink-driver-${version} && ./displaylink-installer.sh install
 }
 
 # uninstall
@@ -222,14 +222,14 @@ uninstall(){
 
 echo -e "\nUninstalling ...\n"
 
-sudo displaylink-installer uninstall
+displaylink-installer uninstall
 
 # double check if evdi module is loaded, if yes remove it
 evdi_module="evdi"
 
 if lsmod | grep "$evdi_module" &> /dev/null ; then
 	echo "Removing $evdi_module module"
-	sudo rmmod evdi
+	rmmod evdi
 fi
 }
 
