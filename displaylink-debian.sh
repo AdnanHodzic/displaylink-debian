@@ -31,7 +31,7 @@ fi
 deps=(unzip linux-headers-$(uname -r) dkms lsb-release)
 
 dep_check() {
-echo -e "\nChecking dependencies...\n"
+echo -e "\nChecking dependencies\n"
 for dep in ${deps[@]}
 do
 	if ! dpkg -s $dep > /dev/null 2>&1
@@ -193,7 +193,7 @@ wget -O DisplayLink_Ubuntu_${version}.zip $dlurl
 mkdir $driver_dir
 
 separator
-echo -e "\nPreparing for install ...\n"
+echo -e "\nPreparing for install\n"
 test -d $driver_dir && /bin/rm -Rf $driver_dir
 unzip -d $driver_dir DisplayLink_Ubuntu_${version}.zip
 chmod +x $driver_dir/displaylink-driver-${version}.run
@@ -217,7 +217,7 @@ fi
 
 # install
 separator
-echo -e "\nInstalling ... \n"
+echo -e "\nInstalling driver version: $version\n"
 cd $driver_dir/displaylink-driver-${version} && ./displaylink-installer.sh install
 }
 
