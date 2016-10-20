@@ -1,6 +1,8 @@
 #!/bin/bash
 #
-# DisplayLink driver installer for Linux
+# displaylink-debian:
+# DisplayLink driver installer for Debian/Ubuntu based Linux distributions.
+#
 # Supported platforms: Debian GNU/Linux, Ubuntu, Elementary OS, Mint, Kali
 #
 # Blog post: http://foolcontrol.org/?p=1777
