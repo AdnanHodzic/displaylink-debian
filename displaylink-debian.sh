@@ -196,6 +196,10 @@ sed -i "s/detect_distro/detect_distro/g" $driver_dir/displaylink-driver-${versio
 sed -i "s/detect_distro()/detect_distro()/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh 
 sed -i "s/check_requirements/check_requirements/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 sed -i "s/check_requirements()/check_requirements()/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
+if [ "$lsb" == "Debian" ] || [ $codename == "Kali" ];
+then
+	sed -i 's#/lib/modules/$KVER/build/Kconfig#/lib/modules/$KVER/build/scripts/kconfig/conf#g' $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
+fi
 
 # install
 echo -e "\nInstalling ... \n"
