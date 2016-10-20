@@ -31,7 +31,7 @@ fi
 deps=(unzip linux-headers-$(uname -r) dkms lsb-release)
 
 dep_check() {
-echo "Checking dependencies..."
+echo -e "\nChecking dependencies...\n"
 for dep in ${deps[@]}
 do
 	if ! dpkg -s $dep > /dev/null 2>&1
@@ -56,7 +56,7 @@ done
 }
 
 distro_check(){
-
+separator
 # RedHat
 if [ -f /etc/redhat-release ];
 then
@@ -89,7 +89,7 @@ if [ "$lsb" == "Ubuntu" ];
 then
 	if [ $codename == "trusty" ] || [ $codename == "vivid" ] || [ $codename == "wily" ] || [ $codename == "xenial" ] || [ $codename == "yakkety" ];
 	then
-		echo -e "\nPlatform requirements satisfied, proceeding ...\n"
+		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
 		message
 		exit 1
@@ -99,7 +99,7 @@ elif [ "$lsb" == "elementary OS" ] || [ "$lsb" == "elementary" ];
 then
 	if [ $codename == "freya" ] || [ $codename == "loki" ];
 	then
-		echo -e "\nPlatform requirements satisfied, proceeding ...\n"
+		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
 		message
 		exit 1
@@ -109,7 +109,7 @@ elif [ "$lsb" == "Debian" ];
 then
 	if [ $codename == "jessie" ] || [ $codename == "stretch" ] || [ $codename == "sid" ];
 	then
-		echo -e "\nPlatform requirements satisfied, proceeding ...\n"
+		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
 		message
 		exit 1
@@ -119,7 +119,7 @@ elif [ "$lsb" == "LinuxMint" ];
 then
 	if [ $codename == "sarah" ] || [ $codename == "rosa" ] || [ $codename == "petra" ] || [ $codename == "olivia" ];
 	then
-		echo -e "\nPlatform requirements satisfied, proceeding ...\n"
+		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
 		message
 		exit 1
@@ -129,7 +129,7 @@ elif [ "$lsb" == "Kali" ];
 then
 	if [ $codename == "kali-rolling" ] || [ $codename == "2016.2" ];
 	then
-		echo -e "\nPlatform requirements satisfied, proceeding ...\n"
+		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
 		message
 		exit 1
@@ -142,7 +142,6 @@ fi
 }
 
 sysinitdaemon_get(){
-
 sysinitdaemon="systemd"
 
 if [ "$lsb" == "Ubuntu" ];
@@ -166,7 +165,8 @@ echo $sysinitdaemon
 clean_up(){
 # remove obsolete/redundant files which can only hamper reinstalls
 
-echo -e "\nPerforming clean-up\n"
+separator
+echo -e "\nPerforming clean-up"
 
 # go back to displaylink-debian
 cd - &> /dev/null
@@ -185,12 +185,15 @@ fi
 }
 
 install(){
-echo -e "\nDownloading DisplayLink Ubuntu driver:"
+separator
+echo -e "\nDownloading DisplayLink Ubuntu driver:\n"
 dlurl="http://www.displaylink.com/downloads/file?id=708"
 wget -O DisplayLink_Ubuntu_${version}.zip $dlurl
 # prep
 mkdir $driver_dir
-echo -e "\nPrepring for install ...\n"
+
+separator
+echo -e "\nPreparing for install ...\n"
 test -d $driver_dir && /bin/rm -Rf $driver_dir
 unzip -d $driver_dir DisplayLink_Ubuntu_${version}.zip
 chmod +x $driver_dir/displaylink-driver-${version}.run
@@ -213,13 +216,14 @@ then
 fi
 
 # install
+separator
 echo -e "\nInstalling ... \n"
 cd $driver_dir/displaylink-driver-${version} && ./displaylink-installer.sh install
 }
 
 # uninstall
 uninstall(){
-
+separator
 echo -e "\nUninstalling ...\n"
 
 displaylink-installer uninstall
@@ -255,13 +259,19 @@ then
 	distro_check
 	install
 	clean_up
-	echo -e "\nInstall complete, please reboot to apply the changes\n"
+	separator
+	echo -e "\nInstall complete, please reboot to apply the changes"
+	separator
+	echo ""
 elif [[ $answer == [Uu] ]];
 then
 	distro_check
 	uninstall
 	clean_up
-	echo -e "\nUninstall complete\n"
+	separator
+	echo -e "\nUninstall complete"
+	separator
+	echo ""
 elif [[ $answer == [Rr] ]];
 then
 	distro_check
@@ -270,11 +280,14 @@ then
 	distro_check
 	install
 	clean_up
+	separator
 	echo -e "\nRe-install complete, please reboot to apply the changes"
 	separator
+	echo ""
 elif [[ $answer == [Qq] ]];
 then
 	separator
+	echo ""
 	exit 0
 else
 	echo -e "\nWrong key, aborting ...\n"
