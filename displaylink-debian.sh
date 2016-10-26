@@ -30,7 +30,7 @@ fi
 }
 
 # Dependencies
-deps=(unzip linux-headers-$(uname -r) dkms lsb-release)
+deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source)
 
 dep_check() {
 echo -e "\nChecking dependencies\n"
@@ -215,6 +215,7 @@ sed -i "s/check_requirements()/check_requirements()/g" $driver_dir/displaylink-d
 if [ "$lsb" == "Debian" ] || [ $codename == "Kali" ];
 then
 	sed -i 's#/lib/modules/$KVER/build/Kconfig#/lib/modules/$KVER/build/scripts/kconfig/conf#g' $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
+	ln -s /lib/modules/$(uname -r)/build/Makefile /lib/modules/$(uname -r)/build/Kconfig
 fi
 
 # install
