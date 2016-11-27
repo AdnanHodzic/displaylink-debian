@@ -231,6 +231,7 @@ echo -e "\nPerforming post install steps\n"
 
 # fix: issue #36 (can't enable dlm.service)
 sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/dlm.service
+sudo systemctl enable dlm.service
 }
 
 # uninstall
