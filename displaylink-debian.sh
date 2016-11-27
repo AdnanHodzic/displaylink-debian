@@ -224,6 +224,15 @@ echo -e "\nInstalling driver version: $version\n"
 cd $driver_dir/displaylink-driver-${version} && ./displaylink-installer.sh install
 }
 
+# post install
+post_install(){
+separator
+echo -e "\nPerforming post install steps\n"
+
+# fix: issue #36 (can't enable dlm.service)
+sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/dlm.service
+}
+
 # uninstall
 uninstall(){
 separator
@@ -261,6 +270,7 @@ if [[ $answer == [Ii] ]];
 then
 	distro_check
 	install
+	post_install
 	clean_up
 	separator
 	echo -e "\nInstall complete, please reboot to apply the changes"
@@ -282,6 +292,7 @@ then
 	clean_up
 	distro_check
 	install
+	post_install
 	clean_up
 	separator
 	echo -e "\nRe-install complete, please reboot to apply the changes"
