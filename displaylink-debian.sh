@@ -214,6 +214,10 @@ sed -i "s/check_requirements/check_requirements/g" $driver_dir/displaylink-drive
 sed -i "s/check_requirements()/check_requirements()/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 if [ "$lsb" == "Debian" ] || [ $codename == "Kali" ];
 then
+	# fix: issue #42 (dlm.service can't start)
+	# note: for this to work libstdc++6 package needs to be installed from >= Stretch
+	ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /opt/displaylink/libstdc++.so.6
+
 	sed -i 's#/lib/modules/$KVER/build/Kconfig#/lib/modules/$KVER/build/scripts/kconfig/conf#g' $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 	ln -s /lib/modules/$(uname -r)/build/Makefile /lib/modules/$(uname -r)/build/Kconfig
 fi
@@ -228,10 +232,6 @@ cd $driver_dir/displaylink-driver-${version} && ./displaylink-installer.sh insta
 post_install(){
 separator
 echo -e "\nPerforming post install steps\n"
-
-# fix: issue #42 (dlm.service can't start)
-# note: for this to work libstdc++6 package needs to be installed from >= Stretch
-ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /opt/displaylink/libstdc++.so.6
 
 # fix: issue #36 (can't enable dlm.service)
 sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/dlm.service
