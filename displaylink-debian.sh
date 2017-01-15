@@ -216,7 +216,6 @@ sed -i "s/check_requirements()/check_requirements()/g" $driver_dir/displaylink-d
 if [ "$lsb" == "Debian" ] || [ "$lsb" == "Kali" ];
 then
 	sed -i 's#/lib/modules/$KVER/build/Kconfig#/lib/modules/$KVER/build/scripts/kconfig/conf#g' $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
-	#touch "/lib/modules/$(uname -r)/build/Kconfig"
 	ln -s /lib/modules/$(uname -r)/build/Makefile /lib/modules/$(uname -r)/build/Kconfig
 fi
 
@@ -249,11 +248,6 @@ separator
 echo -e "\nUninstalling ...\n"
 
 displaylink-installer uninstall
-if [ "$lsb" == "Debian" ] || [ "$lsb" == "Kali" ];
-then
-	rm /opt/displaylink/libstdc++.so.6
-	rm /lib/modules/$(uname -r)/build/Kconfig
-fi
 
 # double check if evdi module is loaded, if yes remove it
 evdi_module="evdi"
