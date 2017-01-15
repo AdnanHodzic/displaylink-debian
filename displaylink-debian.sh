@@ -246,6 +246,10 @@ separator
 echo -e "\nUninstalling ...\n"
 
 displaylink-installer uninstall
+if [ "$lsb" == "Debian" ] || [ "$lsb" == "Kali" ];
+then
+	rm /lib/modules/$(uname -r)/build/Kconfig
+fi
 
 # double check if evdi module is loaded, if yes remove it
 evdi_module="evdi"
