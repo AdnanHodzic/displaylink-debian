@@ -210,11 +210,6 @@ sysinitdaemon=$(sysinitdaemon_get)
 
 # modify displaylink-installer.sh
 sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$sysinitdaemon/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
-sed -i "s/"179"/"17e9"/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
-sed -i "s/detect_distro/detect_distro/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh 
-sed -i "s/detect_distro()/detect_distro()/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh 
-sed -i "s/check_requirements/check_requirements/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
-sed -i "s/check_requirements()/check_requirements()/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 
 if [ "$lsb" == "Debian" ] || [ "$lsb" == "Kali" ];
 then
