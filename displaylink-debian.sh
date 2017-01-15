@@ -38,9 +38,10 @@ for dep in ${deps[@]}
 do
 	if ! dpkg -s $dep > /dev/null 2>&1
 	then
-		read -p "$dep not found! Install? [y/N] " response
-		response=${response,,} # tolower
-		if [[ $response =~ ^(yes|y)$ ]]
+		default=y
+		read -p "$dep not found! Install? [Y/n] " response
+		response=${response:-$default}
+		if [[ $response =~  ^(yes|y|Y)$ ]]
 		then
 			if ! apt-get install $dep
 			then
@@ -48,7 +49,9 @@ do
 				exit 1
 			fi
 		else
-			echo "Cannot continue without $dep.  Aborting."
+			separator
+			echo -e "\nCannot continue without $dep.  Aborting."
+			separator
 		exit 1
 		fi
 	else
