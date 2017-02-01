@@ -12,6 +12,7 @@
 
 version=1.2.65
 driver_dir=$version
+evdi_version=1.3.43
 
 separator(){
 sep="\n-------------------------------------------------------------------"
@@ -176,6 +177,12 @@ echo -e "\nPerforming clean-up"
 # go back to displaylink-debian
 cd - &> /dev/null
 
+if [ -f "evdi_${evdi_version}.zip" ]
+then
+	echo "Removing redundundant: \"evdi_${evdi_version}.zip\" file"
+	rm "evdi_${evdi_version}.zip"
+fi
+
 if [ -f "DisplayLink_Ubuntu_$version.zip" ]
 then
 	echo "Removing redundant: \"DisplayLink_Ubuntu_$version.zip\" file"
@@ -193,7 +200,9 @@ install(){
 separator
 echo -e "\nDownloading DisplayLink Ubuntu driver:\n"
 dlurl="http://www.displaylink.com/downloads/file?id=708"
+evdi_dlurl="https://github.com/DisplayLink/evdi/archive/v$evdi_version.zip"
 wget -O DisplayLink_Ubuntu_${version}.zip $dlurl
+wget -O evdi_${evdi_version}.zip $evdi_dlurl
 # prep
 mkdir $driver_dir
 
@@ -204,6 +213,11 @@ unzip -d $driver_dir DisplayLink_Ubuntu_${version}.zip
 chmod +x $driver_dir/displaylink-driver-${version}.run
 ./$driver_dir/displaylink-driver-${version}.run --keep --noexec
 mv displaylink-driver-${version}/ $driver_dir/displaylink-driver-${version}
+
+unzip -d $driver_dir evdi_${evdi_version}.zip
+
+# pack other evdi driver version
+tar -czf "$driver_dir/displaylink-driver-${version}/evdi-${evdi_version}-src.tar.gz" -C "$driver_dir/evdi-${evdi_version}/module" . 
 
 # get sysinitdaemon
 sysinitdaemon=$(sysinitdaemon_get)
@@ -217,9 +231,14 @@ then
 	ln -s /lib/modules/$(uname -r)/build/Makefile /lib/modules/$(uname -r)/build/Kconfig
 fi
 
+# patch module installation
+sed -i "s/install_module \"evdi.*$/install_module \"evdi-${evdi_version}-src.tar.gz\" \"${evdi_version}\" \"\$ERRORS\"/" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
+sed -i "s/remove_module \$VERSION/remove_module $evdi_version/" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
+
 # install
 separator
 echo -e "\nInstalling driver version: $version\n"
+echo -e "\n      evdi module version: $evdi_version\n"
 cd $driver_dir/displaylink-driver-${version} && ./displaylink-installer.sh install
 }
 
