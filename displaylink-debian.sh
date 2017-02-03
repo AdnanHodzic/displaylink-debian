@@ -93,7 +93,7 @@ echo -e "\n---------------------------------------------------------------\n"
 # Ubuntu
 if [ "$lsb" == "Ubuntu" ];
 then
-	if [ $codename == "trusty" ] || [ $codename == "vivid" ] || [ $codename == "wily" ] || [ $codename == "xenial" ] || [ $codename == "yakkety" ];
+	if [ $codename == "trusty" ] || [ $codename == "vivid" ] || [ $codename == "wily" ] || [ $codename == "xenial" ] || [ $codename == "yakkety" ] || [ $codename == "zesty" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
