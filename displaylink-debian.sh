@@ -10,7 +10,7 @@
 # Copyleft: Adnan Hodzic <adnan@hodzic.org>
 # License: GPLv3
 
-version=1.2.65
+version=1.3.52
 driver_dir=$version
 evdi_version=1.3.43
 
@@ -199,7 +199,7 @@ fi
 install(){
 separator
 echo -e "\nDownloading DisplayLink Ubuntu driver:\n"
-dlurl="http://www.displaylink.com/downloads/file?id=708"
+dlurl="http://www.displaylink.com/downloads/file?id=744"
 evdi_dlurl="https://github.com/DisplayLink/evdi/archive/v$evdi_version.zip"
 wget -O DisplayLink_Ubuntu_${version}.zip $dlurl
 wget -O evdi_${evdi_version}.zip $evdi_dlurl
