@@ -32,9 +32,11 @@ How? Just run the script! (as sudo)
 
   Regardless of which kernel version you're using.
 
-#### Post installation Guide
+#### Post installation Guide and Troubleshooting
 
 Please refer to [Post Installation Guide](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md) for further reference.
+
+Before submitting an issue, please make sure you've seen [Troubleshooting most common issues](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#troubleshooting-most-common-issues).
 
 #### Discussion
 Blog post: [Kernel agnostic, DisplayLink Debian GNU/Linux driver installer (Jessie/Stretch/Sid)](http://foolcontrol.org/?p=1777)
