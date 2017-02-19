@@ -2,7 +2,6 @@
 
 ### Prerequisites
 
-
 * After install you must reboot to apply the changes.
 
 * After reboot, make sure dispaylink is running, i.e:
@@ -86,8 +85,25 @@ alias one="xrandr --output VIRTUAL1 --off --output DVI-1-0 --off --output DP1 --
 
 Note, in case you're editting ```~/.bashrc```, make sure you run ```source ~/.bashrc``` to appy the changes without having to log in/out.
 
-### Troubleshooting
+### Troubleshooting most common issues
 
 * Monitor ```dmesg``` output while plugging in Displaylink
 * Monitor ```/var/log/displaylink/DisplayLinkManager.log``` file
-* displaylink.service fails to start? Make sure [UEFI is disabled](https://github.com/AdnanHodzic/displaylink-debian/issues/15)
+
+##### Most common Ubuntu related issues:
+
+* displaylink.service fails to start
+
+UEFI needs to be disabled. Reference: [issue #15](https://github.com/AdnanHodzic/displaylink-debian/issues/15)
+
+##### Most common Debian Jessie related issues:
+* systemctl status dlm.service failure
+* Glibc GLIBCXX_3.4.21 missing
+
+Due to older version of libstdc++6 in Jessie, you need to download and install version from [Stretch release](https://packages.debian.org/stretch/libstdc++6). After package has been updated, run displaylink-debian and select "Re-install" option.
+
+Reference: [issue #42](https://github.com/AdnanHodzic/displaylink-debian/issues/42)
+
+##### Having a different problem?
+
+Please [submit an issue](https://github.com/AdnanHodzic/displaylink-debian/issues)
