@@ -112,7 +112,7 @@ then
 # Debian
 elif [ "$lsb" == "Debian" ];
 then
-	if [ $codename == "jessie" ] || [ $codename == "stretch" ] || [ $codename == "sid" ];
+	if [ $codename == "jessie" ] || [ $codename == "stretch" ] || [ $codename == "sid" ] || [ $codename == "n/a" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
