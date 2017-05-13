@@ -104,6 +104,10 @@ Due to older version of libstdc++6 in Jessie, you need to download and install v
 
 Reference: [issue #42](https://github.com/AdnanHodzic/displaylink-debian/issues/42)
 
+Should you experience problems with the display either remaining black, only showing mouse pointer or a frozen image of your main screen, then this could be due to Intel graphics driver interfering with displaylink.
+
+Reference: [issue #68](https://github.com/AdnanHodzic/displaylink-debian/issues/68)
+
 ##### Having a different problem?
 
 Please [submit an issue](https://github.com/AdnanHodzic/displaylink-debian/issues)
