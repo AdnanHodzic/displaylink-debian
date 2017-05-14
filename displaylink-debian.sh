@@ -10,7 +10,10 @@
 # Copyleft: Adnan Hodzic <adnan@hodzic.org>
 # License: GPLv3
 
-version=1.3.52
+# define the version to get as the latest available version
+version=`wget -q -O - http://www.displaylink.com/downloads/ubuntu | grep "DisplayLink USB Graphics Software for Ubuntu" | head -n 1 |  perl -pe '($_)=/([0-9]+([.][0-9]+)+)/'`
+# define download url to be the correct version
+dlurl="http://www.displaylink.com/"`wget -q -O - http://www.displaylink.com/downloads/ubuntu | grep "DisplayLink USB Graphics Software for Ubuntu" | head -n 1 | grep -Po '(?<=href=")[^"]*(?=")'`
 driver_dir=$version
 
 separator(){
@@ -192,7 +195,6 @@ fi
 install(){
 separator
 echo -e "\nDownloading DisplayLink Ubuntu driver:\n"
-dlurl="http://www.displaylink.com/downloads/file?id=744"
 wget -O DisplayLink_Ubuntu_${version}.zip $dlurl
 # prep
 mkdir $driver_dir
