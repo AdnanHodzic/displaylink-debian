@@ -1,26 +1,36 @@
 # displaylink-debian
-DisplayLink driver installer for Debian GNU/Linux, Ubuntu, Elementary OS, Mint and Kali Linux.
+
+DisplayLink driver installer for Debian GNU/Linux, Ubuntu, Elementary OS,
+Mint, and Kali Linux.
+
 
 #### Problem
-[DisplayLink](http://www.displaylink.com/) releases its drivers only for Ubuntu 14.04, and latest kernel version they support is 3.19.
+
+[DisplayLink][] releases its drivers only for Ubuntu 14.04 LTS and 16.04 LTS,
+supported Linux kernel versions are 3.19 and 4.4.
 
 
-#### displaylink-debian
+#### Solution
 
-* Allows you to seamlessly install/uninstall DisplayLink drivers on Debian GNU/Linux, Ubuntu and elementary OS.
+[displaylink-debian][] allows seamless install/uninstall of the official
+DisplayLink drivers on Debian GNU/Linux, Ubuntu, elementary OS, and more!
 
+How?  Just run the script! (as root)
 
-How? Just run the script! (as sudo)
+```sh
+sudo ./displaylink-debian.sh
+```
 
-`sudo ./displaylink-debian.sh`
 
 #### Technical
 
-##### displaylink-debian.sh
+* _displaylink-debian.sh_ downloads and extracts the contents of the
+  official [DisplayLink Ubuntu driver][upstream].
 
-* Downloads and extracts contents of original [DisplayLink Ubuntu driver](http://www.displaylink.com/downloads/ubuntu.php)
+* _displaylink-debian.sh_ modifies the contents of the official installer,
+  _displaylink-installer.sh_, to suit Debian and other Linux distributions.
 
-* _displaylink-debian.sh_ will modify contents of original _displaylink-installer.sh_ and customize it for Debian. After which install/uninstall is performed. 
+*  Install/Uninstall is performed.
 
 * Supported platforms are:
 
@@ -30,13 +40,26 @@ How? Just run the script! (as sudo)
   * Mint: 15 Olivia/16 Petra/17.3 Rosa/18 Sarah
   * Kali: 2016.2/kali-rolling
 
-  Regardless of which kernel version you're using.
+  Regardless of the kernel version you're using.
+
 
 #### Post installation Guide and Troubleshooting
 
-Please refer to [Post Installation Guide](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md) for further reference.
+Please refer to the [Post Installation Guide][PostInstall] for further
+reference.
 
-Before submitting an issue, please make sure you've seen [Troubleshooting most common issues](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#troubleshooting-most-common-issues).
+Before submitting a bug report in the issue tracker, please make sure to
+read: [Troubleshooting most common issues][TroubleShooting].
+
 
 #### Discussion
-Blog post: [Kernel agnostic, DisplayLink Debian GNU/Linux driver installer (Jessie/Stretch/Sid)](http://foolcontrol.org/?p=1777)
+
+* [Kernel agnostic, DisplayLink Debian GNU/Linux driver installer][blog]
+
+
+[DisplayLink]:        http://www.displaylink.com/
+[upstream]:           http://www.displaylink.com/downloads/ubuntu.php
+[blog]:               http://foolcontrol.org/?p=1777
+[displaylink-debian]: https://github.com/AdnanHodzic/displaylink-debian
+[PostInstall]:        https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md
+[TroubleShooting]:    https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#troubleshooting-most-common-issues
