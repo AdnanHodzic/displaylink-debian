@@ -18,7 +18,7 @@ How? Just run the script! (as sudo)
 
 ##### displaylink-debian.sh
 
-* Downloads and extracts contents of original [DisplayLink Ubuntu driver] (http://www.displaylink.com/downloads/ubuntu.php>)
+* Downloads and extracts contents of original [DisplayLink Ubuntu driver](http://www.displaylink.com/downloads/ubuntu.php)
 
 * _displaylink-debian.sh_ will modify contents of original _displaylink-installer.sh_ and customize it for Debian. After which install/uninstall is performed. 
 
