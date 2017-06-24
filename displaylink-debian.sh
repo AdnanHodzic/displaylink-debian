@@ -192,16 +192,22 @@ then
 fi
 }
 
+download() {
+    local dlfileid=$(echo $dlurl | perl -pe '($_)=/.+\?id=(\d+)/')
+    echo -e "\nDownloading DisplayLink Ubuntu driver:\n"
+
+    wget -O DisplayLink_Ubuntu_${version}.zip "--post-data=fileId=$dlfileid&accept_submit=Accept" $dlurl
+    # make sure we got the file downloadet before continueing
+    if [ $? -ne 0 ]
+    then
+    	echo -e "\nUnable to download Displaylink driver\n"
+    	exit
+    fi
+}
+
 install(){
 separator
-echo -e "\nDownloading DisplayLink Ubuntu driver:\n"
-wget -O DisplayLink_Ubuntu_${version}.zip $dlurl
-# make sure we got the file downloadet before continueing
-if [ $? -ne 0 ]
-then
-	echo -e "\nUnable to download Displaylink driver\n" 
-	exit
-fi
+download
 
 # prep
 mkdir $driver_dir
