@@ -195,7 +195,7 @@ fi
 download() {
     local dlfileid=$(echo $dlurl | perl -pe '($_)=/.+\?id=(\d+)/')
 
-    echo -en "\nPlease read the Software License Agreement\navailable at $dlurl\nand accept here: [y,yes,n,no] "
+    echo -en "\nPlease read the Software License Agreement\navailable at $dlurl\nand accept here: [Y]es or [N]o"
     read ACCEPT
     case $ACCEPT in
         y*|Y*)
