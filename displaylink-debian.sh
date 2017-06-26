@@ -77,7 +77,7 @@ else
 # Confirm dependencies are in place
 dep_check
 
-# Checker parameters 
+# Checker parameters
 lsb="$(lsb_release -is)"
 codename="$(lsb_release -cs)"
 platform="$(lsb_release -ics | sed '$!s/$/ /' | tr -d '\n')"
@@ -162,7 +162,7 @@ then
 elif [ "$lsb" == "elementary OS" ];
 then
     if [ $codename == "freya" ];
-    then 
+    then
         sysinitdaemon="upstart"
     fi
 fi
@@ -192,16 +192,32 @@ then
 fi
 }
 
+download() {
+    local dlfileid=$(echo $dlurl | perl -pe '($_)=/.+\?id=(\d+)/')
+
+    echo -en "\nPlease read the Software License Agreement\navailable at $dlurl\nand accept here: [y,yes,n,no] "
+    read ACCEPT
+    case $ACCEPT in
+        y*|Y*)
+            echo -e "\nDownloading DisplayLink Ubuntu driver:\n"
+            wget -O DisplayLink_Ubuntu_${version}.zip "--post-data=fileId=$dlfileid&accept_submit=Accept" $dlurl
+            # make sure we got the file downloadet before continueing
+            if [ $? -ne 0 ]
+            then
+            	echo -e "\nUnable to download Displaylink driver\n"
+            	exit
+            fi
+            ;;
+        *)
+            echo "Can't download the driver without accepting the license agreement!"
+            exit 1
+            ;;
+    esac
+}
+
 install(){
 separator
-echo -e "\nDownloading DisplayLink Ubuntu driver:\n"
-wget -O DisplayLink_Ubuntu_${version}.zip $dlurl
-# make sure we got the file downloadet before continueing
-if [ $? -ne 0 ]
-then
-	echo -e "\nUnable to download Displaylink driver\n" 
-	exit
-fi
+download
 
 # prep
 mkdir $driver_dir
