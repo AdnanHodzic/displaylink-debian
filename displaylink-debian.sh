@@ -226,9 +226,9 @@ separator
 echo -e "\nPreparing for install\n"
 test -d $driver_dir && /bin/rm -Rf $driver_dir
 unzip -d $driver_dir DisplayLink_Ubuntu_${version}.zip
-chmod +x $driver_dir/displaylink-driver-${version}.run
-./$driver_dir/displaylink-driver-${version}.run --keep --noexec
-mv displaylink-driver-${version}/ $driver_dir/displaylink-driver-${version}
+chmod +x $driver_dir/displaylink-driver-${version}.???.run
+./$driver_dir/displaylink-driver-${version}.???.run --keep --noexec
+mv displaylink-driver-${version}.???/ $driver_dir/displaylink-driver-${version}
 
 # get sysinitdaemon
 sysinitdaemon=$(sysinitdaemon_get)
