@@ -39,7 +39,7 @@ dep_check() {
 echo -e "\nChecking dependencies\n"
 for dep in ${deps[@]}
 do
-	if ! dpkg -s $dep > /dev/null 2>&1
+	if ! dpkg -s $dep | grep "Status: install ok installed" > /dev/null 2>&1
 	then
 		default=y
 		read -p "$dep not found! Install? [Y/n] " response
