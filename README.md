@@ -39,6 +39,7 @@ sudo ./displaylink-debian.sh
   * elementary OS: O.3 Freya/0.4 Loki
   * Mint: 15 Olivia/16 Petra/17.3 Rosa/18 Sarah
   * Kali: 2016.2/kali-rolling
+  * Deepin: 15/15.1/15.1.1/15.2/15.4.1
 
   Regardless of the kernel version you're using.
 

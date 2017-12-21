@@ -33,7 +33,12 @@ fi
 }
 
 # Dependencies
-deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source)
+if [ "$lsb" == "Deepin" ];
+then
+	deps=(unzip linux-headers-$(uname -r)-deepin dkms lsb-release linux-source-deepin)
+else
+	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source)
+fi
 
 dep_check() {
 echo -e "\nChecking dependencies\n"
@@ -142,6 +147,16 @@ then
 		message
 		exit 1
 	fi
+# Deepin
+elif [ "$lsb" == "Deepin" ];
+then
+	if [ $codename == "unstable" ];
+	then
+		echo -e "\nPlatform requirements satisfied, proceeding ..."
+	else
+		message
+		exit 1
+	fi
 else
 	message
 	exit 1
@@ -236,7 +251,7 @@ sysinitdaemon=$(sysinitdaemon_get)
 # modify displaylink-installer.sh
 sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$sysinitdaemon/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 
-if [ "$lsb" == "Debian" ] || [ "$lsb" == "Kali" ];
+if [ "$lsb" == "Debian" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ];
 then
 	sed -i 's#/lib/modules/$KVER/build/Kconfig#/lib/modules/$KVER/build/scripts/kconfig/conf#g' $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 	ln -s /lib/modules/$(uname -r)/build/Makefile /lib/modules/$(uname -r)/build/Kconfig
@@ -294,6 +309,7 @@ echo -e "* Ubuntu"
 echo -e "* Elementary OS"
 echo -e "* Linux Mint"
 echo -e "* Kali Linux"
+echo -e "* Deepin"
 echo -e "\nOptions:\n"
 read -p "[I]nstall
 [U]ninstall
