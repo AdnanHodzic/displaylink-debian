@@ -1,7 +1,7 @@
 # displaylink-debian
 
 DisplayLink driver installer for Debian GNU/Linux, Ubuntu, Elementary OS,
-Mint, and Kali Linux.
+Mint, Kali and Deepin Linux.
 
 
 #### Problem
