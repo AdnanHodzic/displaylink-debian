@@ -108,6 +108,42 @@ Should you experience problems with the display either remaining black, only sho
 
 Reference: [issue #68](https://github.com/AdnanHodzic/displaylink-debian/issues/68)
 
+##### syntax error near unexpected token \`newline'...
+
+If you just downloaded the script and tried to execute it, you might get the following error:
+
+```
+$ ./displaylink-debian.sh
+./displaylink-debian.sh: line 1: syntax error near unexpected token `newline'
+./displaylink-debian.sh: line 1: `<!DOCTYPE html>'
+```
+
+The line number might be different.
+
+*Solution:*
+
+Download the script again as a ZIP file: https://github.com/AdnanHodzic/displaylink-debian/archive/master.zip
+
+Extract it and run it:
+
+```
+$ unzip displaylink-debian-master.zip
+Archive:  displaylink-debian-master.zip
+075594536fe4683a5e25aec99e3b6379662ef2ea
+   creating: displaylink-debian-master/
+  inflating: displaylink-debian-master/README.md  
+  inflating: displaylink-debian-master/displaylink-debian.sh  
+  inflating: displaylink-debian-master/post-install-guide.md  
+$ cd displaylink-debian-master
+$ sudo ./displaylink-debian.sh
+```
+
+References: [issue #111](https://github.com/AdnanHodzic/displaylink-debian/issues/111),
+[issue #102](https://github.com/AdnanHodzic/displaylink-debian/issues/102),
+[issue #89](https://github.com/AdnanHodzic/displaylink-debian/issues/89),
+[issue #65](https://github.com/AdnanHodzic/displaylink-debian/issues/65)
+
+
 ##### Having a different problem?
 
 Please [submit an issue](https://github.com/AdnanHodzic/displaylink-debian/issues)
