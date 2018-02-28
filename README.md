@@ -35,7 +35,7 @@ sudo ./displaylink-debian.sh
 * Supported platforms are:
 
   * Debian: Jessie 8.0/Stretch 9.0/Sid (unstable)
-  * Ubuntu: 14.04 Trusty/15.04 Vivid/15.10 Wily/16.04 Xenial/16.10 Yakkety/17.04 Zesty/17.10 Artful
+  * Ubuntu: 14.04 Trusty/15.04 Vivid/15.10 Wily/16.04 Xenial/16.10 Yakkety/17.04 Zesty/17.10 Artful/18.04 Bionic
   * elementary OS: O.3 Freya/0.4 Loki
   * Mint: 15 Olivia/16 Petra/17.3 Rosa/18 Sarah/18.3 Sylvia
   * Kali: kali-rolling/2016.2/2017.3
