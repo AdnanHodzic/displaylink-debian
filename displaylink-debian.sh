@@ -318,23 +318,46 @@ if lsmod | grep "$evdi_module" &> /dev/null ; then
 fi
 }
 
-root_check
-
-echo -e "\n--------------------------- displaylink-debian ----------------------------"
-echo -e "\nDisplayLink driver installer for Debian based Linux distributions:\n"
-echo -e "* Debian GNU/Linux"
-echo -e "* Ubuntu"
-echo -e "* Elementary OS"
-echo -e "* Linux Mint"
-echo -e "* Kali Linux"
-echo -e "* Deepin"
-echo -e "\nOptions:\n"
-read -p "[I]nstall
+# interactively asks for operation
+ask_operation(){
+    echo -e "\n--------------------------- displaylink-debian ----------------------------"
+    echo -e "\nDisplayLink driver installer for Debian based Linux distributions:\n"
+    echo -e "* Debian GNU/Linux"
+    echo -e "* Ubuntu"
+    echo -e "* Elementary OS"
+    echo -e "* Linux Mint"
+    echo -e "* Kali Linux"
+    echo -e "* Deepin"
+    echo -e "\nOptions:\n"
+    read -p "[I]nstall
 [U]ninstall
 [R]e-install
 [Q]uit
 
 Select a key: [i/u/r/q]: " answer
+}
+
+root_check
+
+if [[ -z "${1}" ]];
+then
+  ask_operation
+else
+  case "${1}" in
+    "--install")
+        answer="i"
+        ;;
+    "--uninstall")
+        answer="u"
+        ;;
+    "--reinstall")
+        answer="r"
+        ;;
+    *)
+        answer="n"
+        ;;
+  esac
+fi
 
 if [[ $answer == [Ii] ]];
 then
