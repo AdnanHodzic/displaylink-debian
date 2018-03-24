@@ -205,6 +205,12 @@ then
 	echo "Removing redundant: \"$driver_dir\" directory"
 	rm -r $driver_dir
 fi
+
+if [ -f "/usr/share/X11/xorg.conf.d/20-displaylink.conf" ]
+then
+		echo "Removing disabled PageFlip for modesetting"
+		rm "/usr/share/X11/xorg.conf.d/20-displaylink.conf"
+fi
 }
 
 download() {
@@ -296,6 +302,32 @@ fi
 # fix: issue #36 (can't enable dlm.service)
 sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/dlm.service
 sudo systemctl enable dlm.service
+
+# disable pageflip for modesetting
+modesetting(){
+cat > /usr/share/X11/xorg.conf.d/20-displaylink.conf <<EOL
+Section "Device"
+  Identifier  "DisplayLink"
+  Driver      "modesetting"
+  Option      "PageFlip" "false"
+EndSection
+EOL
+}
+
+function ver2int {
+	echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
+}
+
+xorg_vcheck="$(dpkg -l | grep "ii  xserver-xorg-core" | awk '{print $3}' | sed 's/[^,:]*://g')"
+min_xorg=1.18.3
+
+if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $min_xorg)" ];
+then
+	echo "Disabling PageFlip for modesetting"
+	modesetting
+else
+	echo "No need to disable PageFlip for modesetting"
+fi
 }
 
 # uninstall
