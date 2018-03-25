@@ -206,11 +206,6 @@ then
 	rm -r $driver_dir
 fi
 
-if [ -f "/usr/share/X11/xorg.conf.d/20-displaylink.conf" ]
-then
-		echo "Removing disabled PageFlip for modesetting"
-		rm "/usr/share/X11/xorg.conf.d/20-displaylink.conf"
-fi
 }
 
 download() {
@@ -348,6 +343,14 @@ if lsmod | grep "$evdi_module" &> /dev/null ; then
 	echo "Removing $evdi_module module"
 	rmmod evdi
 fi
+
+# remove modesetting file
+if [ -f "/usr/share/X11/xorg.conf.d/20-displaylink.conf" ]
+then
+		echo "Removing disabled PageFlip for modesetting"
+		rm "/usr/share/X11/xorg.conf.d/20-displaylink.conf"
+fi
+
 }
 
 # interactively asks for operation
