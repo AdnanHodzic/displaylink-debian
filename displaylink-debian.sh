@@ -307,6 +307,9 @@ Section "Device"
   Option      "PageFlip" "false"
 EndSection
 EOL
+
+chown root: /usr/share/X11/xorg.conf.d/20-displaylink.conf
+chmod 644 /usr/share/X11/xorg.conf.d/20-displaylink.conf
 }
 
 function ver2int {
