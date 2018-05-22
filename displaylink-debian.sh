@@ -252,24 +252,6 @@ sysinitdaemon=$(sysinitdaemon_get)
 # modify displaylink-installer.sh
 sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$sysinitdaemon/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 
-# minor hack to alter the evdi kernel check on the fly, untill patch is merged into displaylink mainstream.
-if [ -f $driver_dir/displaylink-driver-${version}/evdi-4.1.9-src.tar.gz ];
-then
-	echo -e "\nAltering EVDI source to acommodate typo in evdi_connector.c\n"
-	mkdir /tmp/altering-evdi-driver
-	if [ `tar -zxf $driver_dir/displaylink-driver-${version}/evdi-4.1.9-src.tar.gz -C /tmp/altering-evdi-driver` ];
-	then
-		echo -e "\n## ERROR extracting evdi source ##\n"
-	fi
-	sed -i 's/#if KERNEL_VERSION(4, 16, 0) <= LINUX_VERSION_CODE/#if KERNEL_VERSION(4, 15, 0) <= LINUX_VERSION_CODE/' /tmp/altering-evdi-driver/evdi_connector.c
-	if [ `tar -zcf $driver_dir/displaylink-driver-${version}/evdi-4.1.9-src.tar.gz -C /tmp/altering-evdi-driver  evdi_main.c evdi_ioc32.c evdi_drv.h evdi_stats.c evdi_painter.c Kconfig evdi_drm.h Makefile evdi_gem.c evdi_connector.c evdi_cursor.c evdi_fb.c LICENSE evdi_encoder.c dkms.conf evdi_modeset.c evdi_debug.c evdi_debug.h evdi_cursor.h evdi_drv.c` ];
-	then
-		echo -e "\n## ERROR compressing EVDI source ##\n"
-	fi
-else
-	echo -e "\n## NO suitable EVDI source found ##\n"
-fi
-
 if [ "$lsb" == "Debian" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ];
 then
 	sed -i 's#/lib/modules/$KVER/build/Kconfig#/lib/modules/$KVER/build/scripts/kconfig/conf#g' $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
