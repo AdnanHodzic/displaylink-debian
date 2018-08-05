@@ -282,7 +282,7 @@ sudo systemctl enable dlm.service
 
 # disable pageflip for modesetting
 modesetting(){
-cat > /usr/share/X11/xorg.conf.d/20-displaylink.conf <<EOL
+cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
 Section "Device"
   Identifier  "DisplayLink"
   Driver      "modesetting"
@@ -290,8 +290,8 @@ Section "Device"
 EndSection
 EOL
 
-chown root: /usr/share/X11/xorg.conf.d/20-displaylink.conf
-chmod 644 /usr/share/X11/xorg.conf.d/20-displaylink.conf
+chown root: /etc/X11/xorg.conf.d/20-displaylink.conf
+chmod 644 /etc/X11/xorg.conf.d/20-displaylink.conf
 }
 
 function ver2int {
@@ -330,10 +330,10 @@ if lsmod | grep "$evdi_module" &> /dev/null ; then
 fi
 
 # remove modesetting file
-if [ -f "/usr/share/X11/xorg.conf.d/20-displaylink.conf" ]
+if [ -f "/etc/X11/xorg.conf.d/20-displaylink.conf" ]
 then
 		echo "Removing disabled PageFlip for modesetting"
-		rm "/usr/share/X11/xorg.conf.d/20-displaylink.conf"
+		rm "/etc/X11/xorg.conf.d/20-displaylink.conf"
 fi
 
 }
