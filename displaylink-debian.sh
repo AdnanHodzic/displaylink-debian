@@ -316,7 +316,7 @@ uninstall(){
 separator
 echo -e "\nUninstalling ...\n"
 
-displaylink-installer uninstall
+# displaylink-installer uninstall
 if [ "$lsb" == "Debian" ] || [ "$lsb" == "Kali" ];
 then
 	rm /lib/modules/$(uname -r)/build/Kconfig
