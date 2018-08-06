@@ -282,6 +282,7 @@ sudo systemctl enable dlm.service
 
 # disable pageflip for modesetting
 modesetting(){
+mkdir -p /etc/X11/xorg.conf.d
 cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
 Section "Device"
   Identifier  "DisplayLink"
