@@ -15,9 +15,10 @@ supported Linux kernel versions are 3.19 and 4.4.
 [displaylink-debian][] allows seamless install/uninstall of the official
 DisplayLink drivers on Debian GNU/Linux, Ubuntu, elementary OS, and more!
 
-How?  Just run the script! (as root)
+How?  Just run the following command : 
 
 ```sh
+curl -0 https://github.com/AdnanHodzic/displaylink-debian/blob/master/displaylink-debian.sh -o displaylink-debian.sh
 sudo ./displaylink-debian.sh
 ```
 
