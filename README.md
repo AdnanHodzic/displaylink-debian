@@ -27,7 +27,7 @@ DisplayLink drivers on Debian GNU/Linux, Ubuntu, elementary OS, and more!
 
 `wget https://raw.githubusercontent.com/AdnanHodzic/displaylink-debian/master/displaylink-debian.sh`
 
-`chmod +x ./displaylink-debian.sh && sudo ./displaylink-debian.sh`
+`chmod +x displaylink-debian.sh && sudo ./displaylink-debian.sh`
 
 #### Technical
 
