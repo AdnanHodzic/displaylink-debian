@@ -94,7 +94,7 @@ Note, in case you're editting ```~/.bashrc```, make sure you run ```source ~/.ba
 
 * displaylink.service fails to start
 
-UEFI needs to be disabled. Reference: [issue #15](https://github.com/AdnanHodzic/displaylink-debian/issues/15)
+UEFI (secure boot) needs to be disabled. Reference: [issue #15](https://github.com/AdnanHodzic/displaylink-debian/issues/15)
 
 ##### Most common Debian Jessie related issues:
 * systemctl status dlm.service failure
