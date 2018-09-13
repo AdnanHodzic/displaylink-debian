@@ -110,7 +110,7 @@ then
 # elementary OS
 elif [ "$lsb" == "elementary OS" ] || [ "$lsb" == "elementary" ];
 then
-	if [ $codename == "freya" ] || [ $codename == "loki" ];
+	if [ $codename == "freya" ] || [ $codename == "loki" ] || [ $codename == "juno" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
