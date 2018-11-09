@@ -1,7 +1,7 @@
 # displaylink-debian
 
 DisplayLink driver installer for Debian GNU/Linux, Ubuntu, Elementary OS,
-Mint, Kali and Deepin Linux.
+Mint, Kali, Deepin and MX Linux.
 
 
 #### Problem
@@ -45,8 +45,9 @@ DisplayLink drivers on Debian GNU/Linux, Ubuntu, elementary OS, and more!
   * Ubuntu: 14.04 Trusty/15.04 Vivid/15.10 Wily/16.04 Xenial/16.10 Yakkety/17.04 Zesty/17.10 Artful/18.04 Bionic
   * elementary OS: O.3 Freya/0.4 Loki
   * Mint: 15 Olivia/16 Petra/17.3 Rosa/18 Sarah/18.3 Sylvia
-  * Kali: kali-rolling/2016.2/2017.3
+  * Kali: kali-rolling/2016.2/2017.3/2018.3
   * Deepin: 15/15.1/15.1.1/15.2/15.4.1
+  * MX Linux: 17.1
 
   Regardless of the kernel version you're using.
 
