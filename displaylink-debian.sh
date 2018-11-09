@@ -140,7 +140,7 @@ then
 # Kali
 elif [ "$lsb" == "Kali" ];
 then
-	if [ $codename == "kali-rolling" ] || [ $codename == "2016.2" ] || [ $codename == "2017.3" ];
+	if [ $codename == "kali-rolling" ] || [ $codename == "2016.2" ] || [ $codename == "2017.3" ] || [ $codename == "2018.3" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
@@ -151,6 +151,16 @@ then
 elif [ "$lsb" == "Deepin" ];
 then
 	if [ $codename == "unstable" ];
+	then
+		echo -e "\nPlatform requirements satisfied, proceeding ..."
+	else
+		message
+		exit 1
+	fi
+# MX Linux
+elif [ "$lsb" == "MX" ];
+then
+	if [ $codename == "Horizon" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
