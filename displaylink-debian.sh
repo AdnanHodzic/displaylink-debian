@@ -33,6 +33,9 @@ fi
 }
 
 # Dependencies
+dep_check() {
+echo -e "\nChecking dependencies\n"
+
 if [ "$lsb" == "Deepin" ];
 then
 	deps=(unzip linux-headers-$(uname -r)-deepin dkms lsb-release linux-source-deepin)
@@ -40,8 +43,6 @@ else
 	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source)
 fi
 
-dep_check() {
-echo -e "\nChecking dependencies\n"
 for dep in ${deps[@]}
 do
 	if ! dpkg -s $dep | grep "Status: install ok installed" > /dev/null 2>&1
@@ -167,6 +168,16 @@ then
 		message
 		exit 1
 	fi
+# BunsenLabs
+elif [ "$lsb" == "BunsenLabs" ];
+then
+	if [ $codename == "helium" ];
+	then
+		echo -e "\nPlatform requirements satisfied, proceeding ..."
+	else
+		message
+		exit 1
+	fi
 else
 	message
 	exit 1
@@ -262,7 +273,7 @@ sysinitdaemon=$(sysinitdaemon_get)
 # modify displaylink-installer.sh
 sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$sysinitdaemon/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 
-if [ "$lsb" == "Debian" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ];
+if [ "$lsb" == "Debian" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ];
 then
 	sed -i 's#/lib/modules/$KVER/build/Kconfig#/lib/modules/$KVER/build/scripts/kconfig/conf#g' $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 	ln -s /lib/modules/$(uname -r)/build/Makefile /lib/modules/$(uname -r)/build/Kconfig
@@ -292,15 +303,26 @@ sudo systemctl enable dlm.service
 
 # disable pageflip for modesetting
 modesetting(){
-mkdir -p /etc/X11/xorg.conf.d
-cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
+test ! -d /etc/X11/xorg.conf.d && mkdir -p /etc/X11/xorg.conf.d
+graphic_driver=$(lspci -nnk | grep -i vga -A3 | grep 'in use'|cut -d":" -f2|sed 's/ //g')
+if [ "$graphic_driver" != "i915" ];
+then
+	cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
 Section "Device"
   Identifier  "DisplayLink"
   Driver      "modesetting"
   Option      "PageFlip" "false"
 EndSection
 EOL
-
+else 
+	cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
+Section "Device"
+  Identifier  "Intel"
+  Driver      "intel"
+EndSection
+EOL
+fi
+ 
 chown root: /etc/X11/xorg.conf.d/20-displaylink.conf
 chmod 644 /etc/X11/xorg.conf.d/20-displaylink.conf
 }
@@ -327,7 +349,7 @@ separator
 echo -e "\nUninstalling ...\n"
 
 # displaylink-installer uninstall
-if [ "$lsb" == "Debian" ] || [ "$lsb" == "Kali" ];
+if [ "$lsb" == "Debian" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ];
 then
 	rm /lib/modules/$(uname -r)/build/Kconfig
 fi
