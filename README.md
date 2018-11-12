@@ -48,6 +48,7 @@ DisplayLink drivers on Debian GNU/Linux, Ubuntu, elementary OS, and more!
   * Kali: kali-rolling/2016.2/2017.3/2018.3
   * Deepin: 15/15.1/15.1.1/15.2/15.4.1
   * MX Linux: 17.1
+  * BunsenLabs: Helium
 
   Regardless of the kernel version you're using.
 
