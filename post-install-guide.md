@@ -6,7 +6,7 @@
 
 * [Screen Layout Configuration](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#screen-layout-configuration)
 
-* [Automated (persistant) display configuration](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#automated-configuration)
+* [Automated (persistant) display configuration](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#automated-persistant-display-configuration)
 
 * [Troubleshooting most common issues](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#troubleshooting-most-common-issues)
 
