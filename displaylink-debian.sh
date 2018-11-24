@@ -305,18 +305,16 @@ sudo systemctl enable dlm.service
 modesetting(){
 test ! -d /etc/X11/xorg.conf.d && mkdir -p /etc/X11/xorg.conf.d
 drv=$(lspci -nnk | grep -i vga -A3 | grep 'in use'|cut -d":" -f2|sed 's/ //g')
-cardsub=$(lspci -nnk | grep -i vga -A3|grep Subsystem|cut -d" " -f5)
-if ([ "$drv" == "i915" ] && [ "$cardsub" == "530" ]);
+if ([ "$drv" == "i915" ]);
 then
-	cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
+cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
 Section "Device"
   Identifier  "Intel"
   Driver      "intel"
 EndSection
 EOL
-else 
-	
-	cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
+else
+cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
 Section "Device"
   Identifier  "DisplayLink"
   Driver      "modesetting"
@@ -324,13 +322,13 @@ Section "Device"
 EndSection
 EOL
 fi
- 
+
 chown root: /etc/X11/xorg.conf.d/20-displaylink.conf
 chmod 644 /etc/X11/xorg.conf.d/20-displaylink.conf
 }
 
 function ver2int {
-	echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
+echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
 }
 
 xorg_vcheck="$(dpkg -l | grep "ii  xserver-xorg-core" | awk '{print $3}' | sed 's/[^,:]*://g')"
