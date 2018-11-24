@@ -304,21 +304,23 @@ sudo systemctl enable dlm.service
 # disable pageflip for modesetting
 modesetting(){
 test ! -d /etc/X11/xorg.conf.d && mkdir -p /etc/X11/xorg.conf.d
-graphic_driver=$(lspci -nnk | grep -i vga -A3 | grep 'in use'|cut -d":" -f2|sed 's/ //g')
-if [ "$graphic_driver" != "i915" ];
+drv=$(lspci -nnk | grep -i vga -A3 | grep 'in use'|cut -d":" -f2|sed 's/ //g')
+cardsub=$(lspci -nnk | grep -i vga -A3|grep Subsystem|cut -d" " -f5)
+if ([ "$drv" == "i915" ] && [ "$cardsub" == "530" ]);
 then
+	cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
+Section "Device"
+  Identifier  "Intel"
+  Driver      "intel"
+EndSection
+EOL
+else 
+	
 	cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
 Section "Device"
   Identifier  "DisplayLink"
   Driver      "modesetting"
   Option      "PageFlip" "false"
-EndSection
-EOL
-else 
-	cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
-Section "Device"
-  Identifier  "Intel"
-  Driver      "intel"
 EndSection
 EOL
 fi
