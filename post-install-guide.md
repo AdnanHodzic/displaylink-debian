@@ -118,10 +118,12 @@ Note, in case you're editting ```~/.bashrc```, make sure you run ```source ~/.ba
 
 * [Unable to locate package linux-headers](https://github.com/AdnanHodzic/displaylink-debian/issues/141)
 
+* [Debian / Fail to connect screens](https://github.com/AdnanHodzic/displaylink-debian/issues/130)
+
 
 ##### Monitoring for errors
 
-* Monitor ```dmesg``` output while plugging in Displaylink
+* Monitor ```dmesg | grep Display``` output while plugging in Displaylink
 * Monitor ```/var/log/displaylink/DisplayLinkManager.log``` file
 
 ##### Most common Debian Jessie related issues:
