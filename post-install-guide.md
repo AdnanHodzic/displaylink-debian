@@ -16,6 +16,8 @@
 
 * Make sure that UEFI/secure boot is disabled!
 
+* When you are logging into your session you are using X server (X11) and not Wayland.
+
 * After install you must reboot to apply the changes.
 
 * After reboot, make sure DispayLink is running, i.e:
