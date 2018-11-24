@@ -1,19 +1,19 @@
 # displaylink-debian
 
 DisplayLink driver installer for Debian GNU/Linux, Ubuntu, Elementary OS,
-Mint, Kali, Deepin and MX Linux.
+Mint, Kali, Deepin and more! [Full list of all supported Linux distributions](https://github.com/AdnanHodzic/displaylink-debian#supported-platforms-are)
 
 
 #### Problem
 
-[DisplayLink][] releases its drivers only for Ubuntu 14.04 LTS and 16.04 LTS,
-supported Linux kernel versions are 3.19 and 4.4.
+[DisplayLink][] releases its drivers only for Ubuntu 16.04 LTS and 18.04 LTS,
+and only supported Linux kernel versions are 4.4 and 4.15. Hence if you run any other kernel or Ubuntu version or any any Linux distribution DisplayLink will not work as expected. 
 
 
 #### Solution
 
-[displaylink-debian][] allows seamless install/uninstall of the official
-DisplayLink drivers on Debian GNU/Linux, Ubuntu, elementary OS, and more!
+[displaylink-debian][] allows seamless installation of the official
+DisplayLink drivers tailored to work for most of the Debian based Linux distributions regardless of which Linux kernel version you're using. [Full list of all supported Linux distributions](https://github.com/AdnanHodzic/displaylink-debian#supported-platforms-are)
 
 #### How to run "displaylink-debian"
 
@@ -29,17 +29,15 @@ DisplayLink drivers on Debian GNU/Linux, Ubuntu, elementary OS, and more!
 
 `chmod +x displaylink-debian.sh && sudo ./displaylink-debian.sh`
 
-#### Technical
+#### Post installation Guide and Troubleshooting
 
-* _displaylink-debian.sh_ downloads and extracts the contents of the
-  official [DisplayLink Ubuntu driver][upstream].
+Please refer to the [Post Installation Guide][PostInstall] for further
+reference.
 
-* _displaylink-debian.sh_ modifies the contents of the official installer,
-  _displaylink-installer.sh_, to suit Debian and other Linux distributions.
+Before submitting a bug report in the issue tracker, please make sure to
+read: [Troubleshooting most common issues][TroubleShooting].
 
-*  Install/Uninstall is performed.
-
-* Supported platforms are:
+#### Supported platforms are:
 
   * Debian: Jessie 8.0/Stretch 9.0/Sid (unstable)
   * Ubuntu: 14.04 Trusty/15.04 Vivid/15.10 Wily/16.04 Xenial/16.10 Yakkety/17.04 Zesty/17.10 Artful/18.04 Bionic
@@ -50,16 +48,19 @@ DisplayLink drivers on Debian GNU/Linux, Ubuntu, elementary OS, and more!
   * MX Linux: 17.1
   * BunsenLabs: Helium
 
-  Regardless of the kernel version you're using.
+  Regardless of which Linux kernel version you're using.
+  
+  If your distribution is not on the list, please [submit a request to add support for it](https://github.com/AdnanHodzic/displaylink-debian/issues/new).
 
+#### Technical
 
-#### Post installation Guide and Troubleshooting
+* _displaylink-debian.sh_ downloads and extracts the contents of the
+  official [DisplayLink Ubuntu driver][upstream].
 
-Please refer to the [Post Installation Guide][PostInstall] for further
-reference.
+* _displaylink-debian.sh_ modifies the contents of the official installer,
+  _displaylink-installer.sh_, makes all necessary changes for DisplayLink to work out of box on supported Linux distribution.
 
-Before submitting a bug report in the issue tracker, please make sure to
-read: [Troubleshooting most common issues][TroubleShooting].
+*  Install/Reinstall/Uninstall is performed.
 
 
 #### Discussion
