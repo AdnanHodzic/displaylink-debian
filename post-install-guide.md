@@ -6,7 +6,7 @@
 
 * [Screen Layout Configuration](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#screen-layout-configuration)
 
-* [Automated (persistant) display configuration](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#automated-persistant-display-configuration)
+* [Automated (persistent) display configuration](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#automated-persistent-display-configuration)
 
 * [Troubleshooting most common issues](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#troubleshooting-most-common-issues)
 
@@ -74,7 +74,7 @@ Another very easy and intuative (gui) tool is ```arandr``` (Another XRandR GUI)
 
 Make sure to install it first: ```sudo apt-get install arandr```
 
-### Automated (persistant) display configuration
+### Automated (persistent) display configuration
 
 Since hotplug doesn't work (on Debian and Kali) and every time you connect your computer to Displaylink you'll need to re-configure your displays.
 
