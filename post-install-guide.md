@@ -76,7 +76,7 @@ Make sure to install it first: ```sudo apt-get install arandr```
 
 ### Automated configuration
 
-Since hotplug doesn't work (on Debian) and every time you connect your computer to Displaylink you'll need to re-configure your displays.
+Since hotplug doesn't work (on Debian and Kali) and every time you connect your computer to Displaylink you'll need to re-configure your displays.
 
 I've set-up couple of [aliases](http://www.linfo.org/alias.html) which help me accomplish this in semi-automated manner.
 
@@ -114,7 +114,7 @@ Note, in case you're editting ```~/.bashrc```, make sure you run ```source ~/.ba
 
 * [rendering issues](https://github.com/AdnanHodzic/displaylink-debian/issues/68)
 
-* [unsorted but should be added](https://github.com/AdnanHodzic/displaylink-debian/issues/48#issuecomment-432044380)
+* [dml.service won't start](https://github.com/AdnanHodzic/displaylink-debian/issues/48#issuecomment-432044380)
 
 
 ##### Monitoring for errors
