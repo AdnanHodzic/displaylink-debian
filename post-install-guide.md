@@ -1,10 +1,24 @@
 # Post Installation Guide
 
+* [Prerequisites](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#prerequisites)
+
+* [Setting provider sources](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#setting-provider-sources)
+
+* [Screen Layout Configuration](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#screen-layout-configuration)
+
+* [Automated configuration](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#automated-configuration)
+
+* [Troubleshooting most common issues](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#troubleshooting-most-common-issues)
+
+* [Having a different problem](https://github.com/AdnanHodzic/displaylink-debian#having-a-different-problem)
+
 ### Prerequisites
+
+* Make sure that UEFI/secure boot is disabled!
 
 * After install you must reboot to apply the changes.
 
-* After reboot, make sure dispaylink is running, i.e:
+* After reboot, make sure DispayLink is running, i.e:
 
   ```systemctl status dlm.service```
   
@@ -15,6 +29,7 @@
   To start automatically at boot run:
   
   ```systemctl enable dlm.service```
+
 
 ### Setting provider sources
 
@@ -87,14 +102,23 @@ Note, in case you're editting ```~/.bashrc```, make sure you run ```source ~/.ba
 
 ### Troubleshooting most common issues
 
+* [Service won't start](https://github.com/AdnanHodzic/displaylink-debian/issues/15)
+
+* [Disable UEFI / secure boot](https://github.com/AdnanHodzic/displaylink-debian/issues/123)
+
+* [Bash / sh can't be executed](https://github.com/AdnanHodzic/displaylink-debian/issues/74#issuecomment-410622725)
+
+* [secure boot / cable problems](https://github.com/AdnanHodzic/displaylink-debian/issues/142#issuecomment-413091374)
+
+* [rendering issues](https://github.com/AdnanHodzic/displaylink-debian/issues/68)
+
+* [unsorted but should be added](https://github.com/AdnanHodzic/displaylink-debian/issues/48#issuecomment-432044380)
+
+
+##### Monitoring for errors
+
 * Monitor ```dmesg``` output while plugging in Displaylink
 * Monitor ```/var/log/displaylink/DisplayLinkManager.log``` file
-
-##### Most common Ubuntu related issues:
-
-* displaylink.service fails to start
-
-UEFI (secure boot) needs to be disabled. Reference: [issue #15](https://github.com/AdnanHodzic/displaylink-debian/issues/15)
 
 ##### Most common Debian Jessie related issues:
 * systemctl status dlm.service failure
@@ -144,6 +168,6 @@ References: [issue #111](https://github.com/AdnanHodzic/displaylink-debian/issue
 [issue #65](https://github.com/AdnanHodzic/displaylink-debian/issues/65)
 
 
-##### Having a different problem?
+### Having a different problem?
 
 Please [submit an issue](https://github.com/AdnanHodzic/displaylink-debian/issues)
