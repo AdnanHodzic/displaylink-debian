@@ -4,13 +4,10 @@ DisplayLink driver installer for Debian GNU/Linux, Ubuntu, Elementary OS,
 Mint, Kali, Deepin and more! [Full list of all supported Linux distributions](https://github.com/AdnanHodzic/displaylink-debian#supported-platforms-are)
 
 
-#### Problem
+#### Why do I need displaylink-debian?
 
 [DisplayLink][] releases its drivers only for Ubuntu 16.04 LTS and 18.04 LTS,
 and only supported Linux kernel versions are 4.4 and 4.15. Hence if you run any other kernel or Ubuntu version or any any Linux distribution DisplayLink will not work as expected. 
-
-
-#### Solution
 
 [displaylink-debian][] allows seamless installation of the official
 DisplayLink drivers tailored to work for most of the Debian based Linux distributions regardless of which Linux kernel version you're using. [Full list of all supported Linux distributions](https://github.com/AdnanHodzic/displaylink-debian#supported-platforms-are)
