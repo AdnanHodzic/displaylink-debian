@@ -10,7 +10,7 @@
 
 * [Troubleshooting most common issues](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#troubleshooting-most-common-issues)
 
-* [Having a different problem](https://github.com/AdnanHodzic/displaylink-debian#having-a-different-problem)
+* [Having a different problem](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#having-a-different-problem)
 
 ### Prerequisites
 
