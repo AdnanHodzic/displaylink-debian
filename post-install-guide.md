@@ -116,6 +116,8 @@ Note, in case you're editting ```~/.bashrc```, make sure you run ```source ~/.ba
 
 * [dml.service won't start](https://github.com/AdnanHodzic/displaylink-debian/issues/48#issuecomment-432044380)
 
+* [Unable to locate package linux-headers](https://github.com/AdnanHodzic/displaylink-debian/issues/141)
+
 
 ##### Monitoring for errors
 
