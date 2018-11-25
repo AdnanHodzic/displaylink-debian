@@ -1,9 +1,10 @@
 #!/bin/bash
 #
 # displaylink-debian:
-# DisplayLink driver installer for Debian/Ubuntu based Linux distributions.
+# DisplayLink driver installer for Debian and Ubuntu based Linux distributions: Debian, Ubuntu, Elementary OS,
+# Mint, Kali, Deepin and more! Full list of all supported platforms: http://bit.ly/2zrwz2u
 #
-# Supported platforms: Debian GNU/Linux, Ubuntu, Elementary OS, Mint, Kali
+# DisplayLink driver installer for Debian GNU/Linux, Ubuntu, Elementary OS, Mint, Kali, Deepin and more! Full list of all supported Linux distributions
 #
 # Blog post: http://foolcontrol.org/?p=1777
 #
@@ -92,6 +93,7 @@ platform="$(lsb_release -ics | sed '$!s/$/ /' | tr -d '\n')"
 message(){
 echo -e "\n---------------------------------------------------------------\n"
 echo -e "Unsuported platform: $platform"
+echo -e "Full list of all supported platforms: http://bit.ly/2zrwz2u"
 echo -e ""
 echo -e "This tool is Open Source and feel free to extend it"
 echo -e "GitHub repo: https://github.com/AdnanHodzic/displaylink-debian/"
@@ -373,14 +375,10 @@ fi
 
 # interactively asks for operation
 ask_operation(){
-    echo -e "\n--------------------------- displaylink-debian ----------------------------"
-    echo -e "\nDisplayLink driver installer for Debian based Linux distributions:\n"
-    echo -e "* Debian GNU/Linux"
-    echo -e "* Ubuntu"
-    echo -e "* Elementary OS"
-    echo -e "* Linux Mint"
-    echo -e "* Kali Linux"
-    echo -e "* Deepin"
+    echo -e "\n--------------------------- displaylink-debian -------------------------------"
+    echo -e "\nDisplayLink driver installer for Debian and Ubuntu based Linux distributions:\n"
+    echo -e "* Debian, Ubuntu, Elementary OS, Mint, Kali, Deepin and many more!"
+    echo -e "* Full list of all supported platforms: http://bit.ly/2zrwz2u"
     echo -e "\nOptions:\n"
     read -p "[I]nstall
 [U]ninstall
