@@ -101,7 +101,7 @@ echo -e "\n---------------------------------------------------------------\n"
 # Ubuntu
 if [ "$lsb" == "Ubuntu" ];
 then
-	if [ $codename == "trusty" ] || [ $codename == "vivid" ] || [ $codename == "wily" ] || [ $codename == "xenial" ] || [ $codename == "yakkety" ] || [ $codename == "zesty" ] || [ $codename == "artful" ] || [ $codename == "bionic" ] || [ $codename == "cosmic" ];
+	if [ $codename == "trusty" ] || [ $codename == "vivid" ] || [ $codename == "wily" ] || [ $codename == "xenial" ] || [ $codename == "yakkety" ] || [ $codename == "zesty" ] || [ $codename == "artful" ] || [ $codename == "bionic" ] || [ $codename == "cosmic" ] || [ $codename == "disco" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
@@ -141,7 +141,7 @@ then
 # Kali
 elif [ "$lsb" == "Kali" ];
 then
-	if [ $codename == "kali-rolling" ] || [ $codename == "2016.2" ] || [ $codename == "2017.3" ] || [ $codename == "2018.3" ];
+	if [ $codename == "kali-rolling" ] || [ $codename == "2016.2" ] || [ $codename == "2017.3" ] || [ $codename == "2018.3" ] || [ $codename == "2018.4" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
