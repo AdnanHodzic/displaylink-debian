@@ -36,9 +36,9 @@ read: [Troubleshooting most common issues][TroubleShooting].
 
 #### Supported platforms are:
 
-  * Debian: Jessie 8.0/Stretch 9.0/Sid (unstable)
+  * Debian: Jessie 8.0/Stretch 9.0/Buster 10/Sid (unstable)
   * Ubuntu: 14.04 Trusty/15.04 Vivid/15.10 Wily/16.04 Xenial/16.10 Yakkety/17.04 Zesty/17.10 Artful/18.04 Bionic/19.04 Disco
-  * elementary OS: O.3 Freya/0.4 Loki
+  * elementary OS: O.3 Freya/0.4 Loki/5.0 Juno
   * Mint: 15 Olivia/16 Petra/17.3 Rosa/18 Sarah/18.3 Sylvia
   * Kali: kali-rolling/2016.2/2017.3/2018.3/2018.4
   * Deepin: 15/15.1/15.1.1/15.2/15.4.1
