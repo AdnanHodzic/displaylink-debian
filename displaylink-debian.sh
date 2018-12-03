@@ -307,12 +307,37 @@ sudo systemctl enable dlm.service
 modesetting(){
 test ! -d /etc/X11/xorg.conf.d && mkdir -p /etc/X11/xorg.conf.d
 drv=$(lspci -nnk | grep -i vga -A3 | grep 'in use'|cut -d":" -f2|sed 's/ //g')
+cardsub=$(lspci -nnk | grep -i vga -A3|grep Subsystem|cut -d" " -f5)
 if ([ "$drv" == "i915" ]);
 then
 cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
 Section "Device"
   Identifier  "Intel"
   Driver      "intel"
+EndSection
+EOL
+elif ([ "$drv" == "i915" ] && [ "$cardsub" == "530" ] || [ "$cardsub" == "v2/3rd" ]);
+then
+cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
+Section "Device"
+  Identifier  "Intel"
+  Driver      "intel"
+EndSection
+EOL
+elif ([ "$drv" == "nvidia" ]);
+then
+cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
+Section "Device"
+  Identifier "DisplayLink"
+EndSection
+EOL
+elif ([ "$drv" == "nvidia" ] && [ "$cardsub" == "GP106" ]);
+then
+cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
+Section "Device"
+  Identifier  "DisplayLink"
+  Driver      "modesetting"
+  Option      "PageFlip" "false"
 EndSection
 EOL
 else
