@@ -312,16 +312,17 @@ if ([ "$drv" == "i915" ]);
 then
 cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
 Section "Device"
-  Identifier  "Intel"
-  Driver      "intel"
+    Identifier  "Intel"
+    Driver      "intel"
 EndSection
 EOL
-elif ([ "$drv" == "i915" ] && [ "$cardsub" == "530" ] || [ "$cardsub" == "v2/3rd" ]);
+elif ([ "$drv" == "i915" ] && [ "$cardsub" == "v2/3rd" ]);
 then
 cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
 Section "Device"
-  Identifier  "Intel"
-  Driver      "intel"
+    Identifier  "DisplayLink"
+    Driver      "modesetting"
+    Option      "PageFlip" "false"
 EndSection
 EOL
 elif ([ "$drv" == "nvidia" ]);
@@ -335,17 +336,26 @@ elif ([ "$drv" == "nvidia" ] && [ "$cardsub" == "GP106" ]);
 then
 cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
 Section "Device"
-  Identifier  "DisplayLink"
-  Driver      "modesetting"
-  Option      "PageFlip" "false"
+    Identifier  "DisplayLink"
+    Driver      "modesetting"
+    Option      "PageFlip" "false"
+EndSection
+EOL
+elif ([ "$drv" == "amdgpu" ]);
+then
+cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
+Section "Device"
+    Identifier "AMDGPU"
+    Driver     "amdgpu"
+    Option     "PageFlip" "false"
 EndSection
 EOL
 else
 cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
 Section "Device"
-  Identifier  "DisplayLink"
-  Driver      "modesetting"
-  Option      "PageFlip" "false"
+    Identifier  "DisplayLink"
+    Driver      "modesetting"
+    Option      "PageFlip" "false"
 EndSection
 EOL
 fi
