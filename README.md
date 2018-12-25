@@ -14,23 +14,23 @@ DisplayLink drivers tailored to work for most of the Debian based Linux distribu
 
 ##### Repo clone (method 1)
 
-`git clone https://github.com/AdnanHodzic/displaylink-debian.git`
-
-`cd displaylink-debian/ && sudo ./displaylink-debian.sh`
+* `git clone https://github.com/AdnanHodzic/displaylink-debian.git`
+* `cd displaylink-debian/ && sudo ./displaylink-debian.sh`
+* **THEN CONSULT THE [Post Install Guide][PostInstall] FOR ADDITIONAL STEPS**
 
 ##### Download and run script without Git (method 2)
 
-`wget https://raw.githubusercontent.com/AdnanHodzic/displaylink-debian/master/displaylink-debian.sh`
-
-`chmod +x displaylink-debian.sh && sudo ./displaylink-debian.sh`
+* `wget https://raw.githubusercontent.com/AdnanHodzic/displaylink-debian/master/displaylink-debian.sh`
+* `chmod +x displaylink-debian.sh && sudo ./displaylink-debian.sh`
+* **THEN CONSULT THE [Post Install Guide][PostInstall] FOR ADDITIONAL STEPS**
 
 #### Post installation Guide and Troubleshooting
 
-Please refer to the [Post Installation Guide][PostInstall] for further
-reference.
+**NOTE: Your monitor probably will not work until you perform additional steps described in the [Post Installation Guide][PostInstall].**
 
-Before submitting a bug report in the issue tracker, please make sure to
-read: [Troubleshooting most common issues][TroubleShooting].
+There is also additional information available in the [Troubleshooting guide][TroubleShooting].
+
+Before submitting a bug report in the issue tracker, please make sure to consult both of these documents.
 
 #### Supported platforms are:
 
@@ -44,7 +44,7 @@ read: [Troubleshooting most common issues][TroubleShooting].
   * BunsenLabs: Helium
 
   Regardless of which Linux kernel version you're using.
-  
+
   If your distribution is not on the list, please [submit a request to add support for it](https://github.com/AdnanHodzic/displaylink-debian/issues/new).
 
 #### Technical
