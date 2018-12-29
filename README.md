@@ -18,19 +18,23 @@ DisplayLink drivers tailored to work for most of the Debian based Linux distribu
 
 `cd displaylink-debian/ && sudo ./displaylink-debian.sh`
 
+*After installation has been completed, make sure to consult [Post Install Guide][PostInstall]!*
+
 ##### Download and run script without Git (method 2)
 
 `wget https://raw.githubusercontent.com/AdnanHodzic/displaylink-debian/master/displaylink-debian.sh`
 
 `chmod +x displaylink-debian.sh && sudo ./displaylink-debian.sh`
 
+*After installation has been completed, make sure to consult [Post Install Guide][PostInstall]!*
+
 #### Post installation Guide and Troubleshooting
 
-Please refer to the [Post Installation Guide][PostInstall] for further
-reference.
+***Please note:** Your external monitor/s may not work as expected unless you perform additional steps as described in the [Post Installation Guide][PostInstall].*
 
-Before submitting a bug report in the issue tracker, please make sure to
-read: [Troubleshooting most common issues][TroubleShooting].
+Before submitting a bug report in the [issue tracker](https://github.com/AdnanHodzic/displaylink-debian/issues/new), please make sure to:
+* read [Troubleshooting most common issues][TroubleShooting].
+* when submitting a new issue, include debug information by running: `sudo ./displaylink-debian.sh --debug`
 
 #### Supported platforms are:
 
