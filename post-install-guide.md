@@ -176,4 +176,4 @@ References: [issue #111](https://github.com/AdnanHodzic/displaylink-debian/issue
 
 ### Having a different problem?
 
-Please [submit an issue](https://github.com/AdnanHodzic/displaylink-debian/issues)
+When submitting a new [issue](https://github.com/AdnanHodzic/displaylink-debian/issues), include debug information by running: `sudo ./displaylink-debian.sh --debug`
