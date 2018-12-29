@@ -325,6 +325,15 @@ Section "Device"
     Option      "PageFlip" "false"
 EndSection
 EOL
+elif ([ "$drv" == "i915" ] && [ "$cardsub" == "[HD" ]);
+then
+cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
+Section "Device"
+    Identifier  "DisplayLink"
+    Driver      "modesetting"
+    Option      "PageFlip" "false"
+EndSection
+EOL
 elif ([ "$drv" == "nvidia" ]);
 then
 cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
