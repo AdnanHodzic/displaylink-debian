@@ -17,6 +17,17 @@ version=`wget -q -O - https://www.displaylink.com/downloads/ubuntu | grep "downl
 dlurl="https://www.displaylink.com/"`wget -q -O - https://www.displaylink.com/downloads/ubuntu | grep "download-link" | head -n 1 | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/'`
 driver_dir=$version
 
+# global vars
+lsb="$(lsb_release -is)"
+codename="$(lsb_release -cs)"
+platform="$(lsb_release -ics | sed '$!s/$/ /' | tr -d '\n')"
+kernel="$(uname -r)"
+xorg_config_displaylink="/etc/X11/xorg.conf.d/20-displaylink.conf"
+vga_info="$(lspci | grep -i vga)"
+graphics_vendor="$(lspci -nnk | grep -i vga -A3 | grep 'in use' | cut -d ':' -f2 | sed 's/ //g')"
+graphics_subcard="$(lspci -nnk | grep -i vga -A3 | grep Subsystem | cut -d ' ' -f5)"
+
+
 separator(){
 sep="\n-------------------------------------------------------------------"
 echo -e $sep
@@ -92,16 +103,6 @@ else
 
 # Confirm dependencies are in place
 dep_check
-
-# Checker parameters
-lsb="$(lsb_release -is)"
-codename="$(lsb_release -cs)"
-platform="$(lsb_release -ics | sed '$!s/$/ /' | tr -d '\n')"
-kernel="$(uname -r)"
-xorg_config_displaylink="/etc/X11/xorg.conf.d/20-displaylink.conf"
-vga_info="$(lspci | grep -i vga)"
-graphics_vendor="$(lspci -nnk | grep -i vga -A3 | grep 'in use' | cut -d ':' -f2 | sed 's/ //g')"
-graphics_subcard="$(lspci -nnk | grep -i vga -A3 | grep Subsystem | cut -d ' ' -f5)"
 
 # Unsupported platform message
 message(){
@@ -480,8 +481,6 @@ for letter in "$ack"; do
 	fi
 done
 
-echo -e "\nUse this information when submitting an issue (http://bit.ly/2GLDlpY)\n"
-
 echo -e "------------ Linux system info ------------\n"
 echo -e "Distro: $lsb"
 echo -e "Release: $codename"
@@ -494,8 +493,6 @@ echo -e "\n---------- DisplayLink xorg.conf ----------\n"
 echo -e "File: $xorg_config_displaylink"
 echo -e "Contents:\n $(cat $xorg_config_displaylink)\n"
 }
-
-
 
 # interactively asks for operation
 ask_operation(){
@@ -574,7 +571,7 @@ elif [[ $answer == [Dd] ]];
 then
 	debug
 	separator
-	echo -e "\nRe-install complete, please reboot to apply the changes"
+	echo -e "\nUse this information when submitting an issue (http://bit.ly/2GLDlpY)"
 	separator
 	echo ""
 elif [[ $answer == [Qq] ]];
