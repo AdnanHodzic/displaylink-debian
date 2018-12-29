@@ -28,6 +28,7 @@ evdi_version="$(systemctl status dlm.service | grep -o "4.4.[[:digit:]]*")"
 vga_info="$(lspci | grep -oP '(?<=VGA compatible controller: ).*')"
 graphics_vendor="$(lspci -nnk | grep -i vga -A3 | grep 'in use' | cut -d ':' -f2 | sed 's/ //g')"
 graphics_subcard="$(lspci -nnk | grep -i vga -A3 | grep Subsystem | cut -d ' ' -f5)"
+providers="$(xrandr --listproviders)"
 
 
 separator(){
@@ -61,9 +62,9 @@ echo -e "\nChecking dependencies\n"
 
 if [ "$lsb" == "Deepin" ];
 then
-	deps=(unzip linux-headers-$(uname -r)-deepin dkms lsb-release linux-source-deepin)
+	deps=(unzip linux-headers-$(uname -r)-deepin dkms lsb-release linux-source-deepin x11-xserver-utils)
 else
-	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source)
+	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils)
 fi
 
 for dep in ${deps[@]}
@@ -483,21 +484,23 @@ for letter in "$ack"; do
 	fi
 done
 
-echo -e "------------ Linux system info ------------\n"
+echo -e "--------------- Linux system info ----------------\n"
 echo -e "Distro: $lsb"
 echo -e "Release: $codename"
 echo -e "Kernel: $kernel"
-echo -e "\n------------ DisplayLink info ------------\n"
+echo -e "\n---------------- DisplayLink info ----------------\n"
 echo -e "Driver version: $version"
 echo -e "EVDI service status: $dlm_service_check"
 echo -e "EVDI service version: $evdi_version"
-echo -e "\n-------------- Graphics card --------------\n"
+echo -e "\n------------------ Graphics card -----------------\n"
 echo -e "Vendor: $graphics_vendor"
 echo -e "Subsystem: $graphics_subcard"
 echo -e "VGA: $vga_info"
-echo -e "\n---------- DisplayLink xorg.conf ----------\n"
+echo -e "\n-------------- DisplayLink xorg.conf -------------\n"
 echo -e "File: $xorg_config_displaylink"
 echo -e "Contents:\n $(cat $xorg_config_displaylink)"
+echo -e "\n-------------------- Monitors --------------------\n"
+echo -e "$providers"
 }
 
 # interactively asks for operation
