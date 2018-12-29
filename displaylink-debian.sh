@@ -22,6 +22,15 @@ sep="\n-------------------------------------------------------------------"
 echo -e $sep
 }
 
+# Wrong key error message
+wrong_key(){
+echo -e "\n-----------------------------"
+echo -e "\nWrong value. Concentrate!\n"
+echo -e "-----------------------------\n"
+echo -e "Enter any key to continue"
+read key
+}
+
 root_check(){
 # root check
 if (( $EUID != 0 ));
@@ -88,6 +97,11 @@ dep_check
 lsb="$(lsb_release -is)"
 codename="$(lsb_release -cs)"
 platform="$(lsb_release -ics | sed '$!s/$/ /' | tr -d '\n')"
+kernel="$(uname -r)"
+xorg_config_displaylink="/etc/X11/xorg.conf.d/20-displaylink.conf"
+vga_info="$(lspci | grep -i vga)"
+graphics_vendor="$(lspci -nnk | grep -i vga -A3 | grep 'in use' | cut -d ':' -f2 | sed 's/ //g')"
+graphics_subcard="$(lspci -nnk | grep -i vga -A3 | grep Subsystem | cut -d ' ' -f5)"
 
 # Unsupported platform message
 message(){
@@ -303,8 +317,6 @@ fi
 sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/dlm.service
 sudo systemctl enable dlm.service
 
-xorg_config_displaylink="/etc/X11/xorg.conf.d/20-displaylink.conf"
-
 # setup xorg.conf depending on graphics card
 modesetting(){
 test ! -d /etc/X11/xorg.conf.d && mkdir -p /etc/X11/xorg.conf.d
@@ -426,6 +438,65 @@ fi
 
 }
 
+# debug: get system information for issue debug
+debug(){
+separator
+echo -e "\nStarting Debug ...\n"
+
+ack=${ack:-$default}
+default=N
+
+read -p "Did you read Post Installation Guide? http://bit.ly/2TbZleK [y/N] " ack
+ack=${ack:-$default}
+
+for letter in "$ack"; do
+	if [[ "$letter" == [Yy] ]];
+	then
+			echo ""
+			continue
+	elif [[ "$letter" == [Nn] ]];
+	then
+			echo -e "\nPlease read Post Installation Guide: http://bit.ly/2TbZleK\n"
+			exit 1
+	else
+			wrong_key
+	fi
+done
+
+read -p "Did you read Troubleshooting most common issues? http://bit.ly/2Rofd0x [y/N] " ack
+ack=${ack:-$default}
+
+for letter in "$ack"; do
+	if [[ "$letter" == [Yy] ]];
+	then
+			echo -e ""
+			continue
+	elif [[ "$letter" == [Nn] ]];
+	then
+			echo -e "\nPlease read Troubleshooting most common issues: http://bit.ly/2Rofd0x\n"
+			exit 1
+	else
+			wrong_key
+	fi
+done
+
+echo -e "\nUse this information when submitting an issue (http://bit.ly/2GLDlpY)\n"
+
+echo -e "------------ Linux system info ------------\n"
+echo -e "Distro: $lsb"
+echo -e "Release: $codename"
+echo -e "Kernel: $kernel"
+echo -e "\n-------------- Graphics card --------------\n"
+echo -e "Vendor: $graphics_vendor"
+echo -e "Subsystem: $graphics_subcard"
+echo -e "VGA PCI: $vga_info"
+echo -e "\n---------- DisplayLink xorg.conf ----------\n"
+echo -e "File: $xorg_config_displaylink"
+echo -e "Contents:\n $(cat $xorg_config_displaylink)\n"
+}
+
+
+
 # interactively asks for operation
 ask_operation(){
     echo -e "\n--------------------------- displaylink-debian -------------------------------"
@@ -436,9 +507,10 @@ ask_operation(){
     read -p "[I]nstall
 [U]ninstall
 [R]e-install
+[D]ebug
 [Q]uit
 
-Select a key: [i/u/r/q]: " answer
+Select a key: [i/u/r/d/q]: " answer
 }
 
 root_check
@@ -456,6 +528,9 @@ else
         ;;
     "--reinstall")
         answer="r"
+        ;;
+    "--debug")
+        answer="d"
         ;;
     *)
         answer="n"
@@ -491,6 +566,13 @@ then
 	install
 	post_install
 	clean_up
+	separator
+	echo -e "\nRe-install complete, please reboot to apply the changes"
+	separator
+	echo ""
+elif [[ $answer == [Dd] ]];
+then
+	debug
 	separator
 	echo -e "\nRe-install complete, please reboot to apply the changes"
 	separator
