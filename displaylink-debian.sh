@@ -505,18 +505,19 @@ echo -e "$providers"
 
 # interactively asks for operation
 ask_operation(){
-    echo -e "\n--------------------------- displaylink-debian -------------------------------"
-    echo -e "\nDisplayLink driver installer for Debian and Ubuntu based Linux distributions:\n"
-    echo -e "* Debian, Ubuntu, Elementary OS, Mint, Kali, Deepin and many more!"
-    echo -e "* Full list of all supported platforms: http://bit.ly/2zrwz2u"
-    echo -e "\nOptions:\n"
-    read -p "[I]nstall
-[U]ninstall
-[R]e-install
+echo -e "\n--------------------------- displaylink-debian -------------------------------"
+echo -e "\nDisplayLink driver installer for Debian and Ubuntu based Linux distributions:\n"
+echo -e "* Debian, Ubuntu, Elementary OS, Mint, Kali, Deepin and many more!"
+echo -e "* Full list of all supported platforms: http://bit.ly/2zrwz2u"
+echo -e "* When submitting a new issue, include Debug information"
+echo -e "\nOptions:\n"
+read -p "[I]nstall
 [D]ebug
+[R]e-install
+[U]ninstall
 [Q]uit
 
-Select a key: [i/u/r/d/q]: " answer
+Select a key: [i/d/r/u/q]: " answer
 }
 
 root_check
