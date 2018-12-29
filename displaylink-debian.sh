@@ -303,74 +303,83 @@ fi
 sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/dlm.service
 sudo systemctl enable dlm.service
 
-# disable pageflip for modesetting
+xorg_config_displaylink="/etc/X11/xorg.conf.d/20-displaylink.conf"
+
+# setup xorg.conf depending on graphics card
 modesetting(){
 test ! -d /etc/X11/xorg.conf.d && mkdir -p /etc/X11/xorg.conf.d
 drv=$(lspci -nnk | grep -i vga -A3 | grep 'in use'|cut -d":" -f2|sed 's/ //g')
 cardsub=$(lspci -nnk | grep -i vga -A3|grep Subsystem|cut -d" " -f5)
-if ([ "$drv" == "i915" ]);
-then
-cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
+
+# intel displaylink xorg.conf
+xorg_intel(){
+cat > $xorg_config_displaylink <<EOL
 Section "Device"
     Identifier  "Intel"
     Driver      "intel"
 EndSection
 EOL
-elif ([ "$drv" == "i915" ] && [ "$cardsub" == "v2/3rd" ]);
-then
-cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
+}
+
+# modesetting displaylink xorg.conf
+xorg_modesetting(){
+cat > $xorg_config_displaylink <<EOL
 Section "Device"
     Identifier  "DisplayLink"
     Driver      "modesetting"
     Option      "PageFlip" "false"
 EndSection
 EOL
-elif ([ "$drv" == "i915" ] && [ "$cardsub" == "[HD" ]);
-then
-cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
-Section "Device"
-    Identifier  "DisplayLink"
-    Driver      "modesetting"
-    Option      "PageFlip" "false"
-EndSection
-EOL
-elif ([ "$drv" == "nvidia" ]);
-then
-cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
+}
+
+# nvidia displaylink xorg.conf
+xorg_nvidia(){
+cat > $xorg_config_displaylink <<EOL
 Section "Device"
   Identifier "DisplayLink"
 EndSection
 EOL
-elif ([ "$drv" == "nvidia" ] && [ "$cardsub" == "GP106" ]);
-then
-cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
-Section "Device"
-    Identifier  "DisplayLink"
-    Driver      "modesetting"
-    Option      "PageFlip" "false"
-EndSection
-EOL
-elif ([ "$drv" == "amdgpu" ]);
-then
-cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
+}
+
+# amd displaylink xorg.conf
+xorg_amd(){
+cat > $xorg_config_displaylink <<EOL
 Section "Device"
     Identifier "AMDGPU"
     Driver     "amdgpu"
     Option     "PageFlip" "false"
 EndSection
 EOL
+}
+
+# customize displaylink xorg.conf
+if ([ "$drv" == "i915" ]);
+then
+		# set xorg for Intel cards
+		xorg_intel
+elif ([ "$drv" == "i915" ] && [ "$cardsub" == "v2/3rd" ] || [ "$cardsub" == "[HD" ]);
+then
+		# set xorg for Intel cards pt2 (issue: 179, 68, 88)
+		xorg_modesetting
+elif ([ "$drv" == "nvidia" ]);
+then
+		# set xorg for Nvidia cards
+		xorg_nvidia
+elif ([ "$drv" == "nvidia" ] && [ "$cardsub" == "GP106" ]);
+then
+		# set xorg for Nvidia cards pt2 (issue: 176, 179)
+		xorg_modesetting
+elif ([ "$drv" == "amdgpu" ]);
+then
+		# set xorg for AMD cards (issue: 180)
+		xorg_amd
 else
-cat > /etc/X11/xorg.conf.d/20-displaylink.conf <<EOL
-Section "Device"
-    Identifier  "DisplayLink"
-    Driver      "modesetting"
-    Option      "PageFlip" "false"
-EndSection
-EOL
+		# default xorg setting
+		xorg_modesetting
 fi
 
-chown root: /etc/X11/xorg.conf.d/20-displaylink.conf
-chmod 644 /etc/X11/xorg.conf.d/20-displaylink.conf
+chown root: $xorg_config_displaylink
+chmod 644 $xorg_config_displaylink
 }
 
 function ver2int {
@@ -382,7 +391,7 @@ min_xorg=1.18.3
 
 if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $min_xorg)" ];
 then
-	echo "Disabling PageFlip for modesetting"
+	echo "Setup DisplayLink xorg.conf depending on graphics card"
 	modesetting
 else
 	echo "No need to disable PageFlip for modesetting"
@@ -409,10 +418,10 @@ if lsmod | grep "$evdi_module" &> /dev/null ; then
 fi
 
 # remove modesetting file
-if [ -f "/etc/X11/xorg.conf.d/20-displaylink.conf" ]
+if [ -f $xorg_config_displaylink ]
 then
-		echo "Removing disabled PageFlip for modesetting"
-		rm "/etc/X11/xorg.conf.d/20-displaylink.conf"
+		echo "Removing Displaylink Xorg config file"
+		rm $xorg_config_displaylink
 fi
 
 }
