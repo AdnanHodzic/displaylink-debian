@@ -552,6 +552,7 @@ then
 	clean_up
 	separator
 	echo -e "\nInstall complete, please reboot to apply the changes"
+	echo -e "After reboot, make sure to consult post-install guide! http://bit.ly/2TbZleK"
 	separator
 	echo ""
 elif [[ $answer == [Uu] ]];
@@ -574,6 +575,7 @@ then
 	clean_up
 	separator
 	echo -e "\nRe-install complete, please reboot to apply the changes"
+	echo -e "After reboot, make sure to consult post-install guide! http://bit.ly/2TbZleK"
 	separator
 	echo ""
 elif [[ $answer == [Dd] ]];
