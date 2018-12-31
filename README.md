@@ -49,7 +49,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
 
   Regardless of which Linux kernel version you're using.
   
-  If your distribution is not on the list, please [submit a request to add support for it](https://github.com/AdnanHodzic/displaylink-debian/issues/new).
+  If your distribution is not on the list, make sure to include debug information by running: `sudo ./displaylink-debian.sh --debug` and [submit a request to add support for it](https://github.com/AdnanHodzic/displaylink-debian/issues/new).
 
 #### Technical
 
