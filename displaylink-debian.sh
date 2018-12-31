@@ -393,9 +393,9 @@ if ([ "$drv" == "i915" ]);
 then
 		# set xorg for Intel cards
 		xorg_intel
-elif ([ "$drv" == "i915" ] && [ "$cardsub" == "v2/3rd" ] || [ "$cardsub" == "[HD" ]);
+elif ([ "$drv" == "i915" ] && [ "$cardsub" == "v2/3rd" ] || [ "$cardsub" == "[HD" ] || [ "$cardsub" == "620" ]);
 then
-		# set xorg for Intel cards pt2 (issue: 179, 68, 88)
+		# set xorg for Intel cards pt2 (issue: 179, 68, 88, 192)
 		xorg_modesetting
 elif ([ "$drv" == "nvidia" ]);
 then
