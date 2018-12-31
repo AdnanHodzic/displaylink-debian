@@ -446,16 +446,23 @@ then
 	rm /lib/modules/$(uname -r)/build/Kconfig
 fi
 
-# double check if evdi module is loaded, if yes remove it
-evdi_module="evdi"
-
-if lsmod | grep "$evdi_module" &> /dev/null ; then
-	echo "Removing $evdi_module module"
-	rmmod evdi
+# evdi module still in use (issue 178, 192)
+dkms remove evdi/$evdi_version --all
+evdi_dir="/usr/src/evdi-$evdi_version"
+if [ -d "$evdi_dir" ];
+then
+		rm -rf $evdi_dir
 fi
 
-# evdi module still in use (issue 178, 192)
-dkms remove $evdi_module/$evdi_version --all
+# disabled and remove dlm.service
+systemctl disable dlm.service
+rm -f /lib/systemd/system/dlm.service
+
+# double check if evdi module is loaded, if yes remove it
+if lsmod | grep "evdi" &> /dev/null ; then
+	echo "Removing evdi module"
+	rmmod evdi
+fi
 
 # remove modesetting file
 if [ -f $xorg_config_displaylink ]
