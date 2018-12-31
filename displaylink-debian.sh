@@ -249,6 +249,27 @@ fi
 
 }
 
+setup_complete(){
+ack=${ack:-$default}
+default=N
+
+read -p "Rebot now? [y/N] " ack
+ack=${ack:-$default}
+
+for letter in "$ack"; do
+	if [[ "$letter" == [Yy] ]];
+	then
+			echo "Rebooting ..."
+			reboot
+	elif [[ "$letter" == [Nn] ]];
+	then
+			echo -e "\nReboot postponed, changes won't be applied until reboot"
+	else
+			wrong_key
+	fi
+done
+}
+
 download() {
     local dlfileid=$(echo $dlurl | perl -pe '($_)=/.+\?id=(\d+)/')
 
@@ -557,6 +578,7 @@ then
 	separator
 	echo -e "\nInstall complete, please reboot to apply the changes"
 	echo -e "After reboot, make sure to consult post-install guide! http://bit.ly/2TbZleK"
+	setup_complete
 	separator
 	echo ""
 elif [[ $answer == [Uu] ]];
@@ -565,7 +587,8 @@ then
 	uninstall
 	clean_up
 	separator
-	echo -e "\nUninstall complete"
+	echo -e "\nUninstall complete, please reboot to apply the changes"
+	setup_complete
 	separator
 	echo ""
 elif [[ $answer == [Rr] ]];
@@ -578,8 +601,9 @@ then
 	post_install
 	clean_up
 	separator
-	echo -e "\nRe-install complete, please reboot to apply the changes"
+	echo -e "\nInstall complete, please reboot to apply the changes"
 	echo -e "After reboot, make sure to consult post-install guide! http://bit.ly/2TbZleK"
+	setup_complete
 	separator
 	echo ""
 elif [[ $answer == [Dd] ]];
