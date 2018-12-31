@@ -24,7 +24,7 @@ platform="$(lsb_release -ics | sed '$!s/$/ /' | tr -d '\n')"
 kernel="$(uname -r)"
 xorg_config_displaylink="/etc/X11/xorg.conf.d/20-displaylink.conf"
 dlm_service_check="$(systemctl is-active --quiet dlm.service && echo up and running)"
-evdi_version="$(systemctl status dlm.service | grep -o "4.4.[[:digit:]]*")"
+evdi_version="$(systemctl status dlm.service | grep -o '4.4.[[:digit:]]*')"
 vga_info="$(lspci | grep -oP '(?<=VGA compatible controller: ).*')"
 graphics_vendor="$(lspci -nnk | grep -i vga -A3 | grep 'in use' | cut -d ':' -f2 | sed 's/ //g')"
 graphics_subcard="$(lspci -nnk | grep -i vga -A3 | grep Subsystem | cut -d ' ' -f5)"
@@ -432,6 +432,9 @@ if lsmod | grep "$evdi_module" &> /dev/null ; then
 	echo "Removing $evdi_module module"
 	rmmod evdi
 fi
+
+# evdi module still in use (issue 178, 192)
+dkms remove $evdi_module/$evdi_version --all
 
 # remove modesetting file
 if [ -f $xorg_config_displaylink ]
