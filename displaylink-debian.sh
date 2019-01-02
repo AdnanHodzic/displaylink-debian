@@ -388,29 +388,34 @@ EndSection
 EOL
 }
 
-# customize displaylink xorg.conf
-if ([ "$drv" == "i915" ] && [ "$cardsub" == "v2/3rd" ] || [ "$cardsub" == "[HD" ] || [ "$cardsub" == "620" ]);
+# set xorg for Intel cards
+if [ "$drv" == "i915" ];
 then
-		# set xorg for Intel cards pt2 (issue: 179, 68, 88, 192)
-		xorg_modesetting
-elif ([ "$drv" == "i915" ]);
+		# set xorg modesetting for Intel cards (issue: 179, 68, 88, 192)
+		if [ "$cardsub" == "v2/3rd" ] || [ "$cardsub" == "[HD" ] || [ "$cardsub" == "620" ];
+		then
+				xorg_modesetting
+		# generic intel
+		else
+				xorg_intel
+		fi
+# set xorg for Nvidia cards
+elif [ "$drv" == "nvidia" ];
 then
-        # set xorg for Intel cards
-        xorg_intel
-elif ([ "$drv" == "nvidia" ]);
+		# set xorg modesetting for Intel cards (issue: 176, 179)
+		if [ "$cardsub" == "GP106" ];
+		then
+				xorg_modesetting
+		# generic nvidia
+		else
+				xorg_nvidia
+		fi
+# set xorg for AMD cards (issue: 180)
+elif [ "$drv" == "amdgpu" ];
 then
-		# set xorg for Nvidia cards
-		xorg_nvidia
-elif ([ "$drv" == "nvidia" ] && [ "$cardsub" == "GP106" ]);
-then
-		# set xorg for Nvidia cards pt2 (issue: 176, 179)
-		xorg_modesetting
-elif ([ "$drv" == "amdgpu" ]);
-then
-		# set xorg for AMD cards (issue: 180)
 		xorg_amd
+# default xorg modesetting
 else
-		# default xorg setting
 		xorg_modesetting
 fi
 
