@@ -392,7 +392,7 @@ EOL
 if [ "$drv" == "i915" ];
 then
 		# set xorg modesetting for Intel cards (issue: 179, 68, 88, 192)
-		if [ "$cardsub" == "v2/3rd" ] || [ "$cardsub" == "[HD" ] || [ "$cardsub" == "620" ];
+		if [ "$cardsub" == "v2/3rd" ] || [ "$cardsub" == "[HD" ] || [ "$cardsub" == "620" ] || [ "$cardsub" == "540" ];
 		then
 				xorg_modesetting
 		# generic intel
