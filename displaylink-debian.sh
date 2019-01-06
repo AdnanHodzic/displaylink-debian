@@ -17,7 +17,7 @@ version=`wget -q -O - https://www.displaylink.com/downloads/ubuntu | grep "downl
 dlurl="https://www.displaylink.com/"`wget -q -O - https://www.displaylink.com/downloads/ubuntu | grep "download-link" | head -n 1 | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/'`
 driver_dir=$version
 
-# global vars
+# globalvars
 lsb="$(lsb_release -is)"
 codename="$(lsb_release -cs)"
 platform="$(lsb_release -ics | sed '$!s/$/ /' | tr -d '\n')"
@@ -28,7 +28,9 @@ vga_info="$(lspci | grep -oP '(?<=VGA compatible controller: ).*')"
 graphics_vendor="$(lspci -nnk | grep -i vga -A3 | grep 'in use' | cut -d ':' -f2 | sed 's/ //g')"
 graphics_subcard="$(lspci -nnk | grep -i vga -A3 | grep Subsystem | cut -d ' ' -f5)"
 providers="$(xrandr --listproviders)"
-
+xorg_vcheck="$(dpkg -l | grep "ii  xserver-xorg-core" | awk '{print $3}' | sed 's/[^,:]*://g')"
+min_xorg=1.18.3
+newgen_xorg=1.19.6
 
 separator(){
 sep="\n-------------------------------------------------------------------"
@@ -423,7 +425,7 @@ then
 		if [ "$cardsub" == "GP106" ];
 		then
 				if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $newgen_xorg)" ];
-        then
+				then
 						xorg_modesetting_newgen
 				else
 						xorg_modesetting
@@ -454,10 +456,7 @@ function ver2int {
 echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
 }
 
-xorg_vcheck="$(dpkg -l | grep "ii  xserver-xorg-core" | awk '{print $3}' | sed 's/[^,:]*://g')"
-min_xorg=1.18.3
-newgen_xorg=1.19.6
-
+# depending on X11 version start modesetting func
 if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $min_xorg)" ];
 then
 	echo "Setup DisplayLink xorg.conf depending on graphics card"
