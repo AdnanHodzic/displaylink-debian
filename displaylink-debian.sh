@@ -382,9 +382,85 @@ EndSection
 EOL
 }
 
-# nvidia displaylink xorg.conf
+nvidia_pregame(){
+xsetup_loc="/usr/share/sddm/scripts/Xsetup"
+
+nvidia_xrandr(){
+cat >> $xsetup_loc << EOL
+
+xrandr --setprovideroutputsource modesetting NVIDIA-0
+xrandr --auto
+EOL
+}
+
+# make necessary changes to Xsetup
+if ! grep -q "setprovideroutputsource modesetting" $xsetup_loc
+then
+		mv $xsetup_loc $xsetup_loc.org.bak
+		echo -e "\nMade backup of: $xsetup_loc file"
+		echo -e "\nLocation: $xsetup_loc.org.bak"
+		nvidia_xrandr
+		echo -e "Wrote changes to $xsetup_loc"
+fi
+
+# xorg.conf ops
+xorg_config="/etc/x11/xorg.conf"
+usr_xorg_config_displaylink="/usr/share/X11/xorg.conf.d/20-displaylink.conf"
+
+if [ -f $xorg_config ];
+then
+		mv $xorg_config $xorg_config.org.bak
+		echo -e "\nMade backup of: $xorg_config file"
+		echo -e "\nLocation: $xorg_config.org.bak"
+fi
+
+if [ -f $xorg_config_displaylink ];
+then
+		mv $xorg_config_displaylink $xorg_config_displaylink.org.bak
+		echo -e "\nMade backup of: $xorg_config_displaylink file"
+		echo -e "\nLocation: $xorg_config_displaylink.org.bak"
+fi
+
+if [ -f $usr_xorg_config_displaylink ];
+then
+		mv $usr_xorg_config_displaylink $usr_xorg_config_displaylink.org.bak
+		echo -e "\nMade backup of: $usr_xorg_config_displaylink file"
+		echo -e "\nLocation: $usr_xorg_config_displaylink.org.bak"
+fi
+}
+
+# nvidia displaylink xorg.conf (issue: 176)
 xorg_nvidia(){
 cat > $xorg_config_displaylink <<EOL
+Section "ServerLayout"
+    Identifier "layout"
+    Screen 0 "nvidia"
+    Inactive "intel"
+EndSection
+
+Section "Device"
+    Identifier "intel"
+    Driver "modesetting"
+    Option "AccelMethod" "None"
+EndSection
+
+Section "Screen"
+    Identifier "intel"
+    Device "intel"
+EndSection
+
+Section "Device"
+    Identifier "nvidia"
+    Driver "nvidia"
+    Option "ConstrainCursor" "off"
+EndSection
+
+Section "Screen"
+    Identifier "nvidia"
+    Device "nvidia"
+    Option "AllowEmptyInitialConfiguration" "on"
+    Option "IgnoreDisplayDevices" "CRT"
+EndSection
 Section "Device"
   Identifier "DisplayLink"
 EndSection
@@ -418,22 +494,11 @@ then
 		else
 				xorg_intel
 		fi
-# set xorg for Nvidia cards
+# set xorg for Nvidia cards (issue: 176, 179)
 elif [ "$drv" == "nvidia" ];
 then
-		# set xorg modesetting for Intel cards (issue: 176, 179)
-		if [ "$cardsub" == "GP106" ];
-		then
-				if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $newgen_xorg)" ];
-				then
-						xorg_modesetting_newgen
-				else
-						xorg_modesetting
-				fi
-		# generic nvidia
-		else
-				xorg_nvidia
-		fi
+		nvidia_pregame
+		xorg_nvidia
 # set xorg for AMD cards (issue: 180)
 elif [ "$drv" == "amdgpu" ];
 then
@@ -448,6 +513,7 @@ else
 		fi
 fi
 
+echo -e "\n--- Wrote X11 changes to: $xorg_config_displaylink ---\n"
 chown root: $xorg_config_displaylink
 chmod 644 $xorg_config_displaylink
 }
