@@ -513,7 +513,7 @@ else
 		fi
 fi
 
-echo -e "\n--- Wrote X11 changes to: $xorg_config_displaylink ---\n"
+echo -e "Wrote X11 changes to: $xorg_config_displaylink"
 chown root: $xorg_config_displaylink
 chmod 644 $xorg_config_displaylink
 }
