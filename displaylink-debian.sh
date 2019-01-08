@@ -309,6 +309,25 @@ chmod +x $driver_dir/displaylink-driver-${version}.[0-9]*.run
 ./$driver_dir/displaylink-driver-${version}.[0-9]*.run --keep --noexec
 mv displaylink-driver-${version}.[0-9]*/ $driver_dir/displaylink-driver-${version}
 
+nextgen_kernel_patch(){
+
+# check kernel
+
+# extract evdi src
+evdi_src_ver="$(echo evdi-* | cut -d'-' -f2)"
+evdi_src="evdi-$evdi_src_ver-src"
+mkdir $evdi_src
+
+echo "extracting dir: $evdi_src.tar.gz to $evdi_src"
+tar -xzvf $evdi_src.tar.gz -C $evdi_src
+
+# modify patch
+
+echo "compressing: $evdi_src.tar.gz from $evdi_src"
+tar -zcvf $evdi_src.tar.gz $evdi_src
+
+}
+
 # get sysinitdaemon
 sysinitdaemon=$(sysinitdaemon_get)
 
