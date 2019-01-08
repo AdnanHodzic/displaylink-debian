@@ -63,9 +63,9 @@ echo -e "\nChecking dependencies\n"
 
 if [ "$lsb" == "Deepin" ];
 then
-	deps=(unzip linux-headers-$(uname -r)-deepin dkms lsb-release linux-source-deepin x11-xserver-utils)
+	deps=(unzip linux-headers-$(uname -r)-deepin dkms lsb-release linux-source-deepin x11-xserver-utils wget)
 else
-	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils)
+	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget)
 fi
 
 for dep in ${deps[@]}
@@ -309,47 +309,6 @@ chmod +x $driver_dir/displaylink-driver-${version}.[0-9]*.run
 ./$driver_dir/displaylink-driver-${version}.[0-9]*.run --keep --noexec
 mv displaylink-driver-${version}.[0-9]*/ $driver_dir/displaylink-driver-${version}
 
-# Broken after update to 4.19 kernel (issue: #191)
-nexgen_kernel_patch(){
-
-# check kernel
-kernel_check="$(uname -r | egrep -o '[0-9]+\.[0-9]+')"
-
-kernel_patch(){
-# extract evdi src
-evdi_src_ver="$(echo evdi-* | cut -d'-' -f2)"
-evdi_src="evdi-$evdi_src_ver-src"
-mkdir $evdi_src
-
-echo -e "extracting dir: $evdi_src.tar.gz to $evdi_src"
-tar -xzvf $evdi_src.tar.gz -C $evdi_src
-
-# modify evdi
-
-echo "compressing: $evdi_src.tar.gz from $evdi_src"
-tar -zcvf $evdi_src.tar.gz $evdi_src
-}
-
-function ver2int {
-echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
-}
-
-# patch evdi depending on kernel version
-if [ "$(ver2int $kernel_check)" -ge "$(ver2int '4.19')" ];
-then
-    echo "detected: $kernel_check, patching\n"
-    kernel_patch
-elif [ "$(ver2int $kernel_check)" -ge "$(ver2int '5.0')" ];
-then
-    echo "dected: $kernel_check, patching\n"
-    kernel_patch
-else
-    echo "got out"
-fi
-}
-
-nexgen_kernel_patch
-
 # get sysinitdaemon
 sysinitdaemon=$(sysinitdaemon_get)
 
@@ -365,7 +324,47 @@ fi
 # install
 separator
 echo -e "\nInstalling driver version: $version\n"
-cd $driver_dir/displaylink-driver-${version} && ./displaylink-installer.sh install
+# original install before newgen_kernel_patch
+# cd $driver_dir/displaylink-driver-${version} && ./displaylink-installer.sh install
+cd $driver_dir/displaylink-driver-${version}
+
+# Broken after update to 4.19 kernel (issue: #191)
+#
+# check kernel version
+kernel_check="$(uname -r | egrep -o '[0-9]+\.[0-9]+')"
+
+kernel_patch(){
+# extract evdi src
+evdi_src_ver="$(echo evdi-* | cut -d'-' -f2)"
+evdi_src="evdi-$evdi_src_ver-src"
+mkdir $evdi_src
+
+# extract $evdi_src.tar.gz to $evdi_src
+tar -xzvf $evdi_src.tar.gz -C $evdi_src --strip 1
+
+# get latest (patched) evdi_connector.c file
+wget https://github.com/DisplayLink/evdi/raw/devel/module/evdi_connector.c -O $evdi_src/evdi_connector.c
+# get latest (patched) evdi_gem.c file
+wget https://raw.githubusercontent.com/DisplayLink/evdi/devel/module/evdi_gem.c -O $evdi_src/evdi_gem.c
+
+# compress $evdi_src.tar.gz from $evdi_src
+tar -zcvf $evdi_src.tar.gz $evdi_src
+}
+
+function ver2int {
+echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
+}
+
+# patch evdi depending on kernel version
+if [ "$(ver2int $kernel_check)" -ge "$(ver2int '4.19')" ];
+then
+		echo "detected: $kernel_check, patching\n"
+		kernel_patch
+		./displaylink-installer.sh install
+else
+		./displaylink-installer.sh install
+fi
+
 }
 
 # post install
