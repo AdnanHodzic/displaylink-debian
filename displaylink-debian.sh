@@ -309,24 +309,46 @@ chmod +x $driver_dir/displaylink-driver-${version}.[0-9]*.run
 ./$driver_dir/displaylink-driver-${version}.[0-9]*.run --keep --noexec
 mv displaylink-driver-${version}.[0-9]*/ $driver_dir/displaylink-driver-${version}
 
-nextgen_kernel_patch(){
+# Broken after update to 4.19 kernel (issue: #191)
+nexgen_kernel_patch(){
 
 # check kernel
+kernel_check="$(uname -r | egrep -o '[0-9]+\.[0-9]+')"
 
+kernel_patch(){
 # extract evdi src
 evdi_src_ver="$(echo evdi-* | cut -d'-' -f2)"
 evdi_src="evdi-$evdi_src_ver-src"
 mkdir $evdi_src
 
-echo "extracting dir: $evdi_src.tar.gz to $evdi_src"
+echo -e "extracting dir: $evdi_src.tar.gz to $evdi_src"
 tar -xzvf $evdi_src.tar.gz -C $evdi_src
 
-# modify patch
+# modify evdi
 
 echo "compressing: $evdi_src.tar.gz from $evdi_src"
 tar -zcvf $evdi_src.tar.gz $evdi_src
-
 }
+
+function ver2int {
+echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
+}
+
+# patch evdi depending on kernel version
+if [ "$(ver2int $kernel_check)" -ge "$(ver2int '4.19')" ];
+then
+    echo "detected: $kernel_check, patching\n"
+    kernel_patch
+elif [ "$(ver2int $kernel_check)" -ge "$(ver2int '5.0')" ];
+then
+    echo "dected: $kernel_check, patching\n"
+    kernel_patch
+else
+    echo "got out"
+fi
+}
+
+nexgen_kernel_patch
 
 # get sysinitdaemon
 sysinitdaemon=$(sysinitdaemon_get)
