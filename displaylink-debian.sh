@@ -339,16 +339,13 @@ evdi_src_ver="$(echo evdi-* | cut -d'-' -f2)"
 evdi_src="evdi-$evdi_src_ver-src"
 mkdir $evdi_src
 
-# extract $evdi_src.tar.gz to $evdi_src
-tar -xzvf $evdi_src.tar.gz -C $evdi_src --strip 1
-
-# get latest (patched) evdi_connector.c file
-wget https://github.com/DisplayLink/evdi/raw/devel/module/evdi_connector.c -O $evdi_src/evdi_connector.c
-# get latest (patched) evdi_gem.c file
-wget https://raw.githubusercontent.com/DisplayLink/evdi/devel/module/evdi_gem.c -O $evdi_src/evdi_gem.c
-
-# compress $evdi_src.tar.gz from $evdi_src
-tar -zcvf $evdi_src.tar.gz $evdi_src
+evdi_patch_version=v1.5.1
+# get version v1.5.1 of evdi. Note: the version could also be "devel" or "master"
+wget https://github.com/DisplayLink/evdi/archive/$evdi_patch_version.tar.gz -O evdi-$evdi_patch_version.tar.gz
+# extract evdi to $evdi_src
+tar -xzvf evdi-$evdi_patch_version.tar.gz -C $evdi_src --strip 1
+# compress new $evdi_src.tar.gz from $evdi_src/module - this replaces evdi from displaylink-driver package
+tar -zcvf $evdi_src.tar.gz -C $evdi_src/module .
 }
 
 function ver2int {
@@ -584,7 +581,7 @@ then
 fi
 
 # evdi module still in use (issue 178, 192)
-evdi_version="$(systemctl status dlm.service | grep -o '4.4.[[:digit:]]*')"
+evdi_version="$(dkms status evdi|grep -o '4.4.[[:digit:]]*')"
 dkms remove evdi/$evdi_version --all
 evdi_dir="/usr/src/evdi-$evdi_version"
 if [ -d "$evdi_dir" ];
