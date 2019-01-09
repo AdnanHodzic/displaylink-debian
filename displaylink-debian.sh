@@ -348,7 +348,7 @@ wget https://github.com/DisplayLink/evdi/raw/devel/module/evdi_connector.c -O $e
 wget https://raw.githubusercontent.com/DisplayLink/evdi/devel/module/evdi_gem.c -O $evdi_src/evdi_gem.c
 
 # compress $evdi_src.tar.gz from $evdi_src
-tar -zcvf $evdi_src.tar.gz $evdi_src
+tar -zcvf $evdi_src.tar.gz -C $evdi_src .
 }
 
 function ver2int {
