@@ -581,7 +581,7 @@ then
 fi
 
 # evdi module still in use (issue 178, 192)
-evdi_version="$(systemctl status dlm.service | grep -o '4.4.[[:digit:]]*')"
+evdi_version="$(dkms status evdi|grep -o '4.4.[[:digit:]]*')"
 dkms remove evdi/$evdi_version --all
 evdi_dir="/usr/src/evdi-$evdi_version"
 if [ -d "$evdi_dir" ];
