@@ -498,9 +498,6 @@ Section "Screen"
     Option "AllowEmptyInitialConfiguration" "on"
     Option "IgnoreDisplayDevices" "CRT"
 EndSection
-Section "Device"
-  Identifier "DisplayLink"
-EndSection
 EOL
 }
 
