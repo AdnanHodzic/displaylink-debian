@@ -520,9 +520,9 @@ then
 		then
 				if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $newgen_xorg)" ];
 				then
-						# temporarily disabled (issue: 200)
-						#xorg_modesetting_newgen
-				#else
+						# reference: issue #200
+						xorg_modesetting_newgen
+				else
 						xorg_modesetting
 				fi
 		# generic intel
@@ -542,9 +542,9 @@ then
 else
 		if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $newgen_xorg)" ];
 		then
-				# temporarily disabled (issue: 200)
-				# xorg_modesetting_newgen
-		#else
+				# reference: issue #200
+				xorg_modesetting_newgen
+		else
 				xorg_modesetting
 		fi
 fi
