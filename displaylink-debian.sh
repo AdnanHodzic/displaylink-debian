@@ -69,10 +69,10 @@ if [ ${#check_etc[@]} -gt 0 ];
 then
 		if [ "$x11_etc" != 0 ]
 		then
-				find $x11_etc -type f -name "*.conf" | xargs echo "X11 related conf:"
+				find $x11_etc -type f -name "*.conf" | xargs echo "X11 configs:"
 		elif [ "$list_etc_confd" != 0 ]
 		then
-				find $x11_etc_confd -type f -name "*.conf" | xargs echo "X11 related conf:"
+				find $x11_etc_confd -type f -name "*.conf" | xargs echo "X11 configs:"
 		fi
 fi
 
