@@ -57,37 +57,24 @@ then
 fi
 }
 
-xconfig_check(){
+# list all xorg related configs
+xconfig_list(){
 x11_etc="/etc/X11/"
 x11_etc_confd="/etc/X11/xorg.conf.d/"
 
-x11_usr="/usr/share/X11/"
-x11_usr_confd="/usr/share/xorg.conf.d/"
-
 check_etc=$(find $x11_etc -maxdepth 2 -name "*.conf")
-list_etc_dep1=$(ls -1 $x11_etc*.conf 2>/dev/null | wc -l)
-list_etc_dep2=$(ls -1 $x11_etc_confd*.conf 2>/dev/null | wc -l)
-
-check_usr=$(find $x11_usr -maxdepth 2 -name "*.conf")
+list_etc_confd=$(ls -1 $x11_etc*.conf 2>/dev/null | wc -l)
 
 if [ ${#check_etc[@]} -gt 0 ];
 then
-		#echo there are configs in etc
 		if [ "$x11_etc" != 0 ]
 		then
-				echo "true dep1"
 				find $x11_etc -type f -name "*.conf" | xargs echo "X11 related conf:"
-		elif [ "$etc_dep2" != 0 ]
+		elif [ "$list_etc_confd" != 0 ]
 		then
-				echo "true dep2"
 				find $x11_etc_confd -type f -name "*.conf" | xargs echo "X11 related conf:"
 		fi
 fi
-
-#if [ ${#xconf_find_usr[@]} -gt 0 ];
-#then
-#		...
-#fi
 
 }
 
@@ -697,6 +684,7 @@ echo -e "Vendor: $graphics_vendor"
 echo -e "Subsystem: $graphics_subcard"
 echo -e "VGA: $vga_info"
 echo -e "X11 version: $xorg_vcheck"
+xconfig_list
 echo -e "\n-------------- DisplayLink xorg.conf -------------\n"
 echo -e "File: $xorg_config_displaylink"
 echo -e "Contents:\n $(cat $xorg_config_displaylink)"
@@ -721,7 +709,6 @@ read -p "[I]nstall
 Select a key: [i/d/r/u/q]: " answer
 }
 
-xconfig_check
 root_check
 
 if [[ -z "${1}" ]];
