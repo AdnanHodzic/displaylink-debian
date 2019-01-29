@@ -122,6 +122,8 @@ Note, in case you're editting ```~/.bashrc```, make sure you run ```source ~/.ba
 
 * [mouse flicker issue](https://github.com/AdnanHodzic/displaylink-debian/issues/192)
 
+* [Only one xrandr provider](https://github.com/AdnanHodzic/displaylink-debian/issues/207)
+
 
 ##### Monitoring for errors
 
