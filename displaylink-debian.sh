@@ -57,6 +57,40 @@ then
 fi
 }
 
+xconfig_check(){
+x11_etc="/etc/X11/"
+x11_etc_confd="/etc/X11/xorg.conf.d/"
+
+x11_usr="/usr/share/X11/"
+x11_usr_confd="/usr/share/xorg.conf.d/"
+
+check_etc=$(find $x11_etc -maxdepth 2 -name "*.conf")
+list_etc_dep1=$(ls -1 $x11_etc | grep *.conf 2>/dev/null | wc -l)
+list_etc_dep2=$(ls -1 $x11_etc_confd | grep *.conf 2>/dev/null | wc -l)
+
+check_usr=$(find $x11_usr -maxdepth 2 -name "*.conf")
+
+if [[ ${#check_etc[@]} -gt 0 ]];
+then
+		echo there are configs in etc
+		if [[ $etc_dep1 != 0 ]];
+		then
+				echo "true dep1"
+				find $x11_etc -type f -name "*.conf" | xargs echo "X11 related conf:"
+		elif [[ $etc_dep2 != 0 ]];
+		then
+				echo "true dep2"
+				find $x11_etc_confd -type f -name "*.conf" | xargs echo "X11 related conf:"
+		fi
+fi
+
+#if [ ${#xconf_find_usr[@]} -gt 0 ];
+#then
+#		...
+#fi
+
+}
+
 # Dependencies
 dep_check() {
 echo -e "\nChecking dependencies\n"
@@ -687,6 +721,7 @@ read -p "[I]nstall
 Select a key: [i/d/r/u/q]: " answer
 }
 
+xconfig_check
 root_check
 
 if [[ -z "${1}" ]];
