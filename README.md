@@ -73,3 +73,9 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
 [displaylink-debian]: https://github.com/AdnanHodzic/displaylink-debian
 [PostInstall]:        https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md
 [TroubleShooting]:    https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#troubleshooting-most-common-issues
+
+#### Donate (PayPal)
+
+Since I'm working on this project in free time without any support or reimbursement from DisplayLink, and [have saved some 100$](https://github.com/AdnanHodzic/displaylink-debian/issues/172#issuecomment-441384936). Please consider supporting this project by making a donation of any amount!
+
+[![paypal](https://www.paypalobjects.com/en_US/NL/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate/?token=ZzAHzIc9Xerb_xL_MLcwmqrY7a8kONrx_r4IwcDkUTr5wxpKEJqJr5hkVHUoZ-vnEHqcr0&country.x=NL&locale.x=en_US)
