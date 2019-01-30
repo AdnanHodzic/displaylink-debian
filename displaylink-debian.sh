@@ -23,6 +23,7 @@ codename="$(lsb_release -cs)"
 platform="$(lsb_release -ics | sed '$!s/$/ /' | tr -d '\n')"
 kernel="$(uname -r)"
 xorg_config_displaylink="/etc/X11/xorg.conf.d/20-displaylink.conf"
+blacklist="/etc/modprobe.d/blacklist.conf"
 dlm_service_check="$(systemctl is-active --quiet dlm.service && echo up and running)"
 vga_info="$(lspci | grep -oP '(?<=VGA compatible controller: ).*')"
 graphics_vendor="$(lspci -nnk | grep -i vga -A3 | grep 'in use' | cut -d ':' -f2 | sed 's/ //g')"
@@ -369,6 +370,28 @@ tar -xzvf evdi-$evdi_patch_version.tar.gz -C $evdi_src --strip 1
 tar -zcvf $evdi_src.tar.gz -C $evdi_src/module .
 }
 
+# add udlfb to blacklist (issue #207)
+udl_block(){
+
+# if necessary create blacklist.conf
+if [ ! -f $blacklist ]; then
+		touch $blacklist
+fi
+
+if ! grep -Fxq "blacklist udlfb" $blacklist
+then
+		echo "Adding udlfb to blacklist"
+		echo "blacklist udlfb" >> $blacklist
+fi
+
+# add udl to blacklist (issue #207)
+if ! grep -Fxq "blacklist udl" $blacklist
+then
+		echo "Adding udl to blacklist"
+		echo "blacklist udl" >> $blacklist
+fi
+}
+
 function ver2int {
 echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
 }
@@ -381,6 +404,12 @@ then
 		./displaylink-installer.sh install
 else
 		./displaylink-installer.sh install
+fi
+
+# add udl/udlfb to blacklist depending on kernel version (issue #207)
+if [ "$(ver2int $kernel_check)" -ge "$(ver2int '4.14.9')" ];
+then
+		udl_block
 fi
 
 }
@@ -625,6 +654,10 @@ then
 		echo "Removing Displaylink Xorg config file"
 		rm $xorg_config_displaylink
 fi
+
+# delete udl/udlfb from blacklist (issue #207)
+sed -i '/blacklist udlfb/d' $blacklist
+sed -i '/blacklist udl/d' $blacklist
 
 }
 
