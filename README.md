@@ -78,4 +78,4 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
 
 Since I'm working on this project in free time without any support or reimbursement from DisplayLink, and [have saved some 100$](https://github.com/AdnanHodzic/displaylink-debian/issues/172#issuecomment-441384936). Please consider supporting this project by making a donation of any amount!
 
-[![paypal](https://www.paypalobjects.com/en_US/NL/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate/?token=ZzAHzIc9Xerb_xL_MLcwmqrY7a8kONrx_r4IwcDkUTr5wxpKEJqJr5hkVHUoZ-vnEHqcr0&country.x=NL&locale.x=en_US)
+[![paypal](https://www.paypalobjects.com/en_US/NL/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate/?token=UUpxvrOpzaCGpe26XDVbp5cAwx0Ogo2Ua6dUe_G9VKbOR3o60IzQxUwKSwTZnNrbaOYZR0&country.x=NL&locale.x=en_US&Z3JncnB0=)
