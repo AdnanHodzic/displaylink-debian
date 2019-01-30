@@ -122,9 +122,6 @@ Note, in case you're editting ```~/.bashrc```, make sure you run ```source ~/.ba
 
 * [mouse/cursor flicker issue](https://github.com/AdnanHodzic/displaylink-debian/issues/192)
 
-* [Only one xrandr provider](https://github.com/AdnanHodzic/displaylink-debian/issues/207)
-
-
 ##### Monitoring for errors
 
 * Monitor ```dmesg | grep Display``` output while plugging in Displaylink
