@@ -488,6 +488,8 @@ then
 		echo -e "\nLocation: $xsetup_loc.org.bak"
 		nvidia_xrandr
 		echo -e "Wrote changes to $xsetup_loc"
+		# give exec permissions to Xsetup (issue #201)
+		chmod +x $xsetup_loc
 fi
 
 # xorg.conf ops
