@@ -480,6 +480,32 @@ xrandr --auto
 EOL
 }
 
+nvidia_xrandr_full(){
+cat >> $xsetup_loc << EOL
+#!/bin/sh
+# Xsetup - run as root before the login dialog appears
+
+if [ -e /sbin/prime-offload ]; then
+    echo running NVIDIA Prime setup /sbin/prime-offload
+    /sbin/prime-offload
+fi
+
+xrandr --setprovideroutputsource modesetting NVIDIA-0
+xrandr --auto
+EOL
+}
+
+# create Xsetup file if not there + make necessary changes (issue: #201, #206)
+if [ ! -f $xsetup_loc ];
+then
+    echo "$xsetup_loc not found, creating"
+		mkdir -p /usr/share/sddm/scripts/
+		touch $xsetup_loc
+		nvidia_xrandr_full
+		chmod +x $xsetup_loc
+		echo -e "Wrote changes to $xsetup_loc"
+fi
+
 # make necessary changes to Xsetup
 if ! grep -q "setprovideroutputsource modesetting" $xsetup_loc
 then
@@ -487,9 +513,8 @@ then
 		echo -e "\nMade backup of: $xsetup_loc file"
 		echo -e "\nLocation: $xsetup_loc.org.bak"
 		nvidia_xrandr
-		echo -e "Wrote changes to $xsetup_loc"
-		# give exec permissions to Xsetup (issue #201)
 		chmod +x $xsetup_loc
+		echo -e "Wrote changes to $xsetup_loc"
 fi
 
 # xorg.conf ops
