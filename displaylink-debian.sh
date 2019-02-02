@@ -26,6 +26,7 @@ xorg_config_displaylink="/etc/X11/xorg.conf.d/20-displaylink.conf"
 blacklist="/etc/modprobe.d/blacklist.conf"
 dlm_service_check="$(systemctl is-active --quiet dlm.service && echo up and running)"
 vga_info="$(lspci | grep -oP '(?<=VGA compatible controller: ).*')"
+vga_info_3d="$(lspci | grep -i '3d controller' | sed 's/^.*: //')"
 graphics_vendor="$(lspci -nnk | grep -i vga -A3 | grep 'in use' | cut -d ':' -f2 | sed 's/ //g')"
 graphics_subcard="$(lspci -nnk | grep -i vga -A3 | grep Subsystem | cut -d ' ' -f5)"
 providers="$(xrandr --listproviders)"
@@ -434,6 +435,7 @@ sudo systemctl enable dlm.service
 modesetting(){
 test ! -d /etc/X11/xorg.conf.d && mkdir -p /etc/X11/xorg.conf.d
 drv=$(lspci -nnk | grep -i vga -A3 | grep 'in use'|cut -d":" -f2|sed 's/ //g')
+drv_nvidia=$(lspci | grep -i '3d controller' | sed 's/^.*: //' | awk '{print $1}')
 cardsub=$(lspci -nnk | grep -i vga -A3|grep Subsystem|cut -d" " -f5)
 
 # intel displaylink xorg.conf
@@ -606,8 +608,8 @@ then
 		else
 				xorg_intel
 		fi
-# set xorg for Nvidia cards (issue: 176, 179)
-elif [ "$drv" == "nvidia" ];
+# set xorg for Nvidia cards (issue: 176, 179, 211)
+elif [ "$drv_nvidia" == "NVIDIA" ];
 then
 		nvidia_pregame
 		xorg_nvidia
@@ -743,6 +745,7 @@ echo -e "\n------------------ Graphics card -----------------\n"
 echo -e "Vendor: $graphics_vendor"
 echo -e "Subsystem: $graphics_subcard"
 echo -e "VGA: $vga_info"
+echo -e "VGA (3D): $vga_info_3d"
 echo -e "X11 version: $xorg_vcheck"
 xconfig_list
 echo -e "\n-------------- DisplayLink xorg.conf -------------\n"
