@@ -591,8 +591,17 @@ EndSection
 EOL
 }
 
+# set xorg for Nvidia cards (issue: 176, 179, 211)
+if [ "$drv_nvidia" == "NVIDIA" ];
+then
+		nvidia_pregame
+		xorg_nvidia
+# set xorg for AMD cards (issue: 180)
+elif [ "$drv" == "amdgpu" ];
+then
+		xorg_amd
 # set xorg for Intel cards
-if [ "$drv" == "i915" ];
+elif [ "$drv" == "i915" ];
 then
 		# set xorg modesetting for Intel cards (issue: 179, 68, 88, 192)
 		if [ "$cardsub" == "v2/3rd" ] || [ "$cardsub" == "[HD" ] || [ "$cardsub" == "620" ] || [ "$cardsub" == "530" ] || [ "$cardsub" == "540" ] || [ "$cardsub" == "UHD" ];
@@ -608,15 +617,6 @@ then
 		else
 				xorg_intel
 		fi
-# set xorg for Nvidia cards (issue: 176, 179, 211)
-elif [ "$drv_nvidia" == "NVIDIA" ];
-then
-		nvidia_pregame
-		xorg_nvidia
-# set xorg for AMD cards (issue: 180)
-elif [ "$drv" == "amdgpu" ];
-then
-		xorg_amd
 # default xorg modesetting
 else
 		if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $newgen_xorg)" ];
