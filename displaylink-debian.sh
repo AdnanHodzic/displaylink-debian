@@ -295,26 +295,28 @@ done
 }
 
 download() {
-    local dlfileid=$(echo $dlurl | perl -pe '($_)=/.+\?id=(\d+)/')
+local dlfileid=$(echo $dlurl | perl -pe '($_)=/.+\?id=(\d+)/')
 
-    echo -en "\nPlease read the Software License Agreement\navailable at $dlurl\nand accept here: [Y]es or [N]o: "
-    read ACCEPT
-    case $ACCEPT in
-        y*|Y*)
-            echo -e "\nDownloading DisplayLink Ubuntu driver:\n"
-            wget -O DisplayLink_Ubuntu_${version}.zip "--post-data=fileId=$dlfileid&accept_submit=Accept" $dlurl
-            # make sure we got the file downloadet before continueing
-            if [ $? -ne 0 ]
-            then
-            	echo -e "\nUnable to download Displaylink driver\n"
-            	exit
-            fi
-            ;;
-        *)
-            echo "Can't download the driver without accepting the license agreement!"
-            exit 1
-            ;;
-    esac
+default=y
+echo -en "\nPlease read the Software License Agreement available at: \n$dlurl\nDo you accept?: [Y/n]: "
+read ACCEPT
+ACCEPT=${ACCEPT:-$default}
+case $ACCEPT in
+		y*|Y*)
+				echo -e "\nDownloading DisplayLink Ubuntu driver:\n"
+				wget -O DisplayLink_Ubuntu_${version}.zip "--post-data=fileId=$dlfileid&accept_submit=Accept" $dlurl
+				# make sure file is downloaded before continuing
+				if [ $? -ne 0 ]
+				then
+					echo -e "\nUnable to download Displaylink driver\n"
+					exit
+				fi
+				;;
+		*)
+				echo "Can't download the driver without accepting the license agreement!"
+				exit 1
+				;;
+esac
 }
 
 install(){
