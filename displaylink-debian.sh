@@ -86,7 +86,7 @@ echo -e "\nChecking dependencies\n"
 
 if [ "$lsb" == "Deepin" ];
 then
-	deps=(unzip linux-headers-$(uname -r)-deepin dkms lsb-release linux-source-deepin x11-xserver-utils wget)
+	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source-deepin x11-xserver-utils wget)
 else
 	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget)
 fi
