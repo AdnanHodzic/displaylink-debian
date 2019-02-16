@@ -185,7 +185,8 @@ then
 # Kali
 elif [ "$lsb" == "Kali" ];
 then
-	if [ $codename == "kali-rolling" ] || [ $codename == "2016.2" ] || [ $codename == "2017.3" ] || [ $codename == "2018.3" ] || [ $codename == "2018.4" ];
+	# issue: 204
+	if [ $codename == "kali-rolling" ] || [ $codename == "2016.2" ] || [ $codename == "2017.3" ] || [ $codename == "2018.3" ] || [ $codename == "2018.4" ] || [ $codename == "n/a" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
@@ -582,6 +583,12 @@ EndSection
 EOL
 }
 
+# issue: 204
+nvidia_hashcat(){
+echo "Installing hashcat-nvidia, 'contrib non-free' must be enabled in apt sources"
+apt-get install hashcat-nvidia
+}
+
 # amd displaylink xorg.conf
 xorg_amd(){
 cat > $xorg_config_displaylink <<EOL
@@ -598,6 +605,7 @@ if [ "$drv_nvidia" == "NVIDIA" ];
 then
 		nvidia_pregame
 		xorg_nvidia
+		nvidia_hashcat
 # set xorg for AMD cards (issue: 180)
 elif [ "$drv" == "amdgpu" ];
 then
