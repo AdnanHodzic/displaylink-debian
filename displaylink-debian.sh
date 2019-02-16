@@ -600,8 +600,8 @@ EndSection
 EOL
 }
 
-# set xorg for Nvidia cards (issue: 176, 179, 211)
-if [ "$drv_nvidia" == "NVIDIA" ];
+# set xorg for Nvidia cards (issue: 176, 179, 211, 217)
+if [ "$drv_nvidia" == "NVIDIA" ] || [ "$drv" == "nvidia" ];
 then
 		nvidia_pregame
 		xorg_nvidia
