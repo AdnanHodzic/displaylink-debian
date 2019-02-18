@@ -583,7 +583,7 @@ EndSection
 EOL
 }
 
-# issue: 204
+# issue: 204, 216
 nvidia_hashcat(){
 echo "Installing hashcat-nvidia, 'contrib non-free' must be enabled in apt sources"
 apt-get install hashcat-nvidia
@@ -605,7 +605,7 @@ if [ "$drv_nvidia" == "NVIDIA" ] || [ "$drv" == "nvidia" ];
 then
 		nvidia_pregame
 		xorg_nvidia
-		nvidia_hashcat
+		#nvidia_hashcat
 # set xorg for AMD cards (issue: 180)
 elif [ "$drv" == "amdgpu" ];
 then
