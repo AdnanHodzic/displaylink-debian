@@ -400,40 +400,43 @@ function ver2int {
 echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
 }
 
-# patch evdi depending on kernel version
-if [ "$(ver2int $kernel_check)" -ge "$(ver2int '4.19')" ];
-then
-		echo "detected: $kernel_check, patching\n"
-		#kernel_patch
-		echo "Registering EVDI kernel module with DKMS"
-		dkms add evdi/$evdi_version -q
-		if [ $? != 0 -a $? != 3 ];
-		then
-			echo "Unable to add evdi/$evdi_version to DKMS source tree."
-			return 1
-		fi
+## patch evdi depending on kernel version
+#if [ "$(ver2int $kernel_check)" -ge "$(ver2int '4.19')" ];
+#then
+#		echo "detected: $kernel_check, patching\n"
+#		#kernel_patch
+#		echo "Registering EVDI kernel module with DKMS"
+#		dkms add evdi/$evdi_version -q
+#		if [ $? != 0 -a $? != 3 ];
+#		then
+#			echo "Unable to add evdi/$evdi_version to DKMS source tree."
+#			return 1
+#		fi
+#
+#		echo "Building EVDI kernel module with DKMS"
+#		dkms build evdi/$evdi_version -q
+#		if [ $? != 0 ];
+#		then
+#			echo "Failed to build evdi/$evdi_version. Consult /var/lib/dkms/evdi/$evdi_version/build/make.log for details."
+#			return 2
+#		fi
+#
+#		echo "Building EVDI kernel module with DKMS"
+#		dkms install evdi/$evdi_version -q
+#		if [ $? != 0 ]; then
+#			echo "Failed to build evdi/$evdi_version. Consult /var/lib/dkms/evdi/$evdi_version/build/make.log for details."
+#			return 3
+#		fi
+#
+#		echo "EVDI kernel module built successfully"
+#
+#		./displaylink-installer.sh install
+#else
+#		./displaylink-installer.sh install
+#fi
 
-		echo "Building EVDI kernel module with DKMS"
-		dkms build evdi/$evdi_version -q
-		if [ $? != 0 ];
-		then
-			echo "Failed to build evdi/$evdi_version. Consult /var/lib/dkms/evdi/$evdi_version/build/make.log for details."
-			return 2
-		fi
+./displaylink-installer.sh install
 
-		echo "Building EVDI kernel module with DKMS"
-		dkms install evdi/$evdi_version -q
-		if [ $? != 0 ]; then
-			echo "Failed to build evdi/$evdi_version. Consult /var/lib/dkms/evdi/$evdi_version/build/make.log for details."
-			return 3
-		fi
-
-		echo "EVDI kernel module built successfully"
-
-		./displaylink-installer.sh install
-else
-		./displaylink-installer.sh install
-fi
 
 # add udl/udlfb to blacklist depending on kernel version (issue #207)
 if [ "$(ver2int $kernel_check)" -ge "$(ver2int '4.14.9')" ];
