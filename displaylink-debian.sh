@@ -354,11 +354,41 @@ echo -e "\nInstalling driver version: $version\n"
 # cd $driver_dir/displaylink-driver-${version} && ./displaylink-installer.sh install
 cd $driver_dir/displaylink-driver-${version}
 
-# Broken after update to 4.19 kernel (issue: #191)
-#
+evdi_ops(){
+echo "Registering EVDI kernel module with DKMS"
+dkms add evdi/$evdi_version -q
+if [ $? != 0 -a $? != 3 ];
+then
+	echo "Unable to add evdi/$evdi_version to DKMS source tree."
+	return 1
+fi
+
+echo "Building EVDI kernel module with DKMS"
+dkms build evdi/$evdi_version -q
+if [ $? != 0 ];
+then
+	echo "Failed to build evdi/$evdi_version. Consult /var/lib/dkms/evdi/$evdi_version/build/make.log for details."
+	return 2
+fi
+
+echo "Building EVDI kernel module with DKMS"
+dkms install evdi/$evdi_version -q
+if [ $? != 0 ]; then
+	echo "Failed to build evdi/$evdi_version. Consult /var/lib/dkms/evdi/$evdi_version/build/make.log for details."
+	return 3
+fi
+
+echo "EVDI kernel module built successfully"
+}
+
+echo "Starting displaylink-driver service"
+systemctl start displaylink-driver
+
 # check kernel version
 kernel_check="$(uname -r | egrep -o '[0-9]+\.[0-9]+')"
 
+# Broken after update to 4.19 kernel (issue: #191)
+#
 kernel_patch(){
 # extract evdi src
 evdi_src_ver="$(echo evdi-* | cut -d'-' -f2)"
@@ -367,11 +397,11 @@ mkdir $evdi_src
 
 evdi_patch_version=v1.5.1
 # get version v1.5.1 of evdi. Note: the version could also be "devel" or "master"
-wget https://github.com/DisplayLink/evdi/archive/$evdi_patch_version.tar.gz -O evdi-$evdi_patch_version.tar.gz
+#wget https://github.com/DisplayLink/evdi/archive/$evdi_patch_version.tar.gz -O evdi-$evdi_patch_version.tar.gz
 # extract evdi to $evdi_src
-tar -xzvf evdi-$evdi_patch_version.tar.gz -C $evdi_src --strip 1
+#tar -xzvf evdi-$evdi_patch_version.tar.gz -C $evdi_src --strip 1
 # compress new $evdi_src.tar.gz from $evdi_src/module - this replaces evdi from displaylink-driver package
-tar -zcvf $evdi_src.tar.gz -C $evdi_src/module .
+#tar -zcvf $evdi_src.tar.gz -C $evdi_src/module .
 }
 
 # add udlfb to blacklist (issue #207)
@@ -400,15 +430,16 @@ function ver2int {
 echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
 }
 
+evdi_ops
 # patch evdi depending on kernel version
-if [ "$(ver2int $kernel_check)" -ge "$(ver2int '4.19')" ];
-then
-		echo "detected: $kernel_check, patching\n"
-		kernel_patch
-		./displaylink-installer.sh install
-else
-		./displaylink-installer.sh install
-fi
+#if [ "$(ver2int $kernel_check)" -ge "$(ver2int '4.19')" ];
+#then
+#		echo "detected: $kernel_check, patching\n"
+#		kernel_patch
+#		./displaylink-installer.sh install
+#else
+#		./displaylink-installer.sh install
+#fi
 
 # add udl/udlfb to blacklist depending on kernel version (issue #207)
 if [ "$(ver2int $kernel_check)" -ge "$(ver2int '4.14.9')" ];
