@@ -460,7 +460,7 @@ fi
 #sudo systemctl enable dlm.service
 
 echo "Enable and start displaylink-driver service"
-systemctl enable displaylink-driver
+#systemctl enable displaylink-driver
 systemctl start displaylink-driver
 
 # setup xorg.conf depending on graphics card
