@@ -458,13 +458,14 @@ then
 	ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /opt/displaylink/libstdc++.so.6
 fi
 
-# fix: issue #36 (can't enable dlm.service)
-#sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/dlm.service
+# Fix inability to enable displaylink-driver.service
+sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/displaylink-driver.service
 #sudo systemctl enable dlm.service
 
+# ToDo: if exists delete dlm.service (/lib/systemd/system/displaylink-driver.service)
 echo "Enable and start displaylink-driver service"
-#systemctl enable displaylink-driver
-systemctl start displaylink-driver
+systemctl enable displaylink-driver.service
+systemctl start displaylink-driver.service
 
 # setup xorg.conf depending on graphics card
 modesetting(){
