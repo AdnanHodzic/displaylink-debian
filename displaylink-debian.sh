@@ -354,9 +354,6 @@ echo -e "\nInstalling driver version: $version\n"
 # cd $driver_dir/displaylink-driver-${version} && ./displaylink-installer.sh install
 cd $driver_dir/displaylink-driver-${version}
 
-echo "Starting displaylink-driver service"
-systemctl start displaylink-driver
-
 # check kernel version
 kernel_check="$(uname -r | egrep -o '[0-9]+\.[0-9]+')"
 
@@ -459,8 +456,12 @@ then
 fi
 
 # fix: issue #36 (can't enable dlm.service)
-sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/dlm.service
-sudo systemctl enable dlm.service
+#sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/dlm.service
+#sudo systemctl enable dlm.service
+
+echo "Enable and start displaylink-driver service"
+systemctl enable displaylink-driver
+systemctl start displaylink-driver
 
 # setup xorg.conf depending on graphics card
 modesetting(){
