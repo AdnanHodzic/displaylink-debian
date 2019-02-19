@@ -349,30 +349,13 @@ fi
 
 # install
 separator
+# run displaylink install
 echo -e "\nInstalling driver version: $version\n"
-# original install before newgen_kernel_patch
-# cd $driver_dir/displaylink-driver-${version} && ./displaylink-installer.sh install
 cd $driver_dir/displaylink-driver-${version}
+./displaylink-installer.sh install
 
-# check kernel version
+# udlfb kernel version check
 kernel_check="$(uname -r | egrep -o '[0-9]+\.[0-9]+')"
-
-# Broken after update to 4.19 kernel (issue: #191)
-#
-kernel_patch(){
-# extract evdi src
-evdi_src_ver="$(echo evdi-* | cut -d'-' -f2)"
-evdi_src="evdi-$evdi_src_ver-src"
-mkdir $evdi_src
-
-evdi_patch_version=v1.5.1
-# get version v1.5.1 of evdi. Note: the version could also be "devel" or "master"
-#wget https://github.com/DisplayLink/evdi/archive/$evdi_patch_version.tar.gz -O evdi-$evdi_patch_version.tar.gz
-# extract evdi to $evdi_src
-#tar -xzvf evdi-$evdi_patch_version.tar.gz -C $evdi_src --strip 1
-# compress new $evdi_src.tar.gz from $evdi_src/module - this replaces evdi from displaylink-driver package
-#tar -zcvf $evdi_src.tar.gz -C $evdi_src/module .
-}
 
 # add udlfb to blacklist (issue #207)
 udl_block(){
@@ -396,49 +379,11 @@ then
 fi
 }
 
+# add udl/udlfb to blacklist depending on kernel version (issue #207)
 function ver2int {
 echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
 }
 
-## patch evdi depending on kernel version
-#if [ "$(ver2int $kernel_check)" -ge "$(ver2int '4.19')" ];
-#then
-#		echo "detected: $kernel_check, patching\n"
-#		#kernel_patch
-#		echo "Registering EVDI kernel module with DKMS"
-#		dkms add evdi/$evdi_version -q
-#		if [ $? != 0 -a $? != 3 ];
-#		then
-#			echo "Unable to add evdi/$evdi_version to DKMS source tree."
-#			return 1
-#		fi
-#
-#		echo "Building EVDI kernel module with DKMS"
-#		dkms build evdi/$evdi_version -q
-#		if [ $? != 0 ];
-#		then
-#			echo "Failed to build evdi/$evdi_version. Consult /var/lib/dkms/evdi/$evdi_version/build/make.log for details."
-#			return 2
-#		fi
-#
-#		echo "Building EVDI kernel module with DKMS"
-#		dkms install evdi/$evdi_version -q
-#		if [ $? != 0 ]; then
-#			echo "Failed to build evdi/$evdi_version. Consult /var/lib/dkms/evdi/$evdi_version/build/make.log for details."
-#			return 3
-#		fi
-#
-#		echo "EVDI kernel module built successfully"
-#
-#		./displaylink-installer.sh install
-#else
-#		./displaylink-installer.sh install
-#fi
-
-./displaylink-installer.sh install
-
-
-# add udl/udlfb to blacklist depending on kernel version (issue #207)
 if [ "$(ver2int $kernel_check)" -ge "$(ver2int '4.14.9')" ];
 then
 		udl_block
@@ -460,9 +405,7 @@ fi
 
 # Fix inability to enable displaylink-driver.service
 sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/displaylink-driver.service
-#sudo systemctl enable dlm.service
 
-# ToDo: if exists delete dlm.service (/lib/systemd/system/displaylink-driver.service)
 echo "Enable and start displaylink-driver service"
 systemctl enable displaylink-driver.service
 systemctl start displaylink-driver.service
@@ -710,9 +653,14 @@ then
 		rm -rf $evdi_dir
 fi
 
+# ToDo: remove
 # disabled and remove dlm.service
 systemctl disable dlm.service
 rm -f /lib/systemd/system/dlm.service
+# ToDo: enable
+#systemctl stop displaylink-driver.service
+#systemctl disable displaylink-driver.service
+#rm -f /lib/systemd/system/displaylink-driver.service
 
 # double check if evdi module is loaded, if yes remove it
 if lsmod | grep "evdi" &> /dev/null ; then
