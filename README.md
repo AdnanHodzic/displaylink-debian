@@ -46,6 +46,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   * Deepin: 15/15.1/15.1.1/15.2/15.4.1
   * MX Linux: 17.1
   * BunsenLabs: Helium
+  * Parrot: 4.5
 
   Regardless of which Linux kernel version you're using.
   

@@ -224,6 +224,16 @@ then
 		message
 		exit 1
 	fi
+# Parrot 
+elif [ "$lsb" == "Parrot" ];
+then
+	if [ $codename == "n/a" ];
+	then
+		echo -e "\nPlatform requirements satisfied, proceeding ..."
+	else
+		message
+		exit 1
+	fi
 else
 	message
 	exit 1
