@@ -277,9 +277,9 @@ fi
 
 setup_complete(){
 ack=${ack:-$default}
-default=N
+default=Y
 
-read -p "Reboot now? [y/N] " ack
+read -p "Reboot now? [Y/n] " ack
 ack=${ack:-$default}
 
 for letter in "$ack"; do
