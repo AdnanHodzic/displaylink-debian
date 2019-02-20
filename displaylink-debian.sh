@@ -645,29 +645,8 @@ then
 	rm /lib/modules/$(uname -r)/build/Kconfig
 fi
 
-# evdi module still in use (issue 178, 192)
-#evdi_version="$(dkms status evdi|grep -o '4.4.[[:digit:]]*')"
-dkms remove evdi/$evdi_version --all
-evdi_dir="/usr/src/evdi-$evdi_version"
-if [ -d "$evdi_dir" ];
-then
-		rm -rf $evdi_dir
-fi
-
-# ToDo: remove
-# disabled and remove dlm.service
-systemctl disable dlm.service
-rm -f /lib/systemd/system/dlm.service
-# ToDo: enable
-#systemctl stop displaylink-driver.service
-#systemctl disable displaylink-driver.service
-#rm -f /lib/systemd/system/displaylink-driver.service
-
-# double check if evdi module is loaded, if yes remove it
-if lsmod | grep "evdi" &> /dev/null ; then
-	echo "Removing evdi module"
-	rmmod evdi
-fi
+# run unintsall script
+bash /opt/displaylink/displaylink-installer.sh uninstall && 2>&1>/dev/null
 
 # remove modesetting file
 if [ -f $xorg_config_displaylink ]
