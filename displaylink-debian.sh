@@ -390,6 +390,13 @@ then
 		udl_block
 fi
 
+# remove modesetting file
+if [ -f $xorg_config_displaylink ]
+then
+		echo "Removing Displaylink Xorg config file"
+		rm $xorg_config_displaylink
+fi
+
 }
 
 # post install
@@ -620,18 +627,19 @@ chown root: $xorg_config_displaylink
 chmod 644 $xorg_config_displaylink
 }
 
-function ver2int {
-echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
-}
-
+# experiment: disable modesetting
+#function ver2int {
+#echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
+#}
+#
 # depending on X11 version start modesetting func
-if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $min_xorg)" ];
-then
-	echo "Setup DisplayLink xorg.conf depending on graphics card"
-	modesetting
-else
-	echo "No need to disable PageFlip for modesetting"
-fi
+#if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $min_xorg)" ];
+#then
+#	echo "Setup DisplayLink xorg.conf depending on graphics card"
+#	modesetting
+#else
+#	echo "No need to disable PageFlip for modesetting"
+#fi
 }
 
 # uninstall
@@ -719,9 +727,9 @@ echo -e "VGA: $vga_info"
 echo -e "VGA (3D): $vga_info_3d"
 echo -e "X11 version: $xorg_vcheck"
 xconfig_list
-echo -e "\n-------------- DisplayLink xorg.conf -------------\n"
-echo -e "File: $xorg_config_displaylink"
-echo -e "Contents:\n $(cat $xorg_config_displaylink)"
+#echo -e "\n-------------- DisplayLink xorg.conf -------------\n"
+#echo -e "File: $xorg_config_displaylink"
+#echo -e "Contents:\n $(cat $xorg_config_displaylink)"
 echo -e "\n-------------------- Monitors --------------------\n"
 echo -e "$providers"
 }
