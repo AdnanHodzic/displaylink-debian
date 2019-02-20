@@ -25,6 +25,7 @@ kernel="$(uname -r)"
 xorg_config_displaylink="/etc/X11/xorg.conf.d/20-displaylink.conf"
 blacklist="/etc/modprobe.d/blacklist.conf"
 displaylink_service_check="$(systemctl is-active --quiet displaylink-driver.service && echo up and running)"
+sys_driver_version="$(ls /usr/src/ | grep "evdi" | cut -d "-" -f2)"
 vga_info="$(lspci | grep -oP '(?<=VGA compatible controller: ).*')"
 vga_info_3d="$(lspci | grep -i '3d controller' | sed 's/^.*: //')"
 graphics_vendor="$(lspci -nnk | grep -i vga -A3 | grep 'in use' | cut -d ':' -f2 | sed 's/ //g')"
@@ -645,7 +646,7 @@ then
 fi
 
 # evdi module still in use (issue 178, 192)
-evdi_version="$(dkms status evdi|grep -o '4.4.[[:digit:]]*')"
+#evdi_version="$(dkms status evdi|grep -o '4.4.[[:digit:]]*')"
 dkms remove evdi/$evdi_version --all
 evdi_dir="/usr/src/evdi-$evdi_version"
 if [ -d "$evdi_dir" ];
@@ -723,14 +724,14 @@ for letter in "$ack"; do
 	fi
 done
 
-evdi_version="$(systemctl status dlm.service | grep -o '4.4.[[:digit:]]*')"
+evdi_version="$(cat /sys/devices/evdi/version)"
 echo -e "--------------- Linux system info ----------------\n"
 echo -e "Distro: $lsb"
 echo -e "Release: $codename"
 echo -e "Kernel: $kernel"
 echo -e "\n---------------- DisplayLink info ----------------\n"
-echo -e "Driver version: $version"
-echo -e "EVDI service status: $displaylink_service_check"
+echo -e "Driver version: $sys_driver_version"
+echo -e "DisplayLink service status: $displaylink_service_check"
 echo -e "EVDI service version: $evdi_version"
 echo -e "\n------------------ Graphics card -----------------\n"
 echo -e "Vendor: $graphics_vendor"
