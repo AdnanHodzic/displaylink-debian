@@ -207,7 +207,7 @@ then
 # MX Linux
 elif [ "$lsb" == "MX" ];
 then
-	if [ $codename == "Horizon" ];
+	if [ $codename == "Horizon" ] || [ $codename == "Continuum" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
