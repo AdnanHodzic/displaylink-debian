@@ -20,17 +20,17 @@
 
 * After install you must reboot to apply the changes.
 
-* After reboot, make sure DispayLink is running, i.e:
+* After reboot, make sure DispayLink is running by running debug i.e: `sudo ./displaylink-debian.sh --debug`
 
-  ```systemctl status dlm.service```
-  
-  If it's not running, start it by running:
-  
-  ```systemctl start dlm.service```
-  
-  To start automatically at boot run:
-  
-  ```systemctl enable dlm.service```
+Then check `DisplayLink info` section, i.e:
+
+```
+---------------- DisplayLink info ----------------
+
+Driver version: 5.1.26
+DisplayLink service status: up and running
+EVDI service version: 1.6.0
+```
 
 
 ### Setting provider sources
@@ -39,7 +39,9 @@
 
   ```xrandr --listproviders```
 
-If you get a list of more then one provider, it means your displays were detected.
+If you get a list of more then one provider, it means your displays were detected. 
+
+If that's not the case, remove: `/etc/X11/xorg.conf.d/20-displaylink.conf` file followed by reboot and check again if you're getting more then one provider. 
 
 * Set provider sources, i.e:
    ```
@@ -113,8 +115,6 @@ Note, in case you're editting ```~/.bashrc```, make sure you run ```source ~/.ba
 * [secure boot / cable problems](https://github.com/AdnanHodzic/displaylink-debian/issues/142#issuecomment-413091374)
 
 * [rendering issues](https://github.com/AdnanHodzic/displaylink-debian/issues/68)
-
-* [dml.service won't start](https://github.com/AdnanHodzic/displaylink-debian/issues/48#issuecomment-432044380)
 
 * [Unable to locate package linux-headers](https://github.com/AdnanHodzic/displaylink-debian/issues/141)
 
