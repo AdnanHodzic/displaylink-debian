@@ -401,13 +401,6 @@ then
 		udl_block
 fi
 
-# remove modesetting file
-if [ -f $xorg_config_displaylink ]
-then
-		echo "Removing Displaylink Xorg config file"
-		rm $xorg_config_displaylink
-fi
-
 }
 
 # post install
