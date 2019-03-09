@@ -176,7 +176,7 @@ then
 # Mint
 elif [ "$lsb" == "LinuxMint" ];
 then
-	if [ $codename == "sarah" ] || [ $codename == "rosa" ] || [ $codename == "petra" ] || [ $codename == "olivia" ] || [ $codename == "serena" ] || [ $codename == "sonya" ] || [ $codename == "sylvia" ] || [ $codename == "tara" ] || [ $codename == "tessa" ];
+	if [ $codename == "sarah" ] || [ $codename == "rosa" ] || [ $codename == "petra" ] || [ $codename == "olivia" ] || [ $codename == "serena" ] || [ $codename == "sonya" ] || [ $codename == "sylvia" ] || [ $codename == "tara" ] || [ $codename == "tessa" ] || [ $codename == "betsy" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
