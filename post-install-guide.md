@@ -36,7 +36,7 @@ EVDI service version: 1.6.0
 
 If you get a list of more then one provider, it means your displays were properly detected. 
 
-If that's not the case and you have an Intel graphics card try [following suggestion](https://github.com/AdnanHodzic/displaylink-debian/issues/228#issuecomment-467889348), if that doens't work [try this](https://github.com/AdnanHodzic/displaylink-debian/issues/236#issuecomment-471213411).
+If that's not the case and you have an Intel graphics card try [following suggestion](https://github.com/AdnanHodzic/displaylink-debian/issues/228#issuecomment-467889348), if that doesn't work [try this](https://github.com/AdnanHodzic/displaylink-debian/issues/236#issuecomment-471213411).
 
 If you have Nvidia or ATI/AMD graphics card, try removing: `/etc/X11/xorg.conf.d/20-displaylink.conf` file followed by reboot and check again if you're getting more then one provider. 
 
