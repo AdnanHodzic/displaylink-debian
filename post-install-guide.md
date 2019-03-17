@@ -2,8 +2,6 @@
 
 * [Prerequisites](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#prerequisites)
 
-* [Setting provider sources](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#setting-provider-sources)
-
 * [Screen Layout Configuration](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#screen-layout-configuration)
 
 * [Automated (persistent) display configuration](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#automated-persistent-display-configuration)
@@ -32,28 +30,33 @@ DisplayLink service status: up and running
 EVDI service version: 1.6.0
 ```
 
-
-### Setting provider sources
-
-* Check providers, i.e:
+* Check providers to see if your monitors were detected, i.e:
 
   ```xrandr --listproviders```
 
-If you get a list of more then one provider, it means your displays were detected. 
+If you get a list of more then one provider, it means your displays were properly detected. 
 
-If that's not the case, remove: `/etc/X11/xorg.conf.d/20-displaylink.conf` file followed by reboot and check again if you're getting more then one provider. 
+If that's not the case and you have an Intel graphics card try [following suggestion](https://github.com/AdnanHodzic/displaylink-debian/issues/228#issuecomment-467889348), if that doens't work [try this](https://github.com/AdnanHodzic/displaylink-debian/issues/236#issuecomment-471213411).
 
-* Set provider sources, i.e:
-   ```
-   xrandr --setprovideroutputsource 1 0
-   
-   xrandr --setprovideroutputsource 2 0
-    ```
-This will connect you to two external monitors. 
+If you have Nvidia or ATI/AMD graphics card, try removing: `/etc/X11/xorg.conf.d/20-displaylink.conf` file followed by reboot and check again if you're getting more then one provider. 
+
+If none of the suggestions in [Prerequsites section](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#prerequisites) solved your problem, make sure to consult [Troubleshooting most common issues](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#troubleshooting-most-common-issues).
 
 ### Screen Layout Configuration
 
-There are couple of tools to help you configure screen layout of your external monitors.
+There are couple of tools to help you configure screen layout of your external monitors. 
+
+##### Set provider sources
+
+Only do this in case your monitors weren't automatically detected, i.e:
+
+```
+xrandr --setprovideroutputsource 1 0
+   
+xrandr --setprovideroutputsource 2 0
+```
+
+This will manually connect you to two external monitors. 
 
 ##### xrandr
 
@@ -105,8 +108,6 @@ alias one="xrandr --output VIRTUAL1 --off --output DVI-1-0 --off --output DP1 --
 Note, in case you're editting ```~/.bashrc```, make sure you run ```source ~/.bashrc``` to appy the changes without having to log in/out.
 
 ### Troubleshooting most common issues
-
-* [Service won't start](https://github.com/AdnanHodzic/displaylink-debian/issues/15)
 
 * [Disable UEFI / secure boot](https://github.com/AdnanHodzic/displaylink-debian/issues/123)
 
