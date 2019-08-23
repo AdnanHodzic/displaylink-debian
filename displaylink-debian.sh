@@ -271,7 +271,7 @@ then
 		message
 		exit 1
 	fi
-# Parrot 
+# Parrot
 elif [ "$lsb" == "Parrot" ];
 then
 	if [ $codename == "n/a" ];
@@ -289,24 +289,26 @@ fi
 }
 
 sysinitdaemon_get(){
-sysinitdaemon="systemd"
+  # One line command to detect system manager (if you have a better solution let's improve it)
+  sysinitdaemon=$(ps -p1 | grep -i "init\|upstart\|systemd" | awk '{print $4}')
 
-if [ "$lsb" == "Ubuntu" ];
-then
-	if [ $codename == "trusty" ];
-	then
-        sysinitdaemon="upstart"
-	fi
-# Elementary
-elif [ "$lsb" == "elementary OS" ];
-then
-    if [ $codename == "freya" ];
-    then
-        sysinitdaemon="upstart"
-    fi
-fi
+  if [ "$sysinitdaemon" == "init" ]; then
+    echo "Your system manager as been detected as $sysinitdaemon."
+  else
+    echo "[ERROR] Can't detect properly your system manager!"
+    exit 1
 
-echo $sysinitdaemon
+  if [ "$sysinitdaemon" == "upstart" ]; then
+    echo "Your system manager as been detected as $sysinitdaemon."
+  else
+    echo "[ERROR] Can't detect properly your system manager!"
+    exit 1
+
+  if [ "$sysinitdaemon" == "systemd" ]; then
+    echo "Your system manager as been detected as $sysinitdaemon."
+  else
+    echo "[ERROR] Can't detect properly your system manager!"
+    exit 1
 }
 
 clean_up(){
@@ -398,6 +400,7 @@ sysinitdaemon=$(sysinitdaemon_get)
 
 # modify displaylink-installer.sh
 sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$sysinitdaemon/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
+}
 
 # issue: 227
 if [ "$lsb" == "Debian" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "MX" ];
@@ -452,6 +455,177 @@ fi
 
 # post install
 post_install(){
+  if [ "$sysinitdaemon" == "init" ]; then
+    separator
+    echo "Performing post installation steps..."
+
+    # fix: issue #42 (dlm.service can't start)
+    # note: for this to work libstdc++6 package needs to be installed from >= Stretch
+    if [ "$lsb" == "Debian" ] || [ "$lsb" == "Kali" ];
+    then
+      ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /opt/displaylink/libstdc++.so.6
+    fi
+
+    # Fix inability to enable displaylink-driver
+    touch /etc/init.d/displaylink-driver
+    cat > /etc/init.d/displaylink-driver <<EOL
+    #!/bin/sh
+    ### BEGIN INIT INFO
+    # Provides: displaylink-driver
+    # Required-Start:	$syslog $local_fs
+    # Required-Stop:	$syslog $local_fs
+    # Default-Start:	2 3 4 5
+    # Default-Stop:		0 1 6
+    # Short-Description: DisplayLink Driver Service
+    ### END INIT INFO
+
+    . /lib/lsb/init-functions
+    prog=displaylink-driver
+    PIDFILE=/var/run/$prog.pid
+    DESC="DisplayLink Driver Service"
+    start() {
+      log_daemon_msg "Starting $DESC" "$prog"
+      start_daemon /bin/sh -c 'modprobe evdi || (dkms install evdi/5.1.26 && modprobe evdi)'
+      if [ $? -ne 0 ]; then
+        log_end_msg 1
+        exit 1
+      fi
+      start_daemon -p $PIDFILE /opt/displaylink/DisplayLinkManager
+      if [ $? -ne 0 ]; then
+        log_end_msg 1
+        exit 1
+      fi
+      if [ $? -eq 0 ]; then
+        log_end_msg 0
+      fi
+      exit 0
+    }
+
+    stop() {
+      log_daemon_msg "Stopping $DESC" "$prog"
+      killproc -p $PIDFILE /opt/displaylink/DisplayLinkManager
+      if [ $? -ne 0 ]; then
+        log_end_msg 1
+        exit 1
+      fi
+      if [ $? -eq 0 ]; then
+        log_end_msg 0
+      fi
+    }
+
+    force_reload() {
+      stop
+      start
+
+    }
+
+    case "$1" in
+      start)
+        start
+        ;;
+      stop)
+        stop
+        ;;
+      force-reload)
+        force_reload
+        ;;
+      restart)
+        stop
+        start
+        ;;
+
+      *)
+        echo "$Usage: $prog {start|stop|force-reload|restart}"
+        exit 2
+    esac
+EOL
+
+    echo "Enable and start displaylink-driver service"
+    # Give execution rights & enable in runlevels
+    chmod +x /etc/init.d/displaylink-driver
+    if [ "$lsb" == "RedHat" ] || [ "$lsb" == "CentOS" ]; then
+      chkconfig displaylink-driver on
+    fi
+    # Start the service
+    service displaylink-driver start
+
+    # setup xorg.conf depending on graphics card
+    modesetting(){
+    test ! -d /etc/X11/xorg.conf.d && mkdir -p /etc/X11/xorg.conf.d
+    drv=$(lspci -nnk | grep -i vga -A3 | grep 'in use'|cut -d":" -f2|sed 's/ //g')
+    drv_nvidia=$(lspci | grep -i '3d controller' | sed 's/^.*: //' | awk '{print $1}')
+    cardsub=$(lspci -nnk | grep -i vga -A3|grep Subsystem|cut -d" " -f5)
+
+    # intel displaylink xorg.conf
+    xorg_intel(){
+    cat > $xorg_config_displaylink <<EOL
+    Section "Device"
+        Identifier  "Intel"
+        Driver      "intel"
+    EndSection
+EOL
+  else
+    echo "[ERROR] Can't run post installation steps!"
+    exit 1
+
+  if [ "$sysinitdaemon" == "upstart" ]; then
+    separator
+    echo "Performing post installation steps..."
+    echo "Sorry, the service manager for upstart isn't created yet with this script!"
+    exit 1
+  else
+    echo "[ERROR] Can't run post installation steps!"
+    exit 1
+
+  if [ "$sysinitdaemon" == "systemd" ]; then
+    separator
+    echo "Performing post installation steps..."
+
+    # fix: issue #42 (dlm.service can't start)
+    # note: for this to work libstdc++6 package needs to be installed from >= Stretch
+    if [ "$lsb" == "Debian" ] || [ "$lsb" == "Kali" ];
+    then
+      ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /opt/displaylink/libstdc++.so.6
+    fi
+
+    # Fix inability to enable displaylink-driver.service
+    sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/displaylink-driver.service
+
+    echo "Enable and start displaylink-driver service"
+    systemctl enable displaylink-driver.service
+    systemctl start displaylink-driver.service
+
+    # setup xorg.conf depending on graphics card
+    modesetting(){
+    test ! -d /etc/X11/xorg.conf.d && mkdir -p /etc/X11/xorg.conf.d
+    drv=$(lspci -nnk | grep -i vga -A3 | grep 'in use'|cut -d":" -f2|sed 's/ //g')
+    drv_nvidia=$(lspci | grep -i '3d controller' | sed 's/^.*: //' | awk '{print $1}')
+    cardsub=$(lspci -nnk | grep -i vga -A3|grep Subsystem|cut -d" " -f5)
+
+    # intel displaylink xorg.conf
+    xorg_intel(){
+    cat > $xorg_config_displaylink <<EOL
+    Section "Device"
+        Identifier  "Intel"
+        Driver      "intel"
+    EndSection
+EOL
+  else
+    echo "[ERROR] Can't run post installation steps!"
+    exit 1
+}
+
+# modesetting displaylink xorg.conf
+xorg_modesetting(){
+cat > $xorg_config_displaylink <<EOL
+Section "Device"
+    Identifier  "DisplayLink"
+    Driver      "modesetting"
+    Option      "PageFlip" "false"
+EndSection
+EOL
+}
+
 separator
 echo -e "\nPerforming post install steps\n"
 
@@ -482,17 +656,6 @@ cat > $xorg_config_displaylink <<EOL
 Section "Device"
     Identifier  "Intel"
     Driver      "intel"
-EndSection
-EOL
-}
-
-# modesetting displaylink xorg.conf
-xorg_modesetting(){
-cat > $xorg_config_displaylink <<EOL
-Section "Device"
-    Identifier  "DisplayLink"
-    Driver      "modesetting"
-    Option      "PageFlip" "false"
 EndSection
 EOL
 }
