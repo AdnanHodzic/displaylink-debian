@@ -38,8 +38,8 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
 
 #### Supported platforms are:
 
-  * Debian: Jessie 8.0/Stretch 9.0/Buster 10/Sid (unstable)
-  * Ubuntu: 14.04 Trusty/15.04 Vivid/15.10 Wily/16.04 Xenial/16.10 Yakkety/17.04 Zesty/17.10 Artful/18.04 Bionic/19.04 Disco
+  * Debian: Jessie 8.0/Stretch 9.0/Buster 10/Bullseye (testing)/Sid (unstable)
+  * Ubuntu: 14.04 Trusty/15.04 Vivid/15.10 Wily/16.04 Xenial/16.10 Yakkety/17.04 Zesty/17.10 Artful/18.04 Bionic/19.04 Disco/Ubuntu 19.10 Eoan
   * elementary OS: O.3 Freya/0.4 Loki/5.0 Juno
   * Mint: 15 Olivia/16 Petra/17.3 Rosa/18 Sarah/18.3 Sylvia/19.1 Tessa
   * Kali: kali-rolling/2016.2/2017.3/2018.3/2018.4
@@ -75,8 +75,14 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
 [PostInstall]:        https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md
 [TroubleShooting]:    https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#troubleshooting-most-common-issues
 
-#### Donate (PayPal)
+#### Donate (PayPal or Bitcoin)
 
 Since I'm working on this project in free time without any support or reimbursement from DisplayLink, and [have saved some 100$](https://github.com/AdnanHodzic/displaylink-debian/issues/172#issuecomment-441384936). Please consider supporting this project by making a donation of any amount!
 
+##### PayPal
 [![paypal](https://www.paypalobjects.com/en_US/NL/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate/?token=UUpxvrOpzaCGpe26XDVbp5cAwx0Ogo2Ua6dUe_G9VKbOR3o60IzQxUwKSwTZnNrbaOYZR0&country.x=NL&locale.x=en_US&Z3JncnB0=)
+
+##### BitCoin
+[bc1qlncmgdjyqy8pe4gad4k2s6xtyr8f2r3ehrnl87](bitcoin:bc1qlncmgdjyqy8pe4gad4k2s6xtyr8f2r3ehrnl87)
+
+[![bitcoin](https://foolcontrol.org/wp-content/uploads/2019/08/btc-donate-displaylink-debian.png)](bitcoin:bc1qlncmgdjyqy8pe4gad4k2s6xtyr8f2r3ehrnl87)
