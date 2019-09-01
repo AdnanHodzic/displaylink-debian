@@ -24,7 +24,6 @@ platform="$(lsb_release -ics | sed '$!s/$/ /' | tr -d '\n')"
 kernel="$(uname -r)"
 xorg_config_displaylink="/etc/X11/xorg.conf.d/20-displaylink.conf"
 blacklist="/etc/modprobe.d/blacklist.conf"
-displaylink_service_check="$(systemctl is-active --quiet displaylink-driver.service && echo up and running)"
 sys_driver_version="$(ls /usr/src/ | grep "evdi" | cut -d "-" -f2)"
 vga_info="$(lspci | grep -oP '(?<=VGA compatible controller: ).*')"
 vga_info_3d="$(lspci | grep -i '3d controller' | sed 's/^.*: //')"
@@ -173,6 +172,16 @@ then
 		message
 		exit 1
 	fi
+# Devuan
+elif [ "$lsb" == "Devuan" ]
+then
+    if [ "$codename" == "ascii" ]
+    then
+        echo -e "\nPlatform requirements satisfied, proceeding ..."
+    else
+        message
+        exit 1
+    fi
 # Mint
 elif [ "$lsb" == "LinuxMint" ];
 then
@@ -257,9 +266,24 @@ then
     then
         sysinitdaemon="upstart"
     fi
+elif [ "$lsb" == "Devuan" ]
+then
+    sysinitdaemon="sysvinit"
 fi
 
 echo $sysinitdaemon
+}
+
+displaylink_service_check () {
+    sysinitdaemon=$(sysinitdaemon_get)
+    if [ "$sysinitdaemon" == "systemd" ]
+    then
+        $(systemctl is-active --quiet displaylink-driver.service && \
+              echo up and running)
+    elif [ "$sysinitdaemon" == "sysvinit" ]
+    then
+        $(/etc/init.d/displaylink-driver status)
+    fi
 }
 
 clean_up(){
@@ -353,7 +377,7 @@ sysinitdaemon=$(sysinitdaemon_get)
 sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$sysinitdaemon/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 
 # issue: 227
-if [ "$lsb" == "Debian" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "MX" ];
+if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "MX" ];
 then
 	sed -i 's#/lib/modules/$KVER/build/Kconfig#/lib/modules/$KVER/build/scripts/kconfig/conf#g' $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 	ln -s /lib/modules/$(uname -r)/build/Makefile /lib/modules/$(uname -r)/build/Kconfig
@@ -410,17 +434,28 @@ echo -e "\nPerforming post install steps\n"
 
 # fix: issue #42 (dlm.service can't start)
 # note: for this to work libstdc++6 package needs to be installed from >= Stretch
-if [ "$lsb" == "Debian" ] || [ "$lsb" == "Kali" ];
+if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ]|| [ "$lsb" == "Kali" ];
 then
 	ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /opt/displaylink/libstdc++.so.6
 fi
 
-# Fix inability to enable displaylink-driver.service
-sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/displaylink-driver.service
+sysinitdaemon=$(sysinitdaemon_get)
+if [ "$sysinitdaemon" == "systemd" ]
+then
+    # Fix inability to enable displaylink-driver.service
+    sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/displaylink-driver.service
 
-echo "Enable and start displaylink-driver service"
-systemctl enable displaylink-driver.service
-systemctl start displaylink-driver.service
+    echo "Enable and start displaylink-driver service"
+    systemctl enable displaylink-driver.service
+    systemctl start displaylink-driver.service
+elif [ "$sysinitdaemon" == "sysvinit" ]
+then
+    echo "Copying init script to /etc/init.d\n"
+    cp displaylink-driver /etc/init.d/
+    echo "Enabling and starting displaylink-driver service"
+    ln -s /etc/init.d/displaylink-driver /etc/rc1.d/S95displaylink-driver
+    /etc/init.d/displaylink-driver start
+fi
 
 # setup xorg.conf depending on graphics card
 modesetting(){
@@ -721,7 +756,7 @@ echo -e "Release: $codename"
 echo -e "Kernel: $kernel"
 echo -e "\n---------------- DisplayLink info ----------------\n"
 echo -e "Driver version: $sys_driver_version"
-echo -e "DisplayLink service status: $displaylink_service_check"
+echo -e "DisplayLink service status: $(displaylink_service_check)"
 echo -e "EVDI service version: $evdi_version"
 echo -e "\n------------------ Graphics card -----------------\n"
 echo -e "Vendor: $graphics_vendor"
