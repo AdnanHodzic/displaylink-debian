@@ -16,6 +16,7 @@ version=`wget -q -O - https://www.displaylink.com/downloads/ubuntu | grep "downl
 # define download url to be the correct version
 dlurl="https://www.displaylink.com/"`wget -q -O - https://www.displaylink.com/downloads/ubuntu | grep "download-link" | head -n 1 | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/'`
 driver_dir=$version
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/" && pwd )"
 
 # globalvars
 lsb="$(lsb_release -is)"
@@ -451,7 +452,8 @@ then
 elif [ "$sysinitdaemon" == "sysvinit" ]
 then
     echo "Copying init script to /etc/init.d\n"
-    cp displaylink-driver /etc/init.d/
+    cp "$dir/displaylink-driver" /etc/init.d/
+    chmod +x /etc/init.d/displaylink-driver
     echo "Enabling and starting displaylink-driver service"
     ln -s /etc/init.d/displaylink-driver /etc/rc1.d/S95displaylink-driver
     /etc/init.d/displaylink-driver start
