@@ -688,9 +688,15 @@ separator
 echo -e "\nUninstalling ...\n"
 
 # displaylink-installer uninstall
-if [ "$lsb" == "Debian" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ];
+if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ];
 then
 	rm /lib/modules/$(uname -r)/build/Kconfig
+fi
+
+if [ "$(sysinitdaemon_get)" == "sysvinit" ]
+then
+    rm -f /etc/rc1.d/S95displaylink-driver
+    rm -f /etc/init.d/displaylink-driver
 fi
 
 # run unintsall script
