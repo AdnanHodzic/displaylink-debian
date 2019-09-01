@@ -16,21 +16,7 @@ fi
 # Author: Gabriel Hondet <gabriel.hondet@gmail.com>
 
 DESC="DisplayLink driver"
-DAEMON=/opt/displaylink/DisplayLink
-
-do_start () {
-    log_daemon_msg "Starting $DESC"
-    modprobe evdi || (dkms install evdi && modprobe evdi)
-    if [ $? -ne 0 ]; then
-        log_failure_msg "Error loading evdi"
-        exit 1
-    fi
-    start_daemon "$DAEMON"
-    if [ $? -ne 0 ]; then
-        log_failure_msg "Error starting $DAEMON"
-        exit 1
-    else
-        log_success_msg "Started $DAEMON"
-    fi
-    exit 0
-}
+DAEMON=/opt/displaylink/DisplayLinkManager
+NAME="DisplayLinkManager"
+PIDFILE=/var/run/$NAME.pid
+START_ARGS="--background"
