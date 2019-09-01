@@ -279,11 +279,11 @@ displaylink_service_check () {
     sysinitdaemon=$(sysinitdaemon_get)
     if [ "$sysinitdaemon" == "systemd" ]
     then
-        $(systemctl is-active --quiet displaylink-driver.service && \
-              echo up and running)
+        systemctl is-active --quiet displaylink-driver.service && \
+            echo up and running
     elif [ "$sysinitdaemon" == "sysvinit" ]
     then
-        $(/etc/init.d/displaylink-driver status)
+        /etc/init.d/displaylink-driver status
     fi
 }
 
