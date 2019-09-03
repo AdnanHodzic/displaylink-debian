@@ -4,7 +4,7 @@ if [ true != "$INIT_D_SCRIPT_SOURCED" ] ; then
     set "$0" "$@"; INIT_D_SCRIPT_SOURCED=true . /lib/init/init-d-script
 fi
 ### BEGIN INIT INFO
-# Provides:          displaylink-driver
+# Provides:          displaylink
 # Required-Start:    $remote_fs $syslog
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
@@ -17,6 +17,6 @@ fi
 
 DESC="DisplayLink driver"
 DAEMON=/opt/displaylink/DisplayLinkManager
-NAME="DisplayLinkManager"
+NAME="displaylink"
 PIDFILE=/var/run/$NAME.pid
 START_ARGS="--background"

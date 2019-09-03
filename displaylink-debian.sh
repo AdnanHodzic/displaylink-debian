@@ -34,6 +34,7 @@ providers="$(xrandr --listproviders)"
 xorg_vcheck="$(dpkg -l | grep "ii  xserver-xorg-core" | awk '{print $3}' | sed 's/[^,:]*://g')"
 min_xorg=1.18.3
 newgen_xorg=1.19.6
+init_script='displaylink.sh'
 
 separator(){
 sep="\n-------------------------------------------------------------------"
@@ -452,11 +453,11 @@ then
 elif [ "$sysinitdaemon" == "sysvinit" ]
 then
     echo "Copying init script to /etc/init.d\n"
-    cp "$dir/displaylink-driver" /etc/init.d/
-    chmod +x /etc/init.d/displaylink-driver
-    echo "Enabling and starting displaylink-driver service"
-    ln -s /etc/init.d/displaylink-driver /etc/rc1.d/S95displaylink-driver
-    /etc/init.d/displaylink-driver start
+    cp "$dir/$init_script" /etc/init.d/
+    chmod +x "/etc/init.d/$init_script"
+    echo "Enable and start displaylink service"
+    ln -s "/etc/init.d/$init_script" /etc/rc1.d/S95displaylink-driver
+    /etc/init.d/$init_script start
 fi
 
 # setup xorg.conf depending on graphics card
