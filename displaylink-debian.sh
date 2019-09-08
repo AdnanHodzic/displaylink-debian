@@ -456,7 +456,7 @@ then
     cp "$dir/$init_script" /etc/init.d/
     chmod +x "/etc/init.d/$init_script"
     echo "Enable and start displaylink service"
-    ln -s "/etc/init.d/$init_script" /etc/rc1.d/S95displaylink-driver
+    update-rc.d "$init_script" defaults
     /etc/init.d/$init_script start
 fi
 
@@ -696,8 +696,8 @@ fi
 
 if [ "$(sysinitdaemon_get)" == "sysvinit" ]
 then
-    rm -f /etc/rc1.d/S95displaylink-driver
-    rm -f /etc/init.d/displaylink-driver
+    update-rc.d "$init_script" remove
+    rm -f "/etc/init.d/$init_script"
 fi
 
 # run unintsall script
