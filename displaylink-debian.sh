@@ -35,6 +35,9 @@ xorg_vcheck="$(dpkg -l | grep "ii  xserver-xorg-core" | awk '{print $3}' | sed '
 min_xorg=1.18.3
 newgen_xorg=1.19.6
 init_script='displaylink.sh'
+evdi_modprobe='/etc/modules-load.d/evdi.conf'
+# Using modules-load.d should always be preferred to 'modprobe evdi' in start
+# command
 
 separator(){
 sep="\n-------------------------------------------------------------------"
@@ -284,7 +287,7 @@ displaylink_service_check () {
             echo up and running
     elif [ "$sysinitdaemon" == "sysvinit" ]
     then
-        /etc/init.d/displaylink-driver status
+        /etc/init.d/$init_script status
     fi
 }
 
@@ -455,6 +458,10 @@ then
     echo "Copying init script to /etc/init.d\n"
     cp "$dir/$init_script" /etc/init.d/
     chmod +x "/etc/init.d/$init_script"
+    echo "Load evdi at startup"
+    cat > "$evdi_modprobe" <<EOF
+evdi
+EOF
     echo "Enable and start displaylink service"
     update-rc.d "$init_script" defaults
     /etc/init.d/$init_script start
@@ -698,6 +705,7 @@ if [ "$(sysinitdaemon_get)" == "sysvinit" ]
 then
     update-rc.d "$init_script" remove
     rm -f "/etc/init.d/$init_script"
+    rm -f "$evdi_modprobe"
 fi
 
 # run unintsall script
