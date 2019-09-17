@@ -47,6 +47,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   * MX Linux: 17.1
   * BunsenLabs: Helium
   * Parrot: 4.5
+  * Devuan: ASCII
 
   Regardless of which Linux kernel version you're using.
   
