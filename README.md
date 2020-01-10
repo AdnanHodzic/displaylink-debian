@@ -81,7 +81,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
 Since I'm working on this project in free time without any support or reimbursement from DisplayLink, and [have saved some 100$](https://github.com/AdnanHodzic/displaylink-debian/issues/172#issuecomment-441384936). Please consider supporting this project by making a donation of any amount!
 
 ##### PayPal
-[![paypal](https://www.paypal.com/donate/?token=sZbcd9zJcq-NxxMwYaCulGDNpqMpu-cUF9kRWkBuncfFMZoWf_CRc86vNPJSLnCadh-kYm&country.x=NL&locale.x=en_NL)
+[![paypal](https://www.paypalobjects.com/en_US/NL/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate/?token=sZbcd9zJcq-NxxMwYaCulGDNpqMpu-cUF9kRWkBuncfFMZoWf_CRc86vNPJSLnCadh-kYm&country.x=NL&locale.x=en_NL)
 
 ##### BitCoin
 [bc1qlncmgdjyqy8pe4gad4k2s6xtyr8f2r3ehrnl87](bitcoin:bc1qlncmgdjyqy8pe4gad4k2s6xtyr8f2r3ehrnl87)
