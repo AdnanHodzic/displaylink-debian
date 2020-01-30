@@ -11,6 +11,12 @@
 # Copyleft: Adnan Hodzic <adnan@hodzic.org>
 # License: GPLv3
 
+# Bash Strict Mode
+set -eu
+# set -o pipefail # TODO: Some code still fails this check, fix before enabling.
+IFS=$'\n\t'
+
+
 # define the version to get as the latest available version
 version=`wget -q -O - https://www.displaylink.com/downloads/ubuntu | grep "download-version" | head -n 1 | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/'`
 # define download url to be the correct version
