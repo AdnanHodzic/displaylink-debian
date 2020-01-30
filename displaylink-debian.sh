@@ -321,8 +321,8 @@ fi
 }
 
 setup_complete(){
-ack=${ack:-$default}
 default=Y
+ack=${ack:-$default}
 
 read -p "Reboot now? [Y/n] " ack
 ack=${ack:-$default}
@@ -756,8 +756,8 @@ debug(){
 separator
 echo -e "\nStarting Debug ...\n"
 
-ack=${ack:-$default}
 default=N
+ack=${ack:-$default}
 
 read -p "Did you read Post Installation Guide? http://bit.ly/2TbZleK [y/N] " ack
 ack=${ack:-$default}
@@ -835,7 +835,7 @@ Select a key: [i/d/r/u/q]: " answer
 
 root_check
 
-if [[ -z "${1}" ]];
+if [[ "$#" -lt 1 ]];
 then
   ask_operation
 else
