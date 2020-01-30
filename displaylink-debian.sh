@@ -73,22 +73,16 @@ fi
 # list all xorg related configs
 xconfig_list(){
 x11_etc="/etc/X11/"
-x11_etc_confd="/etc/X11/xorg.conf.d/"
 
-check_etc=$(find $x11_etc -maxdepth 2 -name "*.conf")
-list_etc_confd=$(ls -1 $x11_etc*.conf 2>/dev/null | wc -l)
-
-if [ ${#check_etc[@]} -gt 0 ];
-then
-		if [ "$x11_etc" != 0 ]
-		then
-				find $x11_etc -type f -name "*.conf" | xargs echo "X11 configs:"
-		elif [ "$list_etc_confd" != 0 ]
-		then
-				find $x11_etc_confd -type f -name "*.conf" | xargs echo "X11 configs:"
-		fi
+if [ ! -d "${x11_etc}" ] ; then # No directory found
+	echo "X11 configs: None"
+	return 0
 fi
 
+count_conf_in_etc=$(find $x11_etc -maxdepth 2 -name "*.conf" | wc -l)
+if [ $count_conf_in_etc -gt 0 ]; then
+	find $x11_etc -type f -name "*.conf" | xargs echo "X11 configs:"
+fi
 }
 
 # Dependencies
