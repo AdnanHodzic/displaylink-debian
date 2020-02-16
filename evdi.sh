@@ -1,5 +1,5 @@
 #!/bin/bash
-apt-get install -y libdrm-dev
+apt-get install -y libdrm-dev libelf-dev
 git clone https://github.com/DisplayLink/evdi.git
 cd evdi
 wget https://crazy.dev.frugalware.org/evdi-all-in-one-fixes.patch
