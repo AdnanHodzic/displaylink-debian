@@ -2,6 +2,14 @@
 
 DisplayLink driver installer for Debian and Ubuntu based Linux distributions: Debian, Ubuntu, Elementary OS, Mint, Kali, Deepin and many more! [Full list of all supported platforms](https://github.com/AdnanHodzic/displaylink-debian#supported-platforms-are)
 
+#### Looking for maintainers (developers)!
+
+[After 4+ years since I started this project](https://foolcontrol.org/?p=1777), I’m no longer using DisplayLink. In the plethora of other projects I’m involved with ([especially latest one](https://twitter.com/fooctrl/status/1233455946350891008)), I don’t have time or [motivation](https://github.com/AdnanHodzic/displaylink-debian/issues/226#issuecomment-467439973) to continue working on displaylink-debian.
+
+Hence, I’m looking for maintainers (developers) to continue work on this project. If necessary I’m more than happy to help you with onboarding. If you’re interested, please [leave a comment on issue #373](https://github.com/AdnanHodzic/displaylink-debian/issues/373).
+
+In meantime, I’ll devote the bare minimum of my time which will mostly consist of MR (merge requests) code review and approval.
+
 #### Why do I need displaylink-debian?
 
 [DisplayLink][] releases its drivers only for Ubuntu 16.04 LTS and 18.04 LTS,
