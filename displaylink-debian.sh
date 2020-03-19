@@ -365,6 +365,13 @@ separator
 download
 
 # prep
+# Check whether prior drivers have been downloaded
+if [ -d $driver_dir ]
+then
+	echo "Removing prior: \"$driver_dir\" directory"
+	rm -r $driver_dir
+fi
+
 mkdir $driver_dir
 
 separator
