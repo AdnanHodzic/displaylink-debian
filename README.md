@@ -34,7 +34,7 @@ DisplayLink drivers tailored to work for most of the Debian based Linux distribu
 `wget https://raw.githubusercontent.com/AdnanHodzic/displaylink-debian/master/displaylink.sh`
 `wget https://raw.githubusercontent.com/AdnanHodzic/displaylink-debian/master/evdi.sh`
 
-`chmod +x displaylink-debian.sh displaylink-debian.sh evdi.sh && sudo ./displaylink-debian.sh`
+`chmod +x displaylink-debian.sh evdi.sh && sudo ./displaylink-debian.sh`
 
 *After installation has been completed, make sure to consult [Post Install Guide][PostInstall]!*
 
