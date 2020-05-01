@@ -95,6 +95,7 @@ if [ "$lsb" == "Deepin" ];
 then
 	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source-deepin x11-xserver-utils wget)
 elif [ "$lsb" == "PureOS" ];
+then
 	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev)
 else
 	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget)
@@ -242,7 +243,7 @@ then
 		message
 		exit 1
 	fi
-# Parrot 
+# Parrot
 elif [ "$lsb" == "Parrot" ];
 then
 	if [ $codename == "n/a" ];
