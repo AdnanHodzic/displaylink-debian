@@ -42,6 +42,8 @@ min_xorg=1.18.3
 newgen_xorg=1.19.6
 init_script='displaylink.sh'
 evdi_modprobe='/etc/modules-load.d/evdi.conf'
+kconfig_file="/lib/modules/$kernel/build/Kconfig"
+
 # Using modules-load.d should always be preferred to 'modprobe evdi' in start
 # command
 
@@ -92,6 +94,8 @@ echo -e "\nChecking dependencies\n"
 if [ "$lsb" == "Deepin" ];
 then
 	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source-deepin x11-xserver-utils wget)
+elif [ "$lsb" == "PureOS" ];
+	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev)
 else
 	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget)
 fi
@@ -248,11 +252,32 @@ then
 		message
 		exit 1
 	fi
+elif [ "$lsb" == "PureOS" ];
+then
+	if [ $codename == "amber" ];
+	then
+		echo -e "\nPlatform requirements satisfied, proceeding ..."
+	else
+		message
+		exit 1
+	fi
 else
 	message
 	exit 1
 fi
 fi
+}
+
+pre_install() {
+
+if [ -f $kconfig_file ];
+then
+  kconfig_exists="true"
+else
+  kconfig_exists="false"
+  touch $kconfig_file
+fi
+
 }
 
 sysinitdaemon_get(){
@@ -464,6 +489,11 @@ fi
 post_install(){
 separator
 echo -e "\nPerforming post install steps\n"
+
+if [ "$kconfig_exists" == "false" ];
+then
+  rm $kconfig_file
+fi
 
 # fix: issue #42 (dlm.service can't start)
 # note: for this to work libstdc++6 package needs to be installed from >= Stretch
@@ -862,6 +892,7 @@ fi
 if [[ $answer == [Ii] ]];
 then
 	distro_check
+        pre_install
 	install
 	post_install
 	clean_up
