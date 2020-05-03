@@ -253,6 +253,16 @@ then
 		message
 		exit 1
 	fi
+# PopOS
+elif [ "$lsb" == "Pop" ];
+then
+	if [ $codename == "focal" ] || [ $codename == "n/a" ];
+	then
+		echo -e "\nPlatform requirements satisfied, proceeding ..."
+	else
+		message
+		exit 1
+	fi
 elif [ "$lsb" == "PureOS" ];
 then
 	if [ $codename == "amber" ];
