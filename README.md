@@ -58,6 +58,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   * BunsenLabs: Helium
   * Parrot: 4.5
   * Devuan: ASCII
+  * Pop!_OS: 20.04 Focal
 
   Regardless of which Linux kernel version you're using.
   
