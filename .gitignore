@@ -2,3 +2,6 @@
 *workspace
 resources/evdi-all-in-one-fixes.patch
 wankytest.sh
+evdi.sh.bak
+evdiNew.sh
+evdi/*
