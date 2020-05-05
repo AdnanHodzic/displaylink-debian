@@ -24,8 +24,6 @@ finalPatchPath="$evdiDir$patchFileName"
 performPatchCheck="false"
 commitPatch="false"
 
-read -p "STOP - Hammer Time"
-
 #Check existing local resources
 if [ ! -d $resourcesDir ] ; then
 	echo "Making $resourcesDir"
@@ -44,7 +42,6 @@ find . ! -name $currentEvdiPatch -delete
 #download any new patch
 echo "$externalPatchURL"
 
-read -p "STOP - Hammer Time"
 wget -N $externalPatchURL
 #Check wget was successful
 if [ $? -eq 0 ] ; then
@@ -71,14 +68,11 @@ if [ -d $evdiDir ] ; then
 	rm -rf $evdiDir
 fi
 
-read -p "STOP - Hammer Time"
-
 git clone $evdiURL
 cd "$evdiDir"
 if [ "$commitPatch" = "true" ] ; then
 	cp $commitPatchPath $evdiDir
-
-	read -p "STOP - Hammer Time"
+	
 	patch -Np1<$finalPatchPath
 	sed -E -e 's:SUBDIRS=([^ ]+) :M=\1 &:g' -i 'module/Makefile'
 fi
