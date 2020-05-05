@@ -1,0 +1,253 @@
+diff --git a/.travis.yml b/.travis.yml
+index 0a9c52b..932d18f 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -26,6 +26,8 @@ env:
+   - KVER=5.0
+   - KVER=5.1
+   - KVER=5.2
++  - KVER=5.3
++  - KVER=5.4
+   - KVER=master
+ 
+ matrix:
+diff --git a/Makefile b/Makefile
+index b19fe8b..66f32fe 100644
+--- a/Makefile
++++ b/Makefile
+@@ -8,6 +8,14 @@ all:
+ 	CFLAGS="$(FLAGS)" $(MAKE) -C module $(MFLAGS)
+ 	CFLAGS="-I../module $(FLAGS) $(CFLAGS)" $(MAKE) -C library $(MFLAGS)
+ 
++install:
++	$(MAKE) -C module install
++	$(MAKE) -C library install
++
++uninstall:
++	$(MAKE) -C module uninstall
++	$(MAKE) -C library uninstall
++
+ clean:
+ 	$(MAKE) clean -C module $(MFLAGS)
+ 	$(MAKE) clean -C library $(MFLAGS)
+diff --git a/library/Makefile b/library/Makefile
+index 03e9999..7da8e3b 100644
+--- a/library/Makefile
++++ b/library/Makefile
+@@ -2,17 +2,37 @@
+ # Copyright (c) 2015 - 2019 DisplayLink (UK) Ltd.
+ #
+ 
++INSTALL ?= install
++LN ?= ln
++RM ?= rm
++
+ DEPS = evdi_ioctl.h
+ CFLAGS := -I../module -std=gnu99 -fPIC $(CFLAGS)
+ 
+-default: libevdi.so
++LIBVER := 1.6.4
++LIBABI := 0
++
++PREFIX ?= /usr/local
++LIBDIR ?= $(PREFIX)/lib
++
++default: libevdi.so.$(LIBVER)
+ 
+ clean:
+-	rm -rf *.o libevdi.so
++	rm -rf *.o libevdi.so.$(LIBVER)
+ 
+ %.o: %.c $(DEPS)
+-	$(CC) -c -o $@ $< $(CFLAGS)
++	$(CC) $(CFLAGS) -o $@ -c $<
++
++libevdi.so.$(LIBVER): evdi_lib.o
++	$(CC) $^ -shared -Wl,-soname,libevdi.so.$(LIBABI) -o $@ -lc -lgcc $(LDFLAGS)
+ 
+-libevdi.so: evdi_lib.o
+-	$(CC) $^ -o $@ -lc -lgcc -shared -Wl,-soname,libevdi.so.0
++install:
++	$(INSTALL) -d $(DESTDIR)$(LIBDIR)
++	$(INSTALL) -m 755 libevdi.so.$(LIBVER) $(DESTDIR)$(LIBDIR)/libevdi.so.$(LIBVER)
++	$(LN) -sf libevdi.so.$(LIBVER) $(DESTDIR)$(LIBDIR)/libevdi.so.$(LIBABI)
++	$(LN) -sf libevdi.so.$(LIBABI) $(DESTDIR)$(LIBDIR)/libevdi.so
+ 
++uninstall:
++	$(RM) -f $(DESTDIR)$(LIBDIR)/libevdi.so.$(LIBVER)
++	$(RM) -f $(DESTDIR)$(LIBDIR)/libevdi.so.$(LIBABI)
++	$(RM) -f $(DESTDIR)$(LIBDIR)/libevdi.so
+diff --git a/module/Makefile b/module/Makefile
+index 8281112..7605c34 100644
+--- a/module/Makefile
++++ b/module/Makefile
+@@ -43,22 +43,39 @@ obj-$(CONFIG_DRM_EVDI) := evdi.o
+ else
+ 
+ # kbuild against specified or current kernel
++RM ?= rm
++
+ ifeq ($(KVER),)
+ 	KVER := $(shell uname -r)
+ endif
+ 
++ifneq ($(RUN_DEPMOD),)
++	DEPMOD := /sbin/depmod -a
++else
++	DEPMOD := true
++endif
++
+ ifeq ($(KDIR),)
+ 	KDIR := /lib/modules/$(KVER)/build
+ endif
+ 
++MOD_KERNEL_PATH := /kernel/drivers/gpu/drm/evdi
++
+ default: module
+ 
+ module:
+ 	$(MAKE) -C $(KDIR) M=$$PWD
+ 
++install:
++	$(MAKE) -C $(KDIR) M=$$PWD INSTALL_MOD_PATH=$(DESTDIR) INSTALL_MOD_DIR=$(MOD_KERNEL_PATH) modules_install
++	$(DEPMOD)
++
+ clean:
+-	rm -rf *.o *.ko .tmp* .*.*.cmd Module.symvers evdi.mod.c modules.order
++	$(RM) -rf *.o *.ko .tmp* .*.*.cmd Module.symvers evdi.mod.c modules.order
+ 
++uninstall:
++	$(RM) -rf $(DESTDIR)/lib/modules/$(KVER)/$(MOD_KERNEL_PATH)
++	$(DEPMOD)
+ 
+ endif # ifneq ($(KERNELRELEASE),)
+ 
+diff --git a/module/evdi_drv.c b/module/evdi_drv.c
+index e59d0a1..8478ceb 100644
+--- a/module/evdi_drv.c
++++ b/module/evdi_drv.c
+@@ -81,8 +81,12 @@ static void evdi_disable_vblank(__always_unused struct drm_device *dev,
+ }
+ 
+ static struct drm_driver driver = {
+-	.driver_features = DRIVER_MODESET | DRIVER_GEM | DRIVER_PRIME
+-			 | DRIVER_ATOMIC,
++#if KERNEL_VERSION(5, 4, 0) > LINUX_VERSION_CODE
++		.driver_features = DRIVER_MODESET | DRIVER_GEM | DRIVER_PRIME
++						| DRIVER_ATOMIC,
++#else
++		.driver_features = DRIVER_MODESET | DRIVER_GEM | DRIVER_ATOMIC,
++#endif
+ #if KERNEL_VERSION(4, 12, 0) > LINUX_VERSION_CODE
+ 	.load = evdi_driver_load,
+ #endif
+diff --git a/module/evdi_drv.h b/module/evdi_drv.h
+index 0d67197..13fbfce 100644
+--- a/module/evdi_drv.h
++++ b/module/evdi_drv.h
+@@ -20,16 +20,20 @@
+ #include <drm/drm_crtc_helper.h>
+ #include <drm/drm_rect.h>
+ #include <drm/drm_gem.h>
++#if KERNEL_VERSION(5, 4, 0) > LINUX_VERSION_CODE
+ #include <linux/reservation.h>
++#else
++#include <linux/dma-resv.h>
++#endif
+ #include "evdi_debug.h"
+ 
+ #define DRIVER_NAME   "evdi"
+ #define DRIVER_DESC   "Extensible Virtual Display Interface"
+-#define DRIVER_DATE   "20180913"
++#define DRIVER_DATE   "20191204"
+ 
+ #define DRIVER_MAJOR      1
+ #define DRIVER_MINOR      6
+-#define DRIVER_PATCHLEVEL 1
++#define DRIVER_PATCHLEVEL 4
+ 
+ struct evdi_fbdev;
+ struct evdi_painter;
+@@ -51,8 +55,13 @@ struct evdi_gem_object {
+ 	struct page **pages;
+ 	void *vmapping;
+ 	struct sg_table *sg;
++#if KERNEL_VERSION(5, 4, 0) > LINUX_VERSION_CODE
+ 	struct reservation_object *resv;
+ 	struct reservation_object _resv;
++#else
++	struct dma_resv *resv;
++	struct dma_resv _resv;
++#endif
+ };
+ 
+ #define to_evdi_bo(x) container_of(x, struct evdi_gem_object, base)
+@@ -112,8 +121,12 @@ uint32_t evdi_gem_object_handle_lookup(struct drm_file *filp,
+ 
+ struct drm_gem_object *evdi_gem_prime_import(struct drm_device *dev,
+ 					     struct dma_buf *dma_buf);
+-struct dma_buf *evdi_gem_prime_export(struct drm_device *dev,
+-				      struct drm_gem_object *obj, int flags);
++#if KERNEL_VERSION(5, 4, 0) > LINUX_VERSION_CODE
++struct dma_buf *evdi_gem_prime_export(__maybe_unused struct drm_device *dev,
++				struct drm_gem_object *obj, int flags);
++#else
++struct dma_buf *evdi_gem_prime_export(struct drm_gem_object *obj, int flags);
++#endif
+ 
+ int evdi_gem_vmap(struct evdi_gem_object *obj);
+ void evdi_gem_vunmap(struct evdi_gem_object *obj);
+diff --git a/module/evdi_gem.c b/module/evdi_gem.c
+index 2895d6c..7487565 100644
+--- a/module/evdi_gem.c
++++ b/module/evdi_gem.c
+@@ -61,7 +61,11 @@ struct evdi_gem_object *evdi_gem_alloc_object(struct drm_device *dev,
+ 		return NULL;
+ 	}
+ 
++#if KERNEL_VERSION(5, 4, 0) > LINUX_VERSION_CODE
+ 	reservation_object_init(&obj->_resv);
++#else
++	dma_resv_init(&obj->_resv);
++#endif
+ 	obj->resv = &obj->_resv;
+ 
+ 	return obj;
+@@ -254,8 +258,11 @@ void evdi_gem_free_object(struct drm_gem_object *gem_obj)
+ 
+ 	if (gem_obj->dev->vma_offset_manager)
+ 		drm_gem_free_mmap_offset(gem_obj);
+-
++#if KERNEL_VERSION(5, 4, 0) > LINUX_VERSION_CODE
+ 	reservation_object_fini(&obj->_resv);
++#else
++	dma_resv_fini(&obj->_resv);
++#endif
+ 	obj->resv = NULL;
+ }
+ 
+@@ -569,8 +576,11 @@ struct drm_gem_object *evdi_gem_prime_import(struct drm_device *dev,
+ 	return ERR_PTR(ret);
+ }
+ 
+-struct dma_buf *evdi_gem_prime_export(__maybe_unused struct drm_device *dev,
+-				      struct drm_gem_object *obj, int flags)
++struct dma_buf *evdi_gem_prime_export(
++#if KERNEL_VERSION(5, 4, 0) > LINUX_VERSION_CODE
++				__maybe_unused struct drm_device *dev,
++#endif
++				struct drm_gem_object *obj, int flags)
+ {
+ 	struct evdi_gem_object *evdi_obj = to_evdi_bo(obj);
+ 	struct dma_buf_export_info exp_info = {
+@@ -581,8 +591,8 @@ struct dma_buf *evdi_gem_prime_export(__maybe_unused struct drm_device *dev,
+ 		.resv = evdi_obj->resv,
+ 		.priv = obj
+ 	};
+-
+-#if KERNEL_VERSION(4, 9, 0) <= LINUX_VERSION_CODE
++#if KERNEL_VERSION(4, 9, 0) < LINUX_VERSION_CODE && \
++	KERNEL_VERSION(5, 4, 0) > LINUX_VERSION_CODE
+ 	return drm_gem_dmabuf_export(dev, &exp_info);
+ #else
+ 	return dma_buf_export(&exp_info);
