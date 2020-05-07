@@ -441,7 +441,7 @@ separator
 ./evdi.sh
 #Replace Broken tgz with new
 tgzName=`ls $driver_dir/displaylink-driver-${version}/*.gz | cut -d'/' -f3`
-cd ./evdi/module/
+cd ./evdi
 tar -czf $tgzName *
 cp -f $tgzName ../$driver_dir/displaylink-driver-${version}/$tgzName
 #Replace Broken libs with new compiled ones
