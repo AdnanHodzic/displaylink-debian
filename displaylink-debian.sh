@@ -443,11 +443,11 @@ separator
 tgzName=`ls $driver_dir/displaylink-driver-${version}/*.gz | cut -d'/' -f3`
 cd ./evdi/module/
 tar -czf $tgzName *
-cp -f $tgzName ../../$driver_dir/displaylink-driver-${version}/$tgzName
+cp -f $tgzName ../$driver_dir/displaylink-driver-${version}/$tgzName
 #Replace Broken libs with new compiled ones
-cp -f ../library/libevdi.so.1.* ../../$driver_dir/displaylink-driver-${version}/x64-ubuntu-1604/libevdi.so
-cp -f ../library/libevdi.so.1.* ../../$driver_dir/displaylink-driver-${version}/x86-ubuntu-1604/libevdi.so
-cd ../../
+cp -f library/libevdi.so.1.* ../$driver_dir/displaylink-driver-${version}/x64-ubuntu-1604/libevdi.so
+cp -f library/libevdi.so.1.* ../$driver_dir/displaylink-driver-${version}/x86-ubuntu-1604/libevdi.so
+cd ../
 rm -rf evdi/
 ############################################################
 ####END of Modifications for EVDI Kernel 5.4 issues     ####
