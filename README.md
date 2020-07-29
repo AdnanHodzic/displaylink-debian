@@ -51,7 +51,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   * Debian: Jessie 8.0/Stretch 9.0/Buster 10/Bullseye (testing)/Sid (unstable)
   * Ubuntu: 14.04 Trusty/15.04 Vivid/15.10 Wily/16.04 Xenial/16.10 Yakkety/17.04 Zesty/17.10 Artful/18.04 Bionic/19.04 Disco/19.10 Eoan/20.04 Focal
   * elementary OS: O.3 Freya/0.4 Loki/5.0 Juno
-  * Mint: 15 Olivia/16 Petra/17.3 Rosa/18 Sarah/18.1 Serena/18.2 Sonya/18.3 Sylvia/19 Tara/19.1 Tessa/19.2 Tina/19.3 Tricia
+  * Mint: 15 Olivia/16 Petra/17.3 Rosa/18 Sarah/18.1 Serena/18.2 Sonya/18.3 Sylvia/19 Tara/19.1 Tessa/19.2 Tina/19.3 Tricia/20 Ulyana
   * LMDE: 2 Betsy/3 Cindy/4 Debbie
   * Kali: kali-rolling/2016.2/2017.3/2018.3/2018.4
   * Deepin: 15/15.1/15.1.1/15.2/15.4.1
