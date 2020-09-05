@@ -10,6 +10,8 @@ externalPatchDomain="https://crazy.dev.frugalware.org/"
 currentEvdiPatch="eaiof.patch"
 patchFileName="evdi-all-in-one-fixes.patch"
 
+# displaylink-installer patch local resources
+displayLinkInstallerPatch="displaylink-installer.patch"
 
 #EVDI Web resources
 externalPatchURL=$externalPatchDomain$patchFileName
@@ -36,8 +38,8 @@ fi
 
 
 cd "$resourcesDir"
-#remove all files except current local patch - if it's present
-find . ! -name $currentEvdiPatch -delete
+#remove all files except current local patch and display-link-installer.patch - if it's present
+find . ! -name $currentEvdiPatch $displayLinkInstallerPatch  -delete
 
 #download any new patch
 echo "$externalPatchURL"
@@ -68,7 +70,7 @@ if [ -d $evdiDir ] ; then
 	rm -rf $evdiDir
 fi
 
-git clone $evdiURL
+git clone --depth=1 --branch v1.7.0 $evdiURL
 cd "$evdiDir"
 if [ "$commitPatch" = "true" ] ; then
 	cp $commitPatchPath $evdiDir

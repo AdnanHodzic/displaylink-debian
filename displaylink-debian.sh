@@ -453,6 +453,13 @@ rm -rf evdi/
 ####END of Modifications for EVDI Kernel 5.4 issues     ####
 ############################################################
 
+# Patch displaylink-installer.sh to prevent reboot before our script is done.
+resourcesDir="$(pwd)/resources/"
+patchName="displaylink-installer.patch"
+finalPatchPath="$resourcesDir$patchName"
+patch -Np0 $driver_dir/displaylink-driver-${version}/displaylink-installer.sh <$finalPatchPath
+
+
 # run displaylink install
 echo -e "\nInstalling driver version: $version\n"
 cd $driver_dir/displaylink-driver-${version}
