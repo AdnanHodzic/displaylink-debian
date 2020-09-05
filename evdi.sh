@@ -68,7 +68,7 @@ if [ -d $evdiDir ] ; then
 	rm -rf $evdiDir
 fi
 
-git clone $evdiURL
+git clone --depth=1 --branch v1.7.0 $evdiURL
 cd "$evdiDir"
 if [ "$commitPatch" = "true" ] ; then
 	cp $commitPatchPath $evdiDir
