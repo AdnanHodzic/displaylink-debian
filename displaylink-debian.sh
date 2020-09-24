@@ -774,7 +774,9 @@ echo -e "\nUninstalling ...\n"
 # displaylink-installer uninstall
 if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ];
 then
-	rm /lib/modules/$(uname -r)/build/Kconfig
+	if [ -f /lib/modules/$(uname -r)/build/Kconfig ]; then
+		rm /lib/modules/$(uname -r)/build/Kconfig
+	fi
 fi
 
 if [ "$(sysinitdaemon_get)" == "sysvinit" ]
