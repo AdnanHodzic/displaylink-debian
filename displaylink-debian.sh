@@ -94,9 +94,6 @@ echo -e "\nChecking dependencies\n"
 if [ "$lsb" == "Deepin" ];
 then
 	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source-deepin x11-xserver-utils wget libdrm-dev git)
-elif [ "$lsb" == "PureOS" ];
-then
-	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev git)
 else
 	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev git)
 fi
