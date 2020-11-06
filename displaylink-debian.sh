@@ -254,7 +254,7 @@ then
 # PopOS
 elif [ "$lsb" == "Pop" ];
 then
-	if [ $codename == "focal" ] || [ $codename == "n/a" ];
+	if [ $codename == "focal" ] || [ $codename == "groovy" ] || [ $codename == "n/a" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
