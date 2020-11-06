@@ -842,7 +842,13 @@ for letter in "$ack"; do
 	fi
 done
 
-evdi_version="$(cat /sys/devices/evdi/version)"
+if [ -f /sys/devices/evdi/version ]
+then
+	evdi_version="$(cat /sys/devices/evdi/version)"
+else
+	evdi_version="/sys/devices/evdi/version not found"
+fi
+
 echo -e "--------------- Linux system info ----------------\n"
 echo -e "Distro: $lsb"
 echo -e "Release: $codename"
