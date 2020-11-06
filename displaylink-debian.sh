@@ -93,12 +93,9 @@ echo -e "\nChecking dependencies\n"
 
 if [ "$lsb" == "Deepin" ];
 then
-	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source-deepin x11-xserver-utils wget libdrm-dev git)
-elif [ "$lsb" == "PureOS" ];
-then
-	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev git)
+	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source-deepin x11-xserver-utils wget libdrm-dev git pciutils)
 else
-	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev git)
+	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev git pciutils)
 fi
 
 for dep in ${deps[@]}
@@ -845,7 +842,13 @@ for letter in "$ack"; do
 	fi
 done
 
-evdi_version="$(cat /sys/devices/evdi/version)"
+if [ -f /sys/devices/evdi/version ]
+then
+	evdi_version="$(cat /sys/devices/evdi/version)"
+else
+	evdi_version="/sys/devices/evdi/version not found"
+fi
+
 echo -e "--------------- Linux system info ----------------\n"
 echo -e "Distro: $lsb"
 echo -e "Release: $codename"
