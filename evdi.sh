@@ -1,7 +1,5 @@
 #!/bin/bash
 
-apt-get install -y libdrm-dev libelf-dev
-
 resourcesDir="$(pwd)/resources/"
 evdiDir="$(pwd)/evdi/"
 externalPatchDomain="https://crazy.dev.frugalware.org/"

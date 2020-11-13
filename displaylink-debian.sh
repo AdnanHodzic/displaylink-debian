@@ -93,9 +93,9 @@ echo -e "\nChecking dependencies\n"
 
 if [ "$lsb" == "Deepin" ];
 then
-	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source-deepin x11-xserver-utils wget libdrm-dev git pciutils)
+	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source-deepin x11-xserver-utils wget libdrm-dev libelf-dev git pciutils)
 else
-	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev git pciutils)
+	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev libelf-dev git pciutils)
 fi
 
 for dep in ${deps[@]}
