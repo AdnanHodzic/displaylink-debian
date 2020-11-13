@@ -21,7 +21,9 @@ DisplayLink drivers tailored to work for most of the Debian based Linux distribu
 
 #### How to run "displaylink-debian"
 
-##### Repo clone (method 1)
+##### Repo clone
+
+`sudo apt-get install git`
 
 `git clone https://github.com/AdnanHodzic/displaylink-debian.git`
 
@@ -29,15 +31,6 @@ DisplayLink drivers tailored to work for most of the Debian based Linux distribu
 
 *After installation has been completed, make sure to consult [Post Install Guide][PostInstall]!*
 
-##### Download and run script without Git (method 2)
-
-`wget https://raw.githubusercontent.com/AdnanHodzic/displaylink-debian/master/displaylink-debian.sh`
-`wget https://raw.githubusercontent.com/AdnanHodzic/displaylink-debian/master/displaylink.sh`
-`wget https://raw.githubusercontent.com/AdnanHodzic/displaylink-debian/master/evdi.sh`
-
-`chmod +x displaylink-debian.sh evdi.sh && sudo ./displaylink-debian.sh`
-
-*After installation has been completed, make sure to consult [Post Install Guide][PostInstall]!*
 
 #### Post installation Guide and Troubleshooting
 
