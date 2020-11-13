@@ -1,14 +1,16 @@
 # Post Installation Guide
 
-* [Prerequisites](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#prerequisites)
+* [Prerequisites](#prerequisites)
 
-* [Screen Layout Configuration](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#screen-layout-configuration)
+* [Display detection](#display-detection)
 
-* [Automated (persistent) display configuration](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#automated-persistent-display-configuration)
+* [Screen Layout Configuration](#screen-layout-configuration)
 
-* [Troubleshooting most common issues](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#troubleshooting-most-common-issues)
+* [Automated (persistent) display configuration](#automated-persistent-display-configuration)
 
-* [Having a different problem](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#having-a-different-problem)
+* [Troubleshooting most common issues](#troubleshooting-most-common-issues)
+
+* [Having a different problem](#having-a-different-problem)
 
 ### Prerequisites
 
@@ -42,30 +44,57 @@ If you have Nvidia or ATI/AMD graphics card, try removing: `/etc/X11/xorg.conf.d
 
 If none of the suggestions in [Prerequsites section](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#prerequisites) solved your problem, make sure to consult [Troubleshooting most common issues](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#troubleshooting-most-common-issues).
 
+### Display Detection
+
+Only do this in case your monitors weren't automatically detected.
+
+First run `xrandr --listproviders`. 
+The output should be similar to this:
+```
+Providers: number : 5
+Provider 0: id: 0x44 cap: 0x9, Source Output, Sink Offload crtcs: 3 outputs: 2 associated providers: 0 name:Intel
+Provider 1: id: 0x138 cap: 0x2, Sink Output crtcs: 1 outputs: 1 associated providers: 0 name:modesetting
+Provider 2: id: 0x116 cap: 0x2, Sink Output crtcs: 1 outputs: 1 associated providers: 0 name:modesetting
+Provider 3: id: 0xf4 cap: 0x2, Sink Output crtcs: 1 outputs: 1 associated providers: 0 name:modesetting
+Provider 4: id: 0xd2 cap: 0x2, Sink Output crtcs: 1 outputs: 1 associated providers: 0 name:modesetting
+```
+Notes:
+* Provider 0 is the actual graphics provider and 1-4 are DisplayLink providers.
+* All providers have 0 associated providers. Which means that we will have to connect all the DisplayLink providers to the main provider. 
+
+We can do this with the command `xrandr --setprovideroutputsource <prov-xid> <source-xid>`
+In this case we would run:
+```
+xrandr --setprovideroutputsource 1 0
+xrandr --setprovideroutputsource 2 0
+xrandr --setprovideroutputsource 3 0
+xrandr --setprovideroutputsource 4 0
+```
+If we would re-run `xrandr --listproviders` this would output:
+```
+Providers: number : 5
+Provider 0: id: 0x44 cap: 0x9, Source Output, Sink Offload crtcs: 3 outputs: 2 associated providers: 4 name:Intel
+Provider 1: id: 0x138 cap: 0x2, Sink Output crtcs: 1 outputs: 1 associated providers: 1 name:modesetting
+Provider 2: id: 0x116 cap: 0x2, Sink Output crtcs: 1 outputs: 1 associated providers: 1 name:modesetting
+Provider 3: id: 0xf4 cap: 0x2, Sink Output crtcs: 1 outputs: 1 associated providers: 1 name:modesetting
+Provider 4: id: 0xd2 cap: 0x2, Sink Output crtcs: 1 outputs: 1 associated providers: 1 name:modesetting
+```
+
+For further reference I suggest reading: 
+[How to use xrandr](https://web.archive.org/web/20180224075928/https://pkg-xorg.alioth.debian.org/howto/use-xrandr.html)
+
 ### Screen Layout Configuration
 
 There are couple of tools to help you configure screen layout of your external monitors. 
 
-##### Set provider sources
-
-Only do this in case your monitors weren't automatically detected, i.e:
-
-```
-xrandr --setprovideroutputsource 1 0
-   
-xrandr --setprovideroutputsource 2 0
-```
-
-This will manually connect you to two external monitors. 
-
 ##### xrandr
 
-Depending on your setup, to connect provider 1 to provier 0, you'd run:
+Depending on your setup, to place DVI-1-0 virtually-right of the eDP1 display you'd run:
 
 ```xrandr --output DVI-1-0 --auto --right-of eDP1```
 
 For further reference I suggest reading: 
-[How to use xrandr](https://pkg-xorg.alioth.debian.org/howto/use-xrandr.html)
+[How to use xrandr](https://web.archive.org/web/20180224075928/https://pkg-xorg.alioth.debian.org/howto/use-xrandr.html)
 
 ##### GNOME Displays
 
