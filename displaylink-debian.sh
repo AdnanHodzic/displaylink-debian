@@ -32,7 +32,7 @@ kernel="$(uname -r)"
 xorg_config_displaylink="/etc/X11/xorg.conf.d/20-displaylink.conf"
 blacklist="/etc/modprobe.d/blacklist.conf"
 sys_driver_version="$(ls /usr/src/ | grep "evdi" | cut -d "-" -f2)"
-vga_info="$(lspci | grep -oP '(?<=VGA compatible controller: ).*')"
+vga_info="$(lspci | grep -oP '(?<=VGA compatible controller: ).*')" || :
 vga_info_3d="$(lspci | grep -i '3d controller' | sed 's/^.*: //')"
 graphics_vendor="$(lspci -nnk | grep -i vga -A3 | grep 'in use' | cut -d ':' -f2 | sed 's/ //g')"
 graphics_subcard="$(lspci -nnk | grep -i vga -A3 | grep Subsystem | cut -d ' ' -f5)"
