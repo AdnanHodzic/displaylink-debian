@@ -214,7 +214,7 @@ then
 # Deepin
 elif [ "$lsb" == "Deepin" ];
 then
-	if [ $codename == "unstable" ] || [ $codename == "stable" ];
+	if [ $codename == "unstable" ] || [ $codename == "stable" ] || [ $codename == "n/a" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
