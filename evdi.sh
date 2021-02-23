@@ -11,7 +11,7 @@ if [ -d $evdiDir ] ; then
 	rm -rf $evdiDir
 fi
 
-git clone --depth=1 --branch v1.7.2 $evdiURL
+git clone --depth=1 --branch v1.7.x $evdiURL
 cd "$evdiDir"
 make
 cd ..
