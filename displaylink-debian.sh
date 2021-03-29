@@ -18,9 +18,10 @@ IFS=$'\n\t'
 
 
 # define the version to get as the latest available version
-version=`wget -q -O - https://www.displaylink.com/downloads/ubuntu | grep "download-version" | head -n 1 | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/'`
+version=`wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 1 | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/'`
 # define download url to be the correct version
-dlurl="https://www.displaylink.com/"`wget -q -O - https://www.displaylink.com/downloads/ubuntu | grep 'class="download-link"' | head -n 1 | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/'`
+dlurl="https://www.synaptics.com/$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep 'class="download-link"' | head -n 1 | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
+driver_url="https://www.synaptics.com/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
 driver_dir=$version
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/" && pwd )"
 
@@ -370,8 +371,6 @@ done
 }
 
 download() {
-local dlfileid=$(echo $dlurl | perl -pe '($_)=/.+\?id=(\d+)/')
-
 default=y
 echo -en "\nPlease read the Software License Agreement available at: \n$dlurl\nDo you accept?: [Y/n]: "
 read ACCEPT
@@ -379,7 +378,7 @@ ACCEPT=${ACCEPT:-$default}
 case $ACCEPT in
 		y*|Y*)
 				echo -e "\nDownloading DisplayLink Ubuntu driver:\n"
-				wget -O DisplayLink_Ubuntu_${version}.zip "--post-data=fileId=$dlfileid&accept_submit=Accept" $dlurl
+				wget -O DisplayLink_Ubuntu_${version}.zip "${driver_url}"
 				# make sure file is downloaded before continuing
 				if [ $? -ne 0 ]
 				then
