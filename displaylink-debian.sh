@@ -428,28 +428,6 @@ then
 	ln -sf /lib/modules/$(uname -r)/build/Makefile /lib/modules/$(uname -r)/build/Kconfig
 fi
 
-
-# install
-separator
-############################################################
-####START of Modifications for EVDI Kernel 5.4 issues   ####
-############################################################
-#Build EVDI from SRC
-./evdi.sh
-#Replace Broken tgz with new
-tgzName=`ls $driver_dir/displaylink-driver-${version}/*.gz | cut -d'/' -f3`
-cd ./evdi
-tar -czf $tgzName *
-cp -f $tgzName ../$driver_dir/displaylink-driver-${version}/$tgzName
-#Replace Broken libs with new compiled ones
-cp -f library/libevdi.so.1.* ../$driver_dir/displaylink-driver-${version}/x64-ubuntu-1604/libevdi.so
-cp -f library/libevdi.so.1.* ../$driver_dir/displaylink-driver-${version}/x86-ubuntu-1604/libevdi.so
-cd ../
-rm -rf evdi/
-############################################################
-####END of Modifications for EVDI Kernel 5.4 issues     ####
-############################################################
-
 # Patch displaylink-installer.sh to prevent reboot before our script is done.
 resourcesDir="$(pwd)/resources/"
 patchName="displaylink-installer.patch"
