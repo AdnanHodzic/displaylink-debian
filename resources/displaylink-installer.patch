@@ -6,12 +6,12 @@
    echo -e "\nInstallation complete!"
 -  echo -e "\nPlease reboot your computer if intending to use Xorg."
 -  $XORG_RUNNING || exit 0
--  read -p 'Xorg is running. Do you want to reboot now? (Y/n)' CHOICE
+-  read -rp 'Xorg is running. Do you want to reboot now? (Y/n)' CHOICE
 -  [[ ${CHOICE:-Y} =~ ^[Nn]$ ]] && exit 0
 -  reboot
 +  #echo -e "\nPlease reboot your computer if intending to use Xorg."
 +  #$XORG_RUNNING || exit 0
-+  #read -p 'Xorg is running. Do you want to reboot now? (Y/n)' CHOICE
++  #read -rp 'Xorg is running. Do you want to reboot now? (Y/n)' CHOICE
 +  #[[ ${CHOICE:-Y} =~ ^[Nn]$ ]] && exit 0
 +  #reboot
  }
