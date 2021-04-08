@@ -1,12 +1,12 @@
 --- /opt/displaylink/displaylink-installer.sh
 +++ /opt/displaylink/displaylink-installer.sh
-@@ -457,11 +457,11 @@
+@@ -456,11 +456,11 @@
    echo "http://support.displaylink.com/knowledgebase/topics/103927-troubleshooting-ubuntu"
  
    echo -e "\nInstallation complete!"
 -  echo -e "\nPlease reboot your computer if intending to use Xorg."
 -  $XORG_RUNNING || exit 0
--  read -p 'Xorg is running. Do you want to reboot now? (Y/n)' CHOICE
+-  read -rp 'Xorg is running. Do you want to reboot now? (Y/n)' CHOICE
 -  [[ ${CHOICE:-Y} =~ ^[Nn]$ ]] && exit 0
 -  reboot
 +  #echo -e "\nPlease reboot your computer if intending to use Xorg."
