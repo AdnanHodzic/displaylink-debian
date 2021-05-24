@@ -54,6 +54,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   * Parrot: 4.5
   * Devuan: ASCII
   * Pop!_OS: 20.04 Focal/20.10 Groovy
+  * Nitrux: nitrux
 
   Regardless of which Linux kernel version (>4.15) you're using.
   

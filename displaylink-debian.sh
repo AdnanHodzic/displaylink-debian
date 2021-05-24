@@ -271,6 +271,15 @@ then
 		message
 		exit 1
 	fi
+elif [ "$lsb" == "Nitrux" ];
+then
+	if [ $codename == "nitrux" ];
+	then
+		echo -e "\nPlatform requirements satisfied, proceeding ..."
+	else
+		message
+		exit 1
+	fi	
 else
 	message
 	exit 1
