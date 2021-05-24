@@ -261,7 +261,7 @@ then
 	else
 		message
 		exit 1
-	fi	
+	fi
 elif [ "$lsb" == "PureOS" ];
 then
 	if [ $codename == "amber" ];
