@@ -53,7 +53,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   * BunsenLabs: Helium
   * Parrot: 4.5
   * Devuan: ASCII
-  * Pop!_OS: 20.04 Focal/20.10 Groovy
+  * Pop!_OS: 20.04 Focal/20.10 Groovy/21.04 Hirsute
   * Nitrux: nitrux
 
   Regardless of which Linux kernel version (>4.15) you're using.
