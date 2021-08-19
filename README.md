@@ -43,22 +43,22 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
 #### Supported platforms are:
 
   * Debian: Jessie 8.0/Stretch 9.0/Buster 10/Bullseye (testing)/Sid (unstable)
-  * Ubuntu: 14.04 Trusty/15.04 Vivid/15.10 Wily/16.04 Xenial/16.10 Yakkety/17.04 Zesty/17.10 Artful/18.04 Bionic/19.04 Disco/19.10 Eoan/20.04 Focal/20.10 Groovy/21.04 Hirsute
-  * elementary OS: O.3 Freya/0.4 Loki/5.0 Juno/5.1 Hera
-  * Mint: 15 Olivia/16 Petra/17.3 Rosa/18 Sarah/18.1 Serena/18.2 Sonya/18.3 Sylvia/19 Tara/19.1 Tessa/19.2 Tina/19.3 Tricia/20 Ulyana/20.1 Ulyssa
+  * Ubuntu: 14.04 Trusty - 21.04 Hirsute
+  * elementary OS: 0.3 Freya- 5.1 Hera
+  * Mint: 15 Olivia / 20.2 Uma
   * LMDE: 2 Betsy/3 Cindy/4 Debbie
   * Kali: kali-rolling/2016.2/2017.3/2018.3/2018.4
-  * Deepin: 15/15.1/15.1.1/15.2/15.4.1
+  * Deepin: 15 - 15.4.1
   * MX Linux: 17.1/18
   * BunsenLabs: Helium
   * Parrot: 4.5
   * Devuan: ASCII
-  * Pop!_OS: 20.04 Focal/20.10 Groovy/21.04 Hirsute
+  * Pop!_OS: 20.04 Focal - 21.04 Hirsute
   * Nitrux: nitrux
 
   Regardless of which Linux kernel version (>4.15) you're using.
   
-  If your distribution is not on the list, make sure to include debug information by running: `sudo ./displaylink-debian.sh --debug` and [submit a request to add support for it](https://github.com/AdnanHodzic/displaylink-debian/issues/new).
+  If your distribution or version is not on the list, make sure to include debug information by running: `sudo ./displaylink-debian.sh --debug` and [submit a request to add support for it](https://github.com/AdnanHodzic/displaylink-debian/issues/new).
 
 #### Technical
 
