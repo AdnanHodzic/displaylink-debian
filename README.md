@@ -44,7 +44,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
 
   * Debian: Jessie 8.0/Stretch 9.0/Buster 10/Bullseye 11/Bookworm (testing)/Sid (unstable)
   * Ubuntu: 14.04 Trusty - 21.04 Hirsute
-  * elementary OS: 0.3 Freya- 5.1 Hera
+  * elementary OS: 0.3 Freya- 6 Odin
   * Mint: 15 Olivia / 20.2 Uma
   * LMDE: 2 Betsy/3 Cindy/4 Debbie
   * Kali: kali-rolling/2016.2/2017.3/2018.3/2018.4

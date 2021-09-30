@@ -161,9 +161,9 @@ then
 		exit 1
 	fi
 # elementary OS
-elif [ "$lsb" == "elementary OS" ] || [ "$lsb" == "elementary" ];
+elif [ "$lsb" == "elementary OS" ] || echo $lsb | grep -qi "elementary";
 then
-	if [ $codename == "freya" ] || [ $codename == "loki" ] || [ $codename == "juno" ] || [ $codename == "hera" ];
+	if [ $codename == "freya" ] || [ $codename == "loki" ] || [ $codename == "juno" ] || [ $codename == "hera" ] || [ $codename == "odin" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
@@ -309,7 +309,7 @@ then
         sysinitdaemon="upstart"
 	fi
 # Elementary
-elif [ "$lsb" == "elementary OS" ];
+elif [ "$lsb" == "elementary OS" ] || echo $lsb | grep -qi "elementary";
 then
     if [ $codename == "freya" ];
     then
