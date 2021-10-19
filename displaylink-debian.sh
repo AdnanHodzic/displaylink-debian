@@ -510,9 +510,8 @@ then
     # Fix inability to enable displaylink-driver.service
     sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/displaylink-driver.service
 
-    echo "Enable and start displaylink-driver service"
+    echo "Enable displaylink-driver service"
     systemctl enable displaylink-driver.service
-    systemctl start displaylink-driver.service
 elif [ "$sysinitdaemon" == "sysvinit" ]
 then
     echo "Copying init script to /etc/init.d\n"
