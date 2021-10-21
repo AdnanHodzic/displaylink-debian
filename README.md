@@ -43,7 +43,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
 #### Supported platforms are:
 
   * Debian: Jessie 8.0/Stretch 9.0/Buster 10/Bullseye 11/Bookworm (testing)/Sid (unstable)
-  * Ubuntu: 14.04 Trusty - 21.04 Hirsute
+  * Ubuntu: 14.04 Trusty - 21.10 Impish
   * elementary OS: 0.3 Freya- 6 Odin
   * Mint: 15 Olivia / 20.2 Uma
   * LMDE: 2 Betsy/3 Cindy/4 Debbie
@@ -53,7 +53,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   * BunsenLabs: Helium
   * Parrot: 4.5
   * Devuan: ASCII
-  * Pop!_OS: 20.04 Focal - 21.04 Hirsute
+  * Pop!_OS: 20.04 Focal - 21.10 Impish
   * Nitrux: nitrux
 
   Regardless of which Linux kernel version (>4.15) you're using.
