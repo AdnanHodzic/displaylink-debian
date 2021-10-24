@@ -927,6 +927,7 @@ then
 	uninstall
 	clean_up
 	distro_check
+	pre_install
 	install
 	post_install
 	clean_up
