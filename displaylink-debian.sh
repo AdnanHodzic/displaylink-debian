@@ -24,6 +24,7 @@ dlurl="https://www.synaptics.com/$(wget -q -O - https://www.synaptics.com/produc
 driver_url="https://www.synaptics.com/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
 driver_dir=$version
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/" && pwd )"
+resourcesDir="$(pwd)/resources/"
 
 # globalvars
 lsb="$(lsb_release -is)"
@@ -450,7 +451,6 @@ then
 fi
 
 # Patch displaylink-installer.sh to prevent reboot before our script is done.
-resourcesDir="$(pwd)/resources/"
 patchName="displaylink-installer.patch"
 finalPatchPath="$resourcesDir$patchName"
 patch -Np0 $driver_dir/displaylink-driver-${version}/displaylink-installer.sh <$finalPatchPath
@@ -939,6 +939,7 @@ then
 	uninstall
 	clean_up
 	distro_check
+	pre_install
 	install
 	post_install
 	clean_up
