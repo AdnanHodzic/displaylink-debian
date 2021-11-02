@@ -152,6 +152,8 @@ Note, in case you're editting ```~/.bashrc```, make sure you run ```source ~/.ba
 
 * [mouse/cursor flicker issue](https://github.com/AdnanHodzic/displaylink-debian/issues/192)
 
+* [`Can't open display :0` error](https://github.com/AdnanHodzic/displaylink-debian/issues/639)
+
 ##### Monitoring for errors
 
 * Monitor ```dmesg | grep Display``` output while plugging in Displaylink
