@@ -55,6 +55,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   * Devuan: ASCII
   * Pop!_OS: 20.04 Focal - 21.10 Impish
   * Nitrux: nitrux
+  * Zorin: focal
 
   Regardless of which Linux kernel version (>4.15) you're using.
   

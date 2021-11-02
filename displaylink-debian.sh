@@ -262,6 +262,7 @@ then
 		message
 		exit 1
 	fi
+# PureOS
 elif [ "$lsb" == "PureOS" ];
 then
 	if [ $codename == "amber" ];
@@ -271,9 +272,20 @@ then
 		message
 		exit 1
 	fi
+# Nitrux
 elif [ "$lsb" == "Nitrux" ];
 then
 	if [ $codename == "nitrux" ];
+	then
+		echo -e "\nPlatform requirements satisfied, proceeding ..."
+	else
+		message
+		exit 1
+	fi	
+# Zorin
+elif [ "$lsb" == "Zorin" ];
+then
+	if [ $codename == "focal" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
