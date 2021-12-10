@@ -31,6 +31,10 @@ DisplayLink drivers tailored to work for most of the Debian based Linux distribu
 
 *After installation has been completed, make sure to consult [Post Install Guide][PostInstall]!*
 
+> :warning: **In case you upgraded your distro to a newer version, first
+> uninstall (using `u` option), then, after rebooting, do a fresh install (using
+> `i` option). A re-install (using `r` option) may not work.**:
+
 
 #### Post installation Guide and Troubleshooting
 
