@@ -17,11 +17,19 @@ set -eu
 IFS=$'\n\t'
 
 
-# define the version to get as the latest available version
-version=`wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 1 | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/'`
-# define download url to be the correct version
-dlurl="https://www.synaptics.com/$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep 'class="download-link"' | head -n 1 | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
-driver_url="https://www.synaptics.com/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
+# Get latest versions
+versions=$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 2 | perl -pe '($_)=/([0-9]+([.][0-9]+)+(\ Beta)*)/')
+# if versions contains "Beta", try to download previous version
+if [[ $versions =~ Beta ]]; then
+    echo "Beta version detected, trying to download previous version"
+    version=$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 2 | perl -pe '($_)=/([0-9]+([.][0-9]+)+(?!\ Beta))/')
+    dlurl="https://www.synaptics.com/$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep -B 2 $version'-Release' | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
+    driver_url="https://www.synaptics.com/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
+else
+    version=`wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 1 | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/'`
+    dlurl="https://www.synaptics.com/$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep 'class="download-link"' | head -n 1 | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
+    driver_url="https://www.synaptics.com/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
+fi
 driver_dir=$version
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/" && pwd )"
 resourcesDir="$(pwd)/resources/"
