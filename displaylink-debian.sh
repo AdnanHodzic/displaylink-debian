@@ -16,12 +16,27 @@ set -eu
 # set -o pipefail # TODO: Some code still fails this check, fix before enabling.
 IFS=$'\n\t'
 
+# Latest regular release only support kernel version <= 5.13
+kernel_check="$(uname -r | egrep -o '[0-9]+\.[0-9]+')"
+max_kernel_version_supported="5.13"
+if [ "$(ver2int $kernel_check)" -gt "$(ver2int $max_kernel_version_supported)" ]; then
+	echo -e "\n---------------------------------------------------------------\n"
+	echo -e "Unsuported kernel version: $kernel_check"
+	echo -e "Please wait for a stable DisplayLink release or try to install the beta"
+	echo -e "No support will be given for the beta version"
+	echo -e ""
+	echo -e ""
+	echo -e "This tool is Open Source and feel free to extend it"
+	echo -e "GitHub repo: https://github.com/AdnanHodzic/displaylink-debian/"
+	echo -e "\n---------------------------------------------------------------\n"
+	exit 1
+fi
+
 
 # Get latest versions
 versions=$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 2 | perl -pe '($_)=/([0-9]+([.][0-9]+)+(\ Beta)*)/')
 # if versions contains "Beta", try to download previous version
 if [[ $versions =~ Beta ]]; then
-    echo "Beta version detected, trying to download previous version"
     version=$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 2 | perl -pe '($_)=/([0-9]+([.][0-9]+)+(?!\ Beta))/')
     dlurl="https://www.synaptics.com/$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep -B 2 $version'-Release' | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
     driver_url="https://www.synaptics.com/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
