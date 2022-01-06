@@ -19,6 +19,11 @@ IFS=$'\n\t'
 # Latest regular release only support kernel version <= 5.13
 kernel_check="$(uname -r | egrep -o '[0-9]+\.[0-9]+')"
 max_kernel_version_supported="5.13"
+
+function ver2int {
+echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
+}
+
 if [ "$(ver2int $kernel_check)" -gt "$(ver2int $max_kernel_version_supported)" ]; then
 	echo -e "\n---------------------------------------------------------------\n"
 	echo -e "Unsuported kernel version: $kernel_check"
@@ -511,10 +516,6 @@ fi
 }
 
 # add udl/udlfb to blacklist depending on kernel version (issue #207)
-function ver2int {
-echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
-}
-
 if [ "$(ver2int $kernel_check)" -ge "$(ver2int '4.14.9')" ];
 then
 		udl_block
