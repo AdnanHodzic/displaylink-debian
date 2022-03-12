@@ -1,19 +1,23 @@
 --- /opt/displaylink/displaylink-installer.sh
 +++ /opt/displaylink/displaylink-installer.sh
-@@ -457,11 +457,11 @@
-   echo "http://support.displaylink.com/knowledgebase/topics/103927-troubleshooting-ubuntu"
+@@ -502,13 +502,13 @@
+   printf '\n%s\n%s\n' "Please read the FAQ" \
+         "http://support.displaylink.com/knowledgebase/topics/103927-troubleshooting-ubuntu"
  
-   echo -e "\nInstallation complete!"
--  echo -e "\nPlease reboot your computer if intending to use Xorg."
--  $XORG_RUNNING || exit 0
--  read -rp 'Xorg is running. Do you want to reboot now? (Y/n)' CHOICE
--  [[ ${CHOICE:-Y} =~ ^[Nn]$ ]] && exit 0
--  reboot
-+  #echo -e "\nPlease reboot your computer if intending to use Xorg."
-+  #$XORG_RUNNING || exit 0
-+  #read -rp 'Xorg is running. Do you want to reboot now? (Y/n)' CHOICE
-+  #[[ ${CHOICE:-Y} =~ ^[Nn]$ ]] && exit 0
-+  #reboot
+-  printf '\n%s\n\n%s\n' "Installation complete!" \
+-        "Please reboot your computer if you're intending to use Xorg."
+-
+-  "$NOREBOOT" && exit 0
+-
+-  xorg_running || exit 0
+-  prompt_yes_no "Xorg is running. Do you want to reboot now?" && reboot
++#  printf '\n%s\n\n%s\n' "Installation complete!" \
++#        "Please reboot your computer if you're intending to use Xorg."
++#
++#  "$NOREBOOT" && exit 0
++#
++#  xorg_running || exit 0
++#  prompt_yes_no "Xorg is running. Do you want to reboot now?" && reboot
+   exit 0
  }
  
- uninstall()

@@ -18,7 +18,7 @@ IFS=$'\n\t'
 
 # Latest regular release only support kernel version <= 5.13
 kernel_check="$(uname -r | egrep -o '[0-9]+\.[0-9]+')"
-max_kernel_version_supported="5.13"
+max_kernel_version_supported="5.16"
 
 function ver2int {
 echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
@@ -461,9 +461,9 @@ separator
 echo -e "\nPreparing for install\n"
 test -d $driver_dir && /bin/rm -Rf $driver_dir
 unzip -d $driver_dir DisplayLink_Ubuntu_${version}.zip
-chmod +x $driver_dir/displaylink-driver-${version}-[0-9]*.run
-./$driver_dir/displaylink-driver-${version}-[0-9]*.run --keep --noexec
-mv displaylink-driver-${version}-[0-9]*/ $driver_dir/displaylink-driver-${version}
+chmod +x $driver_dir/displaylink-driver-${version}.*[0-9]*-[0-9]*.run
+./$driver_dir/displaylink-driver-${version}.*[0-9]*-[0-9]*.run --keep --noexec
+mv displaylink-driver-${version}.*[0-9]*-[0-9]*/ $driver_dir/displaylink-driver-${version}
 
 # get sysinitdaemon
 sysinitdaemon=$(sysinitdaemon_get)
