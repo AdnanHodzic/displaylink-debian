@@ -182,7 +182,7 @@ echo -e "\n---------------------------------------------------------------\n"
 # Ubuntu
 if [ "$lsb" == "Ubuntu" ] || [ "$lsb" == "Neon" ];
 then
-	if [ $codename == "trusty" ] || [ $codename == "vivid" ] || [ $codename == "wily" ] || [ $codename == "xenial" ] || [ $codename == "yakkety" ] || [ $codename == "zesty" ] || [ $codename == "artful" ] || [ $codename == "bionic" ] || [ $codename == "cosmic" ] || [ $codename == "disco" ] || [ $codename == "eoan" ] || [ $codename == "focal" ] || [ $codename == "groovy" ] || [ $codename == "hirsute" ] || [ $codename == "impish" ];
+	if [ $codename == "trusty" ] || [ $codename == "vivid" ] || [ $codename == "wily" ] || [ $codename == "xenial" ] || [ $codename == "yakkety" ] || [ $codename == "zesty" ] || [ $codename == "artful" ] || [ $codename == "bionic" ] || [ $codename == "cosmic" ] || [ $codename == "disco" ] || [ $codename == "eoan" ] || [ $codename == "focal" ] || [ $codename == "groovy" ] || [ $codename == "hirsute" ] || [ $codename == "impish" ] || [ $codename == "jammy" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
@@ -223,7 +223,7 @@ then
 # Issue 464	
 elif echo $lsb | grep -qi "Linuxmint" ;
 then
-	if [ $codename == "sarah" ] || [ $codename == "rosa" ] || [ $codename == "petra" ] || [ $codename == "olivia" ] || [ $codename == "serena" ] || [ $codename == "sonya" ] || [ $codename == "sylvia" ] || [ $codename == "tara" ] || [ $codename == "tessa" ] || [ $codename == "betsy" ] || [ $codename == "cindy" ] || [ $codename == "tina" ] || [ $codename == "tricia" ] || [ $codename == "debbie" ] || [ $codename == "ulyana" ] || [ $codename == "ulyssa" ] || [ $codename == "uma" ] || [ $codename == "una" ];
+	if [ $codename == "sarah" ] || [ $codename == "rosa" ] || [ $codename == "petra" ] || [ $codename == "olivia" ] || [ $codename == "serena" ] || [ $codename == "sonya" ] || [ $codename == "sylvia" ] || [ $codename == "tara" ] || [ $codename == "tessa" ] || [ $codename == "betsy" ] || [ $codename == "cindy" ] || [ $codename == "tina" ] || [ $codename == "tricia" ] || [ $codename == "debbie" ] || [ $codename == "ulyana" ] || [ $codename == "ulyssa" ] || [ $codename == "uma" ] || [ $codename == "una" ] || [ $codename == "elsie" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
@@ -234,7 +234,7 @@ then
 elif [ "$lsb" == "Kali" ];
 then
 	# issue: 204
-	if [ $codename == "kali-rolling" ] || [ $codename == "2016.2" ] || [ $codename == "2017.3" ] || [ $codename == "2018.3" ] || [ $codename == "2018.4" ] || [ $codename == "n/a" ];
+	if [ $codename == "kali-rolling" ] || [ $codename == "2016.2" ] || [ $codename == "2017.3" ] || [ $codename == "2018.3" ] || [ $codename == "2018.4" ] || [ $codename == "2022.1" ] || [ $codename == "n/a" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
@@ -284,7 +284,7 @@ then
 # PopOS
 elif [ "$lsb" == "Pop" ];
 then
-	if [ $codename == "focal" ] || [ $codename == "groovy" ] || [ $codename == "hirsute" ] || [ $codename == "impish" ] || [ $codename == "n/a" ];
+	if [ $codename == "focal" ] || [ $codename == "groovy" ] || [ $codename == "hirsute" ] || [ $codename == "impish" ] || [ $codename == "jammy" ] || [ $codename == "n/a" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
