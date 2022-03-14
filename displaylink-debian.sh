@@ -66,7 +66,7 @@ vga_info="$(lspci | grep -oP '(?<=VGA compatible controller: ).*')" || :
 vga_info_3d="$(lspci | grep -i '3d controller' | sed 's/^.*: //')"
 graphics_vendor="$(lspci -nnk | grep -i vga -A3 | grep 'in use' | cut -d ':' -f2 | sed 's/ //g')"
 graphics_subcard="$(lspci -nnk | grep -i vga -A3 | grep Subsystem | cut -d ' ' -f5)"
-providers="$(xrandr --listproviders 2>/dev/null || echo "*")"
+providers="$(xrandr --listproviders 2>/dev/null || echo '*')"
 xorg_vcheck="$(dpkg -l | grep "ii  xserver-xorg-core" | awk '{print $3}' | sed 's/[^,:]*://g')"
 min_xorg=1.18.3
 newgen_xorg=1.19.6
