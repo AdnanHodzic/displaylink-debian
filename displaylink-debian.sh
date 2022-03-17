@@ -40,27 +40,16 @@ fi
 
 # Get latest versions
 versions=$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 2 | perl -pe '($_)=/([0-9]+([.][0-9]+)+(\ Beta)*)/')
-
-
-# Always download latest even if its beta 
-
 # if versions contains "Beta", try to download previous version
-#if [[ $versions =~ Beta ]]; then
-#    version=$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 2 | perl -pe '($_)=/([0-9]+([.][0-9]+)+(?!\ Beta))/')
-#    dlurl="https://www.synaptics.com/$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep -B 2 $version'-Release' | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
-#    driver_url="https://www.synaptics.com/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
-#else
-#    version=`wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 1 | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/'`
-#    dlurl="https://www.synaptics.com/$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep 'class="download-link"' | head -n 1 | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
-#    driver_url="https://www.synaptics.com/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
-#fi
-
-
-version=`wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 1 | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/'`
-dlurl="https://www.synaptics.com/$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep 'class="download-link"' | head -n 1 | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
-driver_url="https://www.synaptics.com/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
-
-
+if [[ $versions =~ Beta ]]; then
+    version=$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 2 | perl -pe '($_)=/([0-9]+([.][0-9]+)+(?!\ Beta))/')
+    dlurl="https://www.synaptics.com/$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep -B 2 $version'-Release' | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
+    driver_url="https://www.synaptics.com/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
+else
+    version=`wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 1 | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/'`
+    dlurl="https://www.synaptics.com/$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep 'class="download-link"' | head -n 1 | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
+    driver_url="https://www.synaptics.com/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
+fi
 driver_dir=$version
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/" && pwd )"
 resourcesDir="$(pwd)/resources/"
@@ -193,7 +182,7 @@ echo -e "\n---------------------------------------------------------------\n"
 # Ubuntu
 if [ "$lsb" == "Ubuntu" ] || [ "$lsb" == "Neon" ];
 then
-	if [ $codename == "trusty" ] || [ $codename == "vivid" ] || [ $codename == "wily" ] || [ $codename == "xenial" ] || [ $codename == "yakkety" ] || [ $codename == "zesty" ] || [ $codename == "artful" ] || [ $codename == "bionic" ] || [ $codename == "cosmic" ] || [ $codename == "disco" ] || [ $codename == "eoan" ] || [ $codename == "focal" ] || [ $codename == "groovy" ] || [ $codename == "hirsute" ] || [ $codename == "impish" ];
+	if [ $codename == "trusty" ] || [ $codename == "vivid" ] || [ $codename == "wily" ] || [ $codename == "xenial" ] || [ $codename == "yakkety" ] || [ $codename == "zesty" ] || [ $codename == "artful" ] || [ $codename == "bionic" ] || [ $codename == "cosmic" ] || [ $codename == "disco" ] || [ $codename == "eoan" ] || [ $codename == "focal" ] || [ $codename == "groovy" ] || [ $codename == "hirsute" ] || [ $codename == "impish" ] || [ $codename == "jammy" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
@@ -234,7 +223,7 @@ then
 # Issue 464	
 elif echo $lsb | grep -qi "Linuxmint" ;
 then
-	if [ $codename == "sarah" ] || [ $codename == "rosa" ] || [ $codename == "petra" ] || [ $codename == "olivia" ] || [ $codename == "serena" ] || [ $codename == "sonya" ] || [ $codename == "sylvia" ] || [ $codename == "tara" ] || [ $codename == "tessa" ] || [ $codename == "betsy" ] || [ $codename == "cindy" ] || [ $codename == "tina" ] || [ $codename == "tricia" ] || [ $codename == "debbie" ] || [ $codename == "ulyana" ] || [ $codename == "ulyssa" ] || [ $codename == "uma" ] || [ $codename == "una" ];
+	if [ $codename == "sarah" ] || [ $codename == "rosa" ] || [ $codename == "petra" ] || [ $codename == "olivia" ] || [ $codename == "serena" ] || [ $codename == "sonya" ] || [ $codename == "sylvia" ] || [ $codename == "tara" ] || [ $codename == "tessa" ] || [ $codename == "betsy" ] || [ $codename == "cindy" ] || [ $codename == "tina" ] || [ $codename == "tricia" ] || [ $codename == "debbie" ] || [ $codename == "ulyana" ] || [ $codename == "ulyssa" ] || [ $codename == "uma" ] || [ $codename == "una" ] || [ $codename == "elsie" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
@@ -245,7 +234,7 @@ then
 elif [ "$lsb" == "Kali" ];
 then
 	# issue: 204
-	if [ $codename == "kali-rolling" ] || [ $codename == "2016.2" ] || [ $codename == "2017.3" ] || [ $codename == "2018.3" ] || [ $codename == "2018.4" ] || [ $codename == "n/a" ];
+	if [ $codename == "kali-rolling" ] || [ $codename == "2016.2" ] || [ $codename == "2017.3" ] || [ $codename == "2018.3" ] || [ $codename == "2018.4" ] || [ $codename == "2022.1" ] || [ $codename == "n/a" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
@@ -295,7 +284,7 @@ then
 # PopOS
 elif [ "$lsb" == "Pop" ];
 then
-	if [ $codename == "focal" ] || [ $codename == "groovy" ] || [ $codename == "hirsute" ] || [ $codename == "impish" ] || [ $codename == "n/a" ];
+	if [ $codename == "focal" ] || [ $codename == "groovy" ] || [ $codename == "hirsute" ] || [ $codename == "impish" ] || [ $codename == "jammy" ] || [ $codename == "n/a" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
@@ -472,9 +461,9 @@ separator
 echo -e "\nPreparing for install\n"
 test -d $driver_dir && /bin/rm -Rf $driver_dir
 unzip -d $driver_dir DisplayLink_Ubuntu_${version}.zip
-chmod +x $driver_dir/displaylink-driver-${version}*.run 
-./$driver_dir/displaylink-driver-${version}*.run --keep --noexec
-mv displaylink-driver-${version}*/ $driver_dir/displaylink-driver-${version}
+chmod +x $driver_dir/displaylink-driver-${version}.*[0-9]*-[0-9]*.run
+./$driver_dir/displaylink-driver-${version}.*[0-9]*-[0-9]*.run --keep --noexec
+mv displaylink-driver-${version}.*[0-9]*-[0-9]*/ $driver_dir/displaylink-driver-${version}
 
 # get sysinitdaemon
 sysinitdaemon=$(sysinitdaemon_get)
@@ -490,11 +479,7 @@ then
 fi
 
 # Patch displaylink-installer.sh to prevent reboot before our script is done.
-if  [ "`echo "${version} >= 5.5" | bc`" -eq 1 ] ; then
-   patchName="displaylink-installer.5.5.patch"
-else
-   patchName="displaylink-installer.patch"
-fi
+patchName="displaylink-installer.patch"
 finalPatchPath="$resourcesDir$patchName"
 patch -Np0 $driver_dir/displaylink-driver-${version}/displaylink-installer.sh <$finalPatchPath
 
@@ -757,7 +742,7 @@ then
 elif [ "$drv" == "i915" ];
 then
 		# set xorg modesetting for Intel cards (issue: 179, 68, 88, 192)
-		if [ "$cardsub" == "v2/3rd" ] || [ "$cardsub" == "HD" ] || [ "$cardsub" == "620" ] || [ "$cardsub" == "530" ] || [ "$cardsub" == "540" ] || [ "$cardsub" == "UHD" ] || [ "$cardsub" == "GT2" ];
+		if [ "$cardsub" == "v2/3rd" ] || [ "$cardsub" == "HD" ] || [ "$cardsub" == "620" ] || [ "$cardsub" == "530" ] || [ "$cardsub" == "540" ] || [ "$cardsub" == "UHD" ];
 		then
 				if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $newgen_xorg)" ];
 				then

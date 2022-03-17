@@ -43,17 +43,17 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
 #### Supported platforms are:
 
   * Debian: Jessie 8.0/Stretch 9.0/Buster 10/Bullseye 11/Bookworm (testing)/Sid (unstable)
-  * Ubuntu: 14.04 Trusty - 21.10 Impish
+  * Ubuntu: 14.04 Trusty - 22.04 Jammy
   * elementary OS: 0.3 Freya- 6.1 Jolnir
   * Mint: 15 Olivia / 20.3 Una
-  * LMDE: 2 Betsy/3 Cindy/4 Debbie
-  * Kali: kali-rolling/2016.2/2017.3/2018.3/2018.4
+  * LMDE: 2 Betsy - 5 Elsie
+  * Kali: kali-rolling/2016.2/2017.3/2018.3/2018.4/2022.1
   * Deepin: 15 - 15.4.1
   * MX Linux: 17.1/18
   * BunsenLabs: Helium
   * Parrot: 4.5
   * Devuan: ASCII
-  * Pop!_OS: 20.04 Focal - 21.10 Impish
+  * Pop!_OS: 20.04 Focal - 22.04 Jammy
   * Nitrux: nitrux
   * Zorin: focal
 
