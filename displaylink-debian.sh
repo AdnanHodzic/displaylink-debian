@@ -794,7 +794,7 @@ separator
 echo -e "\nUninstalling ...\n"
 
 # displaylink-installer uninstall
-if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "Uos" ] || [ "$lsb" == "BunsenLabs" ];
+if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "Uos" ];
 then
 	if [ -f /lib/modules/$(uname -r)/build/Kconfig ]; then
 		rm /lib/modules/$(uname -r)/build/Kconfig
