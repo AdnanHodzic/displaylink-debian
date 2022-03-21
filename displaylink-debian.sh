@@ -121,15 +121,7 @@ fi
 dep_check() {
 echo -e "\nChecking dependencies\n"
 
-if [ "$lsb" == "Deepin" ];
-then
-	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source-deepin x11-xserver-utils wget libdrm-dev libelf-dev git pciutils)
-elif [ "$lsb" == "Uos" ];
-then
-	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source-4.19 x11-xserver-utils wget libdrm-dev libelf-dev git pciutils)
-else
-	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev libelf-dev git pciutils)
-fi
+deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev libelf-dev git pciutils)
 
 for dep in ${deps[@]}
 do
