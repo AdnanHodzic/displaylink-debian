@@ -121,12 +121,7 @@ fi
 dep_check() {
 echo -e "\nChecking dependencies\n"
 
-if [ "$lsb" == "Deepin" ];
-then
-	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source-deepin x11-xserver-utils wget libdrm-dev libelf-dev git pciutils)
-else
-	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev libelf-dev git pciutils)
-fi
+deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev libelf-dev git pciutils)
 
 for dep in ${deps[@]}
 do
@@ -242,9 +237,9 @@ then
 		exit 1
 	fi
 # Deepin
-elif [ "$lsb" == "Deepin" ];
+elif [ "$lsb" == "Deepin" ] || [ "$lsb" == "Uos" ] ;
 then
-	if [ $codename == "unstable" ] || [ $codename == "stable" ] || [ $codename == "n/a" ];
+	if [ $codename == "unstable" ] || [ $codename == "stable" ] || [ $codename == "eagle" ] || [ $codename == "apricot" ] || [ $codename == "n/a" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
@@ -472,7 +467,7 @@ sysinitdaemon=$(sysinitdaemon_get)
 sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$sysinitdaemon/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 
 # issue: 227
-if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "MX" ];
+if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "MX" ] || [ "$lsb" == "Uos" ];
 then
 	sed -i 's#/lib/modules/$KVER/build/Kconfig#/lib/modules/$KVER/build/scripts/kconfig/conf#g' $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 	ln -sf /lib/modules/$(uname -r)/build/Makefile /lib/modules/$(uname -r)/build/Kconfig
@@ -791,7 +786,7 @@ separator
 echo -e "\nUninstalling ...\n"
 
 # displaylink-installer uninstall
-if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ];
+if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "Uos" ];
 then
 	if [ -f /lib/modules/$(uname -r)/build/Kconfig ]; then
 		rm /lib/modules/$(uname -r)/build/Kconfig

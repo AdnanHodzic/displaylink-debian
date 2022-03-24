@@ -48,7 +48,8 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   * Mint: 15 Olivia / 20.3 Una
   * LMDE: 2 Betsy - 5 Elsie
   * Kali: kali-rolling/2016.2/2017.3/2018.3/2018.4/2022.1
-  * Deepin: 15 - 15.4.1
+  * Deepin: stable - unstable
+  * UOS: apricot - eagle
   * MX Linux: 17.1/18
   * BunsenLabs: Helium
   * Parrot: 4.5
