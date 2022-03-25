@@ -274,7 +274,7 @@ then
 # Parrot
 elif [ "$lsb" == "Parrot" ];
 then
-	if [ $codename == "lts" ];
+	if [ $codename == "n/a" ] || [ $codename == "lts" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
