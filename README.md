@@ -52,7 +52,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   * UOS: apricot - eagle
   * MX Linux: 17.1/18
   * BunsenLabs: Helium
-  * Parrot: 4.5
+  * Parrot: 4.5 - 5+
   * Devuan: ASCII
   * Pop!_OS: 20.04 Focal - 22.04 Jammy
   * Nitrux: nitrux
