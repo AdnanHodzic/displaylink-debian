@@ -51,7 +51,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   * Deepin: 15 - 15.4.1
   * MX Linux: 17.1/18
   * BunsenLabs: Helium
-  * Parrot: 4.5
+  * Parrot: 4.5 - 5+
   * Devuan: ASCII
   * Pop!_OS: 20.04 Focal - 22.04 Jammy
   * Nitrux: nitrux
