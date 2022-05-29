@@ -16,9 +16,8 @@ set -eu
 # set -o pipefail # TODO: Some code still fails this check, fix before enabling.
 IFS=$'\n\t'
 
-# Latest regular release only support kernel version <= 5.13
 kernel_check="$(uname -r | egrep -o '[0-9]+\.[0-9]+')"
-max_kernel_version_supported="5.16"
+max_kernel_version_supported="5.17"
 
 function ver2int {
 echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
