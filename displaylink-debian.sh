@@ -17,7 +17,7 @@ set -eu
 IFS=$'\n\t'
 
 kernel_check="$(uname -r | egrep -o '[0-9]+\.[0-9]+')"
-max_kernel_version_supported="5.17"
+max_kernel_version_supported="5.18"
 
 function ver2int {
 echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
