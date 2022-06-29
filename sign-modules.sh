@@ -21,6 +21,6 @@ else
    read -r -p "Reboot now? [Y/n] " response
    response=${response,,} # tolower
    if [[ $response =~ ^(yes|y) ]] || [[ -z $response ]]; then
-      echo "yes!"
+      reboot
    fi
 fi
