@@ -51,7 +51,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   * Deepin: stable - unstable
   * UOS: apricot - eagle
   * MX Linux: 17.1/18
-  * BunsenLabs: Helium
+  * BunsenLabs: Helium - Lithium
   * Parrot: 4.5 - 5+
   * Devuan: ASCII
   * Pop!_OS: 20.04 Focal - 22.04 Jammy
