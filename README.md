@@ -55,6 +55,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   * Parrot: 4.5 - 5+
   * Devuan: ASCII
   * Pop!_OS: 20.04 Focal - 22.04 Jammy
+  * PureOS: 9 Amber - 10 Byzantium
   * Nitrux: nitrux
   * Zorin: focal
 
