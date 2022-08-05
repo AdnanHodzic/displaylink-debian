@@ -288,7 +288,7 @@ then
 # PureOS
 elif [ "$lsb" == "PureOS" ];
 then
-	if [ $codename == "amber" ];
+	if [ $codename == "amber" ] || [ $codename == "byzantium" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
