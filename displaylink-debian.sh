@@ -206,7 +206,7 @@ then
 # Devuan
 elif [ "$lsb" == "Devuan" ]
 then
-    if [ "$codename" == "ascii" ]
+    if [ "$codename" == "ascii" ] || [ "$codename" == "beowulf" ] || [ "$codename" == "chimaera" ];
     then
         echo -e "\nPlatform requirements satisfied, proceeding ..."
     else
