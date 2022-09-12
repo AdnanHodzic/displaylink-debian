@@ -17,7 +17,7 @@ set -eu
 IFS=$'\n\t'
 
 kernel_check="$(uname -r | egrep -o '[0-9]+\.[0-9]+')"
-max_kernel_version_supported="5.18"
+max_kernel_version_supported="5.19"
 
 function ver2int {
 echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
@@ -176,7 +176,7 @@ echo -e "\n---------------------------------------------------------------\n"
 # Ubuntu
 if [ "$lsb" == "Ubuntu" ] || [ "$lsb" == "Neon" ];
 then
-	if [ $codename == "trusty" ] || [ $codename == "vivid" ] || [ $codename == "wily" ] || [ $codename == "xenial" ] || [ $codename == "yakkety" ] || [ $codename == "zesty" ] || [ $codename == "artful" ] || [ $codename == "bionic" ] || [ $codename == "cosmic" ] || [ $codename == "disco" ] || [ $codename == "eoan" ] || [ $codename == "focal" ] || [ $codename == "groovy" ] || [ $codename == "hirsute" ] || [ $codename == "impish" ] || [ $codename == "jammy" ];
+	if [ $codename == "trusty" ] || [ $codename == "vivid" ] || [ $codename == "wily" ] || [ $codename == "xenial" ] || [ $codename == "yakkety" ] || [ $codename == "zesty" ] || [ $codename == "artful" ] || [ $codename == "bionic" ] || [ $codename == "cosmic" ] || [ $codename == "disco" ] || [ $codename == "eoan" ] || [ $codename == "focal" ] || [ $codename == "groovy" ] || [ $codename == "hirsute" ] || [ $codename == "impish" ] || [ $codename == "jammy" ] || [ $codename == "kinetic" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
