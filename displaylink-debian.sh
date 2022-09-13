@@ -256,7 +256,7 @@ then
 		exit 1
 	fi
 # BunsenLabs
-elif [ "$lsb" == "BunsenLabs" ];
+elif [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "Bunsenlabs" ];
 then
 	if [ $codename == "helium" ] || [ $codename == "lithium" ] || [ $codename == "buster" ];
 	then
@@ -465,7 +465,7 @@ sysinitdaemon=$(sysinitdaemon_get)
 sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$sysinitdaemon/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 
 # issue: 227
-if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "MX" ] || [ "$lsb" == "Uos" ];
+if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "Bunsenlabs" ] || [ "$lsb" == "MX" ] || [ "$lsb" == "Uos" ];
 then
 	sed -i 's#/lib/modules/$KVER/build/Kconfig#/lib/modules/$KVER/build/scripts/kconfig/conf#g' $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 	ln -sf /lib/modules/$(uname -r)/build/Makefile /lib/modules/$(uname -r)/build/Kconfig
@@ -784,7 +784,7 @@ separator
 echo -e "\nUninstalling ...\n"
 
 # displaylink-installer uninstall
-if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "Uos" ];
+if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "Bunsenlabs" ] || [ "$lsb" == "Uos" ];
 then
 	if [ -f /lib/modules/$(uname -r)/build/Kconfig ]; then
 		rm /lib/modules/$(uname -r)/build/Kconfig
