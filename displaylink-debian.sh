@@ -16,7 +16,7 @@ set -eu
 # set -o pipefail # TODO: Some code still fails this check, fix before enabling.
 IFS=$'\n\t'
 
-kernel_check="$(uname -r | egrep -o '[0-9]+\.[0-9]+')"
+kernel_check="$(uname -r | egrep -o '[0-9]+\.[0-9]+' | head -1)"
 max_kernel_version_supported="5.19"
 
 function ver2int {
