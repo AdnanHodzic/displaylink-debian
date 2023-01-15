@@ -17,25 +17,10 @@ set -eu
 IFS=$'\n\t'
 
 kernel_check="$(uname -r | egrep -o '^[0-9]+\.[0-9]+')"
-max_kernel_version_supported="5.19"
 
 function ver2int {
 echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
 }
-
-if [ "$(ver2int $kernel_check)" -gt "$(ver2int $max_kernel_version_supported)" ]; then
-	echo -e "\n---------------------------------------------------------------\n"
-	echo -e "Unsuported kernel version: $kernel_check"
-	echo -e "Please wait for a stable DisplayLink release or try to install the beta"
-	echo -e "No support will be given for the beta version"
-	echo -e ""
-	echo -e ""
-	echo -e "This tool is Open Source and feel free to extend it"
-	echo -e "GitHub repo: https://github.com/AdnanHodzic/displaylink-debian/"
-	echo -e "\n---------------------------------------------------------------\n"
-	exit 1
-fi
-
 
 # Get latest versions
 versions=$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 2 | perl -pe '($_)=/([0-9]+([.][0-9]+)+(\ Beta)*)/')
@@ -476,6 +461,15 @@ patchName="displaylink-installer.patch"
 finalPatchPath="$resourcesDir$patchName"
 patch -Np0 $driver_dir/displaylink-driver-${version}/displaylink-installer.sh <$finalPatchPath
 
+if [ "$(ver2int $kernel_check)" -ge "$(ver2int 6.0.0)" ]; then
+	# Patch displaylink-installer.sh to patch a evdi file to support kernel 6.0 & higher
+	secondPatchName="displaylink-two.patch"
+	evdiPatchName="evdi.patch"
+	patch_location="$resourcesDir$evdiPatchName"
+	sed -i "s|PatchPath|$patch_location|g" "$resourcesDir$secondPatchName"
+
+	patch -Np0 $driver_dir/displaylink-driver-${version}/displaylink-installer.sh <$resourcesDir$secondPatchName
+fi
 
 # run displaylink install
 echo -e "\nInstalling driver version: $version\n"

@@ -1,0 +1,11 @@
+--- displaylink-installer.sh
++++ displaylink-installer.sh
+@@ -41,6 +41,8 @@
+     return 1
+   fi
+ 
++  patch -Np0 ${EVDI}/module/evdi_drm_drv.h <PatchPath
++
+   local dkms_evdi_path='/var/lib/dkms/evdi'
+   local make_log_regex="$dkms_evdi_path/[[:alnum:]./]+/make\\.log"
+   local dkms_log="${EVDI}/dkms.log"
