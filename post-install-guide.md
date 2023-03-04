@@ -1,18 +1,7 @@
 # Post Installation Guide
 
-* [Prerequisites](#prerequisites)
 
-* [Display detection](#display-detection)
-
-* [Screen Layout Configuration](#screen-layout-configuration)
-
-* [Automated (persistent) display configuration](#automated-persistent-display-configuration)
-
-* [Troubleshooting most common issues](#troubleshooting-most-common-issues)
-
-* [Having a different problem](#having-a-different-problem)
-
-### Prerequisites
+## Prerequisites
 
 * Make sure that UEFI/secure boot is disabled!
 
@@ -44,7 +33,7 @@ If you have Nvidia or ATI/AMD graphics card, try removing: `/etc/X11/xorg.conf.d
 
 If none of the suggestions in [Prerequsites section](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#prerequisites) solved your problem, make sure to consult [Troubleshooting most common issues](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#troubleshooting-most-common-issues).
 
-### Display Detection
+## Display Detection
 
 Only do this in case your monitors weren't automatically detected.
 
@@ -83,11 +72,11 @@ Provider 4: id: 0xd2 cap: 0x2, Sink Output crtcs: 1 outputs: 1 associated provid
 For further reference I suggest reading: 
 [How to use xrandr](https://web.archive.org/web/20180224075928/https://pkg-xorg.alioth.debian.org/howto/use-xrandr.html)
 
-### Screen Layout Configuration
+## Screen Layout Configuration
 
 There are couple of tools to help you configure screen layout of your external monitors. 
 
-##### xrandr
+### xrandr
 
 Depending on your setup, to place DVI-1-0 virtually-right of the eDP1 display you'd run:
 
@@ -96,19 +85,19 @@ Depending on your setup, to place DVI-1-0 virtually-right of the eDP1 display yo
 For further reference I suggest reading: 
 [How to use xrandr](https://web.archive.org/web/20180224075928/https://pkg-xorg.alioth.debian.org/howto/use-xrandr.html)
 
-##### GNOME Displays
+### GNOME Displays
 
 If you're GNOME desktop user, simply run:
 
 ```gnome-control-center display```
 
-##### arandr
+### arandr
 
 Another very easy and intuative (gui) tool is ```arandr``` (Another XRandR GUI) 
 
 Make sure to install it first: ```sudo apt-get install arandr```
 
-### Automated (persistent) display configuration
+## Automated (persistent) display configuration
 
 Since hotplug doesn't work (on Debian and Kali) and every time you connect your computer to Displaylink you'll need to re-configure your displays.
 
@@ -116,11 +105,11 @@ I've set-up couple of [aliases](http://www.linfo.org/alias.html) which help me a
 
 Every time I connect my computer to DisplayLink ...
 
-##### two
+### two
 
 I simple run ```two``` which is an alias for setting up two external displays as primary and secondary, whilst turning off laptop built in display. So I can close the lid.
 
-##### one
+### one
 
 Every time I want to diconnect my displays I run ```one```. Which turns off both external displays, turns on built in laptop display and makes it a primary (default behaviour).
 
@@ -136,7 +125,13 @@ alias one="xrandr --output VIRTUAL1 --off --output DVI-1-0 --off --output DP1 --
 
 Note, in case you're editting ```~/.bashrc```, make sure you run ```source ~/.bashrc``` to appy the changes without having to log in/out.
 
-### Troubleshooting most common issues
+## Upgrading your OS or updating displaylink
+It's recommended to run the uninstall and install procedure separately instead of relying on the reinstall option.
+1. `sudo ./displaylink-debian.sh --uninstall`
+2. reboot
+3. `sudo ./displaylink-debian.sh --install`
+
+## Troubleshooting most common issues
 
 * [Disable UEFI / secure boot](https://github.com/AdnanHodzic/displaylink-debian/issues/123)
 
@@ -154,12 +149,12 @@ Note, in case you're editting ```~/.bashrc```, make sure you run ```source ~/.ba
 
 * [`Can't open display :0` error](https://github.com/AdnanHodzic/displaylink-debian/issues/639)
 
-##### Monitoring for errors
+### Monitoring for errors
 
 * Monitor ```dmesg | grep Display``` output while plugging in Displaylink
 * Monitor ```/var/log/displaylink/DisplayLinkManager.log``` file
 
-##### Most common Debian Jessie related issues:
+### Most common Debian Jessie related issues:
 * systemctl status dlm.service failure
 * Glibc GLIBCXX_3.4.21 missing
 
@@ -171,7 +166,7 @@ Should you experience problems with the display either remaining black, only sho
 
 Reference: [issue #68](https://github.com/AdnanHodzic/displaylink-debian/issues/68)
 
-##### syntax error near unexpected token \`newline'...
+### syntax error near unexpected token \`newline'...
 
 If you just downloaded the script and tried to execute it, you might get the following error:
 
@@ -207,6 +202,6 @@ References: [issue #111](https://github.com/AdnanHodzic/displaylink-debian/issue
 [issue #65](https://github.com/AdnanHodzic/displaylink-debian/issues/65)
 
 
-### Having a different problem?
+## Having a different problem?
 
 When submitting a new [issue](https://github.com/AdnanHodzic/displaylink-debian/issues), include debug information by running: `sudo ./displaylink-debian.sh --debug`
