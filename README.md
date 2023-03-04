@@ -12,27 +12,24 @@ Hence, I’m looking for maintainers (developers) to continue work on this proje
 In meantime, I’ll devote the bare minimum of my time which will mostly consist of MR (merge requests) code review and approval.
 -->
 
-#### Why do I need displaylink-debian?
+## Why do I need displaylink-debian?
 
 [DisplayLink][] releases its drivers only for Ubuntu xx.04 LTS. Hence if you run any other Ubuntu version or any other Linux distribution DisplayLink will not work as expected. 
 
 [displaylink-debian][] allows seamless installation of the official
 DisplayLink drivers tailored to work for most of the Debian based Linux distributions regardless of which Linux kernel version (>4.15) you're using. 
 
-#### How to run "displaylink-debian"
-
-##### Repo clone
-
-`sudo apt-get install git`
-
-`git clone https://github.com/AdnanHodzic/displaylink-debian.git`
-
-`cd displaylink-debian/ && sudo ./displaylink-debian.sh`
-
-*After installation has been completed, make sure to consult [Post Install Guide][PostInstall]!*
+## Installation
+1. Download the repo, cd in the directory and run the shell script with sudo:
+```shell
+git clone https://github.com/AdnanHodzic/displaylink-debian.git
+cd displaylink-debian
+sudo ./displaylink-debian.sh
+```
+1. Then consult the [Post Install Guide][PostInstall] to make sure everything works as intended.
 
 
-#### Post installation Guide and Troubleshooting
+## Troubleshooting and debugging
 
 ***Please note:** Your external monitor/s may not work as expected unless you perform additional steps as described in the [Post Installation Guide][PostInstall].*
 
@@ -40,7 +37,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
 * read [Troubleshooting most common issues][TroubleShooting].
 * when submitting a new issue, include debug information by running: `sudo ./displaylink-debian.sh --debug`
 
-#### Supported platforms are:
+## Supported platforms are:
 
   * Debian: Jessie 8.0/Stretch 9.0/Buster 10/Bullseye 11/Bookworm (testing)/Sid (unstable)
   * Ubuntu: 14.04 Trusty - 22.04 Jammy
@@ -63,7 +60,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   
   If your distribution or version is not on the list, make sure to include debug information by running: `sudo ./displaylink-debian.sh --debug` and [submit a request to add support for it](https://github.com/AdnanHodzic/displaylink-debian/issues/new).
 
-#### Technical
+## Technical
 
 * _displaylink-debian.sh_ downloads and extracts the contents of the
   official [DisplayLink Ubuntu driver][upstream].
@@ -74,7 +71,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
 *  Install/Reinstall/Uninstall is performed.
 
 
-#### Discussion
+## Discussion
 
 * [Kernel agnostic, DisplayLink Debian GNU/Linux driver installer][blog]
 
@@ -86,14 +83,14 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
 [PostInstall]:        https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md
 [TroubleShooting]:    https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#troubleshooting-most-common-issues
 
-#### Donate (PayPal or Bitcoin)
+## Donate (PayPal or Bitcoin)
 
 Since I'm working on this project in free time without any support or reimbursement from DisplayLink, and [have saved some 100$](https://github.com/AdnanHodzic/displaylink-debian/issues/172#issuecomment-441384936). Please consider supporting this project by making a donation of any amount!
 
-##### PayPal
+### PayPal
 [![paypal](https://www.paypalobjects.com/en_US/NL/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=adnan%40hodzic.org&item_name=Contribution+for+work+on+debian-displaylink&currency_code=EUR&source=url)
 
-##### BitCoin
+### BitCoin
 [bc1qlncmgdjyqy8pe4gad4k2s6xtyr8f2r3ehrnl87](bitcoin:bc1qlncmgdjyqy8pe4gad4k2s6xtyr8f2r3ehrnl87)
 
 [![bitcoin](https://foolcontrol.org/wp-content/uploads/2019/08/btc-donate-displaylink-debian.png)](bitcoin:bc1qlncmgdjyqy8pe4gad4k2s6xtyr8f2r3ehrnl87)
