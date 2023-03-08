@@ -8,3 +8,49 @@
  #include <drm/drm_crtc.h>
  #include <drm/drm_crtc_helper.h>
  #include <drm/drm_rect.h>
+--- module/evdi_fb.c
++++ module/evdi_fb.c
+@@ -405,7 +405,11 @@ static int evdifb_create(struct drm_fb_helper *helper,
+ 	fb = &efbdev->efb.base;
+ 
+ 	efbdev->helper.fb = fb;
++#if KERNEL_VERSION(6, 2, 0) <= LINUX_VERSION_CODE
++	efbdev->helper.info = info;
++#else
+ 	efbdev->helper.fbdev = info;
++#endif
+ 
+ 	strcpy(info->fix.id, "evdidrmfb");
+ 
+@@ -459,8 +463,13 @@ static void evdi_fbdev_destroy(__always_unused struct drm_device *dev,
+ {
+ 	struct fb_info *info;
+ 
++#if KERNEL_VERSION(6, 2, 0) <= LINUX_VERSION_CODE
++	if (efbdev->helper.info) {
++		info = efbdev->helper.info;
++#else
+ 	if (efbdev->helper.fbdev) {
+ 		info = efbdev->helper.fbdev;
++#endif
+ 		unregister_framebuffer(info);
+ 		if (info->cmap.len)
+ 			fb_dealloc_cmap(&info->cmap);
+@@ -537,10 +546,17 @@ void evdi_fbdev_unplug(struct drm_device *dev)
+ 		return;
+ 
+ 	efbdev = evdi->fbdev;
++#if KERNEL_VERSION(6, 2, 0) <= LINUX_VERSION_CODE
++	if (efbdev->helper.info) {
++		struct fb_info *info;
++
++		info = efbdev->helper.info;
++#else
+ 	if (efbdev->helper.fbdev) {
+ 		struct fb_info *info;
+ 
+ 		info = efbdev->helper.fbdev;
++#endif
+ #if KERNEL_VERSION(5, 6, 0) <= LINUX_VERSION_CODE || defined(EL8)
+ 		unregister_framebuffer(info);
+ #else

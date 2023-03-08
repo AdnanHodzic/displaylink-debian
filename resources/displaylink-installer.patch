@@ -20,4 +20,3 @@
 +#  prompt_yes_no "Xorg is running. Do you want to reboot now?" && reboot
    exit 0
  }
- 
