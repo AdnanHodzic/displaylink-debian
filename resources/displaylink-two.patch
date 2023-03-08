@@ -4,7 +4,7 @@
      return 1
    fi
  
-+  patch -Np0 ${EVDI}/module/evdi_drm_drv.h <PatchPath
++  patch -d ${EVDI} -Np0 <PatchPath
 +
    local dkms_evdi_path='/var/lib/dkms/evdi'
    local make_log_regex="$dkms_evdi_path/[[:alnum:]./]+/make\\.log"
