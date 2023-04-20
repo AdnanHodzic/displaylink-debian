@@ -40,7 +40,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
 ## Supported platforms are:
 
   * Debian: Jessie 8.0/Stretch 9.0/Buster 10/Bullseye 11/Bookworm (testing)/Sid (unstable)
-  * Ubuntu: 14.04 Trusty - 22.04 Jammy
+  * Ubuntu: 14.04 Trusty - 23.04 Lunar
   * elementary OS: 0.3 Freya- 6.1 Jolnir
   * Mint: 15 Olivia / 21.1 Vera
   * LMDE: 2 Betsy - 5 Elsie
