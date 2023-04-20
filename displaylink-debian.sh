@@ -243,7 +243,7 @@ then
 # BunsenLabs
 elif [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "Bunsenlabs" ];
 then
-	if [ $codename == "helium" ] || [ $codename == "lithium" ] || [ $codename == "buster" ];
+	if [ $codename == "helium" ] || [ $codename == "lithium" ] || [ $codename == "buster" ] || [ $codename == "beryllium" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
