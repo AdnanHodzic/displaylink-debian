@@ -44,7 +44,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   * elementary OS: 0.3 Freya- 6.1 Jolnir
   * Mint: 15 Olivia / 21.1 Vera
   * LMDE: 2 Betsy - 5 Elsie
-  * Kali: kali-rolling/2016.2/2017.3/2018.3/2018.4/2022.1
+  * Kali: kali-rolling/2016.2 - 2023.1
   * Deepin: stable - unstable
   * UOS: apricot - eagle
   * MX Linux: 17.1/18

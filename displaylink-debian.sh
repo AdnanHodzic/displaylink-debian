@@ -213,7 +213,7 @@ then
 elif [ "$lsb" == "Kali" ];
 then
 	# issue: 204
-	if [ $codename == "kali-rolling" ] || [ $codename == "2016.2" ] || [ $codename == "2017.3" ] || [ $codename == "2018.3" ] || [ $codename == "2018.4" ] || [ $codename == "2022.1" ] || [ $codename == "n/a" ];
+	if [ $codename == "kali-rolling" ] || [ $codename == "2016.2" ] || [ $codename == "2017.3" ] || [ $codename == "2018.3" ] || [ $codename == "2018.4" ] || [ $codename == "2022.1" ] || [ $codename == "n/a" ] || [ $codename == "2022.2" ] || [ $codename == "2022.3" ] || [ $codename == "2022.4" ] || [ $codename == "2023.1" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
