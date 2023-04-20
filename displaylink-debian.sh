@@ -171,7 +171,7 @@ then
 # elementary OS
 elif [ "$lsb" == "elementary OS" ] || echo $lsb | grep -qi "elementary";
 then
-	if [ $codename == "freya" ] || [ $codename == "loki" ] || [ $codename == "juno" ] || [ $codename == "hera" ] || [ $codename == "odin" ] || [ $codename == "jolnir" ];
+	if [ $codename == "freya" ] || [ $codename == "loki" ] || [ $codename == "juno" ] || [ $codename == "hera" ] || [ $codename == "odin" ] || [ $codename == "jolnir" ] || [ $codename == "horus" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
