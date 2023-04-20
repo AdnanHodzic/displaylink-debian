@@ -461,16 +461,6 @@ patchName="displaylink-installer.patch"
 finalPatchPath="$resourcesDir$patchName"
 patch -Np0 $driver_dir/displaylink-driver-${version}/displaylink-installer.sh <$finalPatchPath
 
-if [ "$(ver2int $kernel_check)" -ge "$(ver2int 6.0.0)" ]; then
-	# Patch displaylink-installer.sh to patch a evdi file to support kernel 6.0 & higher
-	secondPatchName="displaylink-two.patch"
-	evdiPatchName="evdi.patch"
-	patch_location="$resourcesDir$evdiPatchName"
-	sed -i "s|PatchPath|$patch_location|g" "$resourcesDir$secondPatchName"
-
-	patch -Np0 $driver_dir/displaylink-driver-${version}/displaylink-installer.sh <$resourcesDir$secondPatchName
-fi
-
 # run displaylink install
 echo -e "\nInstalling driver version: $version\n"
 cd $driver_dir/displaylink-driver-${version}
