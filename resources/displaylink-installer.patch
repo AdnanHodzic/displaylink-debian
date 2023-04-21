@@ -1,22 +1,25 @@
 --- displaylink-installer.sh
 +++ displaylink-installer.sh
-@@ -526,13 +528,13 @@
+@@ -237,15 +237,15 @@
    printf '\n%s\n%s\n' "Please read the FAQ" \
          "http://support.displaylink.com/knowledgebase/topics/103927-troubleshooting-ubuntu"
  
--  printf '\n%s\n\n%s\n' "Installation complete!" \
--        "Please reboot your computer if you're intending to use Xorg."
--
+-  printf "\n\n%s\n%s\n%s\n\n\n" "Reboot required" "DisplayLink driver installed successfully." \
+-        "Please reboot your computer to ensure the proper functioning of the software." \
+-      && prompt_yes_no "Do you want to reboot now?" \
+-        && reboot
++  # printf "\n\n%s\n%s\n%s\n\n\n" "Reboot required" "DisplayLink driver installed successfully." \
++  #       "Please reboot your computer to ensure the proper functioning of the software." \
++  #     && prompt_yes_no "Do you want to reboot now?" \
++  #       && reboot
+ 
 -  "$NOREBOOT" && exit 0
--
++  # "$NOREBOOT" && exit 0
+ 
 -  xorg_running || exit 0
 -  prompt_yes_no "Xorg is running. Do you want to reboot now?" && reboot
-+#  printf '\n%s\n\n%s\n' "Installation complete!" \
-+#        "Please reboot your computer if you're intending to use Xorg."
-+#
-+#  "$NOREBOOT" && exit 0
-+#
-+#  xorg_running || exit 0
-+#  prompt_yes_no "Xorg is running. Do you want to reboot now?" && reboot
++  # xorg_running || exit 0
++  # prompt_yes_no "Xorg is running. Do you want to reboot now?" && reboot
    exit 0
  }
+ 

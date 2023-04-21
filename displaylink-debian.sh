@@ -30,8 +30,8 @@ if [[ $versions =~ Beta ]]; then
     dlurl="https://www.synaptics.com/$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep -B 2 $version'-Release' | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
     driver_url="https://www.synaptics.com/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
 else
-    version=`wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 1 | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/'`
-    dlurl="https://www.synaptics.com/$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep 'class="download-link"' | head -n 1 | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
+    version=`wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 1 | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/; exit if $. > 1;'`
+    dlurl="https://www.synaptics.com/$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep -B 2 $version'-Release' | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
     driver_url="https://www.synaptics.com/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
 fi
 driver_dir=$version
@@ -440,9 +440,9 @@ separator
 echo -e "\nPreparing for install\n"
 test -d $driver_dir && /bin/rm -Rf $driver_dir
 unzip -d $driver_dir DisplayLink_Ubuntu_${version}.zip
-chmod +x $driver_dir/displaylink-driver-${version}-[0-9]*.[0-9]*.run
-./$driver_dir/displaylink-driver-${version}-[0-9]*.[0-9]*.run --keep --noexec
-mv displaylink-driver-${version}-*[0-9]*.[0-9]*/ $driver_dir/displaylink-driver-${version}
+chmod +x $driver_dir/displaylink-driver-${version}[.\d]*-[0-9]*.[0-9]*.run
+./$driver_dir/displaylink-driver-${version}[.\d]*-[0-9]*.[0-9]*.run --keep --noexec
+mv displaylink-driver-${version}[.\d]*-*[0-9]*.[0-9]*/ $driver_dir/displaylink-driver-${version}
 # get sysinitdaemon
 sysinitdaemon=$(sysinitdaemon_get)
 
