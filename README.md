@@ -75,14 +75,6 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
 
 * [Kernel agnostic, DisplayLink Debian GNU/Linux driver installer][blog]
 
-
-[DisplayLink]:        http://www.displaylink.com/
-[upstream]:           http://www.displaylink.com/downloads/ubuntu.php
-[blog]:               http://foolcontrol.org/?p=1777
-[displaylink-debian]: https://github.com/AdnanHodzic/displaylink-debian
-[PostInstall]:        https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md
-[TroubleShooting]:    https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#troubleshooting-most-common-issues
-
 ## Donate (PayPal or Bitcoin)
 
 Since I'm working on this project in free time without any support or reimbursement from DisplayLink, and [have saved some 100$](https://github.com/AdnanHodzic/displaylink-debian/issues/172#issuecomment-441384936). Please consider supporting this project by making a donation of any amount!
@@ -94,3 +86,14 @@ Since I'm working on this project in free time without any support or reimbursem
 [bc1qlncmgdjyqy8pe4gad4k2s6xtyr8f2r3ehrnl87](bitcoin:bc1qlncmgdjyqy8pe4gad4k2s6xtyr8f2r3ehrnl87)
 
 [![bitcoin](https://foolcontrol.org/wp-content/uploads/2019/08/btc-donate-displaylink-debian.png)](bitcoin:bc1qlncmgdjyqy8pe4gad4k2s6xtyr8f2r3ehrnl87)
+
+
+
+
+
+[DisplayLink]:        https://www.synaptics.com/products/displaylink-graphics
+[upstream]:           https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu
+[blog]:               https://foolcontrol.org/?p=1777
+[displaylink-debian]: https://github.com/AdnanHodzic/displaylink-debian
+[PostInstall]:        docs/post-install-guide.md
+[TroubleShooting]:    docs/common-issues.md
