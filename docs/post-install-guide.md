@@ -1,6 +1,5 @@
 # Post Installation Guide
 
-
 ## Prerequisites
 
 * Make sure that UEFI/secure boot is disabled!
@@ -31,7 +30,7 @@ If that's not the case and you have an Intel graphics card try [following sugges
 
 If you have Nvidia or ATI/AMD graphics card, try removing: `/etc/X11/xorg.conf.d/20-displaylink.conf` file followed by reboot and check again if you're getting more then one provider. 
 
-If none of the suggestions in [Prerequsites section](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#prerequisites) solved your problem, make sure to consult [Troubleshooting most common issues](https://github.com/AdnanHodzic/displaylink-debian/blob/master/post-install-guide.md#troubleshooting-most-common-issues).
+If none of the suggestions in [Prerequsites section](#prerequisites) solved your problem, make sure to consult [Troubleshooting most common issues](common-issues.md).
 
 ## Display Detection
 
@@ -131,77 +130,4 @@ It's recommended to run the uninstall and install procedure separately instead o
 2. reboot
 3. `sudo ./displaylink-debian.sh --install`
 
-## Troubleshooting most common issues
 
-* [Disable UEFI / secure boot](https://github.com/AdnanHodzic/displaylink-debian/issues/123)
-
-* [Bash / sh can't be executed](https://github.com/AdnanHodzic/displaylink-debian/issues/74#issuecomment-410622725)
-
-* [secure boot / cable problems](https://github.com/AdnanHodzic/displaylink-debian/issues/142#issuecomment-413091374)
-
-* [rendering issues](https://github.com/AdnanHodzic/displaylink-debian/issues/68)
-
-* [Unable to locate package linux-headers](https://github.com/AdnanHodzic/displaylink-debian/issues/141)
-
-* [Debian / Fail to connect screens](https://github.com/AdnanHodzic/displaylink-debian/issues/130)
-
-* [mouse/cursor flicker issue](https://github.com/AdnanHodzic/displaylink-debian/issues/192)
-
-* [`Can't open display :0` error](https://github.com/AdnanHodzic/displaylink-debian/issues/639)
-
-### Monitoring for errors
-
-* Monitor ```dmesg | grep Display``` output while plugging in Displaylink
-* Monitor ```/var/log/displaylink/DisplayLinkManager.log``` file
-
-### Most common Debian Jessie related issues:
-* systemctl status dlm.service failure
-* Glibc GLIBCXX_3.4.21 missing
-
-Due to older version of libstdc++6 in Jessie, you need to download and install version from [Stretch release](https://packages.debian.org/stretch/libstdc++6). After package has been updated, run displaylink-debian and select "Re-install" option.
-
-Reference: [issue #42](https://github.com/AdnanHodzic/displaylink-debian/issues/42)
-
-Should you experience problems with the display either remaining black, only showing mouse pointer or a frozen image of your main screen, then this could be due to Intel graphics driver interfering with displaylink.
-
-Reference: [issue #68](https://github.com/AdnanHodzic/displaylink-debian/issues/68)
-
-### syntax error near unexpected token \`newline'...
-
-If you just downloaded the script and tried to execute it, you might get the following error:
-
-```
-$ ./displaylink-debian.sh
-./displaylink-debian.sh: line 1: syntax error near unexpected token `newline'
-./displaylink-debian.sh: line 1: `<!DOCTYPE html>'
-```
-
-The line number might be different.
-
-*Solution:*
-
-Download the script again as a ZIP file: https://github.com/AdnanHodzic/displaylink-debian/archive/master.zip
-
-Extract it and run it:
-
-```
-$ unzip displaylink-debian-master.zip
-Archive:  displaylink-debian-master.zip
-075594536fe4683a5e25aec99e3b6379662ef2ea
-   creating: displaylink-debian-master/
-  inflating: displaylink-debian-master/README.md  
-  inflating: displaylink-debian-master/displaylink-debian.sh  
-  inflating: displaylink-debian-master/post-install-guide.md  
-$ cd displaylink-debian-master
-$ sudo ./displaylink-debian.sh
-```
-
-References: [issue #111](https://github.com/AdnanHodzic/displaylink-debian/issues/111),
-[issue #102](https://github.com/AdnanHodzic/displaylink-debian/issues/102),
-[issue #89](https://github.com/AdnanHodzic/displaylink-debian/issues/89),
-[issue #65](https://github.com/AdnanHodzic/displaylink-debian/issues/65)
-
-
-## Having a different problem?
-
-When submitting a new [issue](https://github.com/AdnanHodzic/displaylink-debian/issues), include debug information by running: `sudo ./displaylink-debian.sh --debug`
