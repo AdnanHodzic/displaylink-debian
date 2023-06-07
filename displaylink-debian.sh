@@ -443,6 +443,12 @@ unzip -d $driver_dir DisplayLink_Ubuntu_${version}.zip
 chmod +x $driver_dir/displaylink-driver-${version}[.\d]*-[0-9]*.[0-9]*.run
 ./$driver_dir/displaylink-driver-${version}[.\d]*-[0-9]*.[0-9]*.run --keep --noexec
 mv displaylink-driver-${version}[.\d]*-*[0-9]*.[0-9]*/ $driver_dir/displaylink-driver-${version}
+# issue: 828
+if [ "$(ver2int $kernel_check)" -gt "$(ver2int 6.0)" ];
+then
+	curl -sL https://github.com/DisplayLink/evdi/archive/refs/heads/devel.tar.gz -o $driver_dir/displaylink-driver-${version}/evdi.tar.gz
+	sed -i 's#if ! tar xf "$TARGZ" -C "$EVDI"; then#if ! tar xf "$TARGZ" -C "$EVDI" --strip-components=1; then#g' $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
+fi
 # get sysinitdaemon
 sysinitdaemon=$(sysinitdaemon_get)
 
