@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # displaylink-debian:
 # DisplayLink driver installer for Debian and Ubuntu based Linux distributions: Debian, Ubuntu, Elementary OS,
@@ -202,7 +201,7 @@ then
 # Issue 464	
 elif echo $lsb | grep -qi "Linuxmint" ;
 then
-	if [ $codename == "sarah" ] || [ $codename == "rosa" ] || [ $codename == "petra" ] || [ $codename == "olivia" ] || [ $codename == "serena" ] || [ $codename == "sonya" ] || [ $codename == "sylvia" ] || [ $codename == "tara" ] || [ $codename == "tessa" ] || [ $codename == "betsy" ] || [ $codename == "cindy" ] || [ $codename == "tina" ] || [ $codename == "tricia" ] || [ $codename == "debbie" ] || [ $codename == "ulyana" ] || [ $codename == "ulyssa" ] || [ $codename == "uma" ] || [ $codename == "una" ] || [ $codename == "elsie" ] || [ $codename == "vanessa" ] || [ $codename == "vera" ] || [ $codename == "victoria" ];
+	if [ $codename == "sarah" ] || [ $codename == "rosa" ] || [ $codename == "petra" ] || [ $codename == "olivia" ] || [ $codename == "serena" ] || [ $codename == "sonya" ] || [ $codename == "sylvia" ] || [ $codename == "tara" ] || [ $codename == "tessa" ] || [ $codename == "betsy" ] || [ $codename == "cindy" ] || [ $codename == "tina" ] || [ $codename == "tricia" ] || [ $codename == "debbie" ] || [ $codename == "ulyana" ] || [ $codename == "ulyssa" ] || [ $codename == "uma" ] || [ $codename == "una" ] || [ $codename == "elsie" ] || [ $codename == "vanessa" ] || [ $codename == "vera" ] || [ "${codename}" == "victoria" ] || [ "${codename}" == "faye" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
