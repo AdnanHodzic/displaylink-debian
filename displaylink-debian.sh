@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # displaylink-debian:
 # DisplayLink driver installer for Debian and Ubuntu based Linux distributions: Debian, Ubuntu, Elementary OS,
