@@ -125,9 +125,9 @@ alias one="xrandr --output VIRTUAL1 --off --output DVI-1-0 --off --output DP1 --
 Note, in case you're editting ```~/.bashrc```, make sure you run ```source ~/.bashrc``` to appy the changes without having to log in/out.
 
 ---
-Alternatively, one can add a Xsession script, so the providers are automatically bound to the default output:
+Alternatively, one can add an Xsession script, so the providers are automatically bound to the default output:
 ```bash
-# /etc/X11/Xsession.d/45displaylink-provider -settings
+# File: /etc/X11/Xsession.d/45displaylink-provider-settings
 # Bind any existing 'modesetting' provider output to the default source
 
 providers=$(xrandr --listproviders | grep "modesetting" | cut -d: -f 1 | cut -d ' ' -f 2 | grep -v 0)
