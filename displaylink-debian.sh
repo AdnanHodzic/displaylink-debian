@@ -514,7 +514,7 @@ fi
 # note: for this to work libstdc++6 package needs to be installed from >= Stretch
 if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ];
 then
-	ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /opt/displaylink/libstdc++.so.6
+	ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /opt/displaylink/libstdc++.so.6
 fi
 
 sysinitdaemon=$(sysinitdaemon_get)
