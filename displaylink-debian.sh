@@ -105,7 +105,8 @@ fi
 dep_check() {
 echo -e "\nChecking dependencies\n"
 
-deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev libelf-dev git pciutils build-essential)
+dpkg_arch="$(dpkg --print-architecture)"
+deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev:$dpkg_arch libelf-dev:$dpkg_arch git pciutils build-essential)
 
 for dep in ${deps[@]}
 do
@@ -243,7 +244,7 @@ then
 # BunsenLabs
 elif [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "Bunsenlabs" ];
 then
-	if [ $codename == "helium" ] || [ $codename == "lithium" ] || [ $codename == "buster" ] || [ $codename == "beryllium" ];
+	if [ $codename == "helium" ] || [ $codename == "lithium" ] || [ $codename == "beryllium" ] || [ $codename == "boron" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
@@ -514,7 +515,7 @@ fi
 # note: for this to work libstdc++6 package needs to be installed from >= Stretch
 if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ];
 then
-	ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /opt/displaylink/libstdc++.so.6
+	ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /opt/displaylink/libstdc++.so.6
 fi
 
 sysinitdaemon=$(sysinitdaemon_get)
@@ -806,7 +807,7 @@ echo -e "\nStarting Debug ...\n"
 default=N
 ack=${ack:-$default}
 
-read -p "Did you read Post Installation Guide? http://bit.ly/2TbZleK [y/N] " ack
+read -p "Did you read Post Installation Guide? https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md [y/N] " ack
 ack=${ack:-$default}
 
 for letter in "$ack"; do
@@ -816,14 +817,14 @@ for letter in "$ack"; do
 			continue
 	elif [[ "$letter" == [Nn] ]];
 	then
-			echo -e "\nPlease read Post Installation Guide: http://bit.ly/2TbZleK\n"
+			echo -e "\nPlease read Post Installation Guide: https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md\n"
 			exit 1
 	else
 			wrong_key
 	fi
 done
 
-read -p "Did you read Troubleshooting most common issues? http://bit.ly/2Rofd0x [y/N] " ack
+read -p "Did you read Troubleshooting most common issues? https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/common-issues.md [y/N] " ack
 ack=${ack:-$default}
 
 for letter in "$ack"; do
@@ -833,7 +834,7 @@ for letter in "$ack"; do
 			continue
 	elif [[ "$letter" == [Nn] ]];
 	then
-			echo -e "\nPlease read Troubleshooting most common issues: http://bit.ly/2Rofd0x\n"
+			echo -e "\nPlease read Troubleshooting most common issues: https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/common-issues.md\n"
 			exit 1
 	else
 			wrong_key
@@ -920,7 +921,7 @@ then
 	clean_up
 	separator
 	echo -e "\nInstall complete, please reboot to apply the changes"
-	echo -e "After reboot, make sure to consult post-install guide! http://bit.ly/2TbZleK"
+	echo -e "After reboot, make sure to consult post-install guide! https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md"
 	setup_complete
 	separator
 	echo ""
@@ -946,7 +947,7 @@ then
 	clean_up
 	separator
 	echo -e "\nInstall complete, please reboot to apply the changes"
-	echo -e "After reboot, make sure to consult post-install guide! http://bit.ly/2TbZleK"
+	echo -e "After reboot, make sure to consult post-install guide! https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md"
 	setup_complete
 	separator
 	echo ""
