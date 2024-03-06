@@ -105,7 +105,9 @@ fi
 dep_check() {
 echo -e "\nChecking dependencies\n"
 
-deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev libelf-dev git pciutils)
+dpkg_arch="$(dpkg --print-architecture)"
+
+deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev:$dpkg_arch libelf-dev:$dpkg_arch git pciutils)
 
 for dep in ${deps[@]}
 do
