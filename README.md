@@ -42,7 +42,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   * Debian: Jessie 8.0/Stretch 9.0/Buster 10/Bullseye 11/Bookworm 12/Trixie(testing)/Sid (unstable)
   * Ubuntu: 14.04 Trusty - 23.10 Mantic
   * elementary OS: 0.3 Freya- 7.0 Horus
-  * Mint: 15 Olivia - 21.2 Victoria
+  * Mint: 15 Olivia - 21.3 Virginia
   * LMDE: 2 Betsy - 6 Faye
   * Kali: kali-rolling/2016.2 - 2023.1
   * Deepin: stable - unstable
