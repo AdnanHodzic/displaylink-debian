@@ -294,13 +294,7 @@ then
 # Zorin
 elif [ "$lsb" == "Zorin" ];
 then
-	if [ $codename == "focal" ];
-	then
-		echo -e "\nPlatform requirements satisfied, proceeding ..."
-	else
-		message
-		exit 1
-	fi	
+	echo -e "\nPlatform requirements satisfied, proceeding ..."
 else
 	message
 	exit 1

@@ -54,7 +54,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   * Pop!_OS: 20.04 Focal - 22.04 Jammy
   * PureOS: 9 Amber - 10 Byzantium
   * Nitrux: nitrux
-  * Zorin: focal
+  * Zorin
 
   Regardless of which Linux kernel version (>4.15) you're using.
   
