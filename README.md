@@ -21,12 +21,12 @@ DisplayLink drivers tailored to work for most of the Debian based Linux distribu
 
 ## Installation
 1. Download the repo, cd in the directory and run the shell script with sudo:
-```shell
-git clone https://github.com/AdnanHodzic/displaylink-debian.git
-cd displaylink-debian
-sudo ./displaylink-debian.sh
-```
-1. Then consult the [Post Install Guide][PostInstall] to make sure everything works as intended.
+    ```shell
+    git clone https://github.com/AdnanHodzic/displaylink-debian.git
+    cd displaylink-debian
+    sudo ./displaylink-debian.sh
+    ```
+2. Then consult the [Post Install Guide][PostInstall] to make sure everything works as intended.
 
 
 ## Troubleshooting and debugging
