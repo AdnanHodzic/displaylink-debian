@@ -49,7 +49,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   * UOS: apricot - eagle
   * MX Linux: 17.1/18
   * BunsenLabs: Helium - Boron
-  * Parrot: 4.5 - 5+
+  * Parrot: 4.5 - 6+
   * Devuan: ASCII - Chimaera
   * Pop!_OS: 20.04 Focal - 22.04 Jammy
   * PureOS: 9 Amber - 10 Byzantium
