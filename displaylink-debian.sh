@@ -159,8 +159,8 @@ echo -e "GitHub repo: https://github.com/AdnanHodzic/displaylink-debian/"
 echo -e "\n---------------------------------------------------------------\n"
 }
 
-# Ubuntu
-if [ "$lsb" == "Ubuntu" ] || [ "$lsb" == "Neon" ];
+# Ubuntu, Neon, PopOS
+if [ "$lsb" == "Ubuntu" ] || [ "$lsb" == "Neon" ] || [ "$lsb" == "Pop" ];
 then
 	if [ $codename == "trusty" ] || [ $codename == "vivid" ] || [ $codename == "wily" ] || [ $codename == "xenial" ] || [ $codename == "yakkety" ] || [ $codename == "zesty" ] || [ $codename == "artful" ] || [ $codename == "bionic" ] || [ $codename == "cosmic" ] || [ $codename == "disco" ] || [ $codename == "eoan" ] || [ $codename == "focal" ] || [ $codename == "groovy" ] || [ $codename == "hirsute" ] || [ $codename == "impish" ] || [ $codename == "jammy" ] || [ $codename == "kinetic" ] || [ $codename == "lunar" ] || [ $codename == "mantic" ] || [ $codename == "noble" ];
 	then
@@ -255,16 +255,6 @@ then
 elif [ "$lsb" == "Parrot" ];
 then
 	if [ $codename == "n/a" ] || [ $codename == "lts" ] || [ $codename == "ara" ] || [ $codename == "lory" ];
-	then
-		echo -e "\nPlatform requirements satisfied, proceeding ..."
-	else
-		message
-		exit 1
-	fi
-# PopOS
-elif [ "$lsb" == "Pop" ];
-then
-	if [ $codename == "focal" ] || [ $codename == "groovy" ] || [ $codename == "hirsute" ] || [ $codename == "impish" ] || [ $codename == "jammy" ] || [ $codename == "n/a" ];
 	then
 		echo -e "\nPlatform requirements satisfied, proceeding ..."
 	else
