@@ -162,13 +162,7 @@ echo -e "\n---------------------------------------------------------------\n"
 # Ubuntu, Neon, PopOS
 if [ "$lsb" == "Ubuntu" ] || [ "$lsb" == "Neon" ] || [ "$lsb" == "Pop" ];
 then
-	if [ $codename == "trusty" ] || [ $codename == "vivid" ] || [ $codename == "wily" ] || [ $codename == "xenial" ] || [ $codename == "yakkety" ] || [ $codename == "zesty" ] || [ $codename == "artful" ] || [ $codename == "bionic" ] || [ $codename == "cosmic" ] || [ $codename == "disco" ] || [ $codename == "eoan" ] || [ $codename == "focal" ] || [ $codename == "groovy" ] || [ $codename == "hirsute" ] || [ $codename == "impish" ] || [ $codename == "jammy" ] || [ $codename == "kinetic" ] || [ $codename == "lunar" ] || [ $codename == "mantic" ] || [ $codename == "noble" ];
-	then
-		echo -e "\nPlatform requirements satisfied, proceeding ..."
-	else
-		message
-		exit 1
-	fi
+	echo -e "\nPlatform requirements satisfied, proceeding ..."
 # elementary OS
 elif [ "$lsb" == "elementary OS" ] || echo $lsb | grep -qi "elementary";
 then
