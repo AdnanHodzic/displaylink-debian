@@ -39,21 +39,22 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
 
 ## Supported platforms are:
 
-  * Debian: Jessie 8.0/Stretch 9.0/Buster 10/Bullseye 11/Bookworm 12/Trixie(testing)/Sid (unstable)
-  * Ubuntu: 14.04 Trusty - 24.04 Noble
-  * elementary OS: 0.3 Freya- 7.0 Horus
-  * Mint: 15 Olivia - 21.3 Virginia
-  * LMDE: 2 Betsy - 6 Faye
-  * Kali: kali-rolling/2016.2 - 2023.1
-  * Deepin: stable - unstable
+  * BunsenLabs
+  * Debian
+  * Deepin
+  * Devuan
+  * elementary OS
+  * Kali
+  * KDE neon
+  * LMDE
+  * Mint
+  * MX Linux
+  * Nitrux
+  * Parrot
+  * Pop!_OS
+  * PureOS
+  * Ubuntu
   * UOS: apricot - eagle
-  * MX Linux: 17.1/18
-  * BunsenLabs: Helium - Boron
-  * Parrot: 4.5 - 6+
-  * Devuan: ASCII - Chimaera
-  * Pop!_OS: 20.04 Focal - 22.04 Jammy
-  * PureOS: 9 Amber - 10 Byzantium
-  * Nitrux: nitrux
   * Zorin
 
   Regardless of which Linux kernel version (>4.15) you're using.
