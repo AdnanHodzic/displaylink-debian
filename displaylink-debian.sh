@@ -435,20 +435,12 @@ separator
 echo -e "\nPreparing for install\n"
 test -d $driver_dir && /bin/rm -Rf $driver_dir
 unzip -d $driver_dir DisplayLink_Ubuntu_${version}.zip
-chmod +x $driver_dir/displaylink-driver-${version}[.\d]*-[0-9]*.[0-9]*.run
-./$driver_dir/displaylink-driver-${version}[.\d]*-[0-9]*.[0-9]*.run --keep --noexec
-mv displaylink-driver-${version}[.\d]*-*[0-9]*.[0-9]*/ $driver_dir/displaylink-driver-${version}
+chmod +x $driver_dir/displaylink-driver-${version}*.run
+./$driver_dir/displaylink-driver-${version}*.run --keep --noexec
+mv displaylink-driver-${version}*/ $driver_dir/displaylink-driver-${version}
 # get sysinitdaemon
 sysinitdaemon=$(sysinitdaemon_get)
 
-if [ 1 -eq "$(echo "$kernel_check > 6.1" | bc)" ]
-then
-    echo "deleting old evdi archive"
-    rm $driver_dir/displaylink-driver-${version}/evdi.tar.gz
-    echo "downloading evdi compatible with kernel > 6.1"
-    curl -L https://github.com/DisplayLink/evdi/archive/refs/tags/v1.14.2.tar.gz -o $driver_dir/displaylink-driver-${version}/evdi.tar.gz
-    sed -i 's#if ! tar xf "$TARGZ" -C "$EVDI"; then#if ! tar xf "$TARGZ" -C "$EVDI" --strip-components=1; then#g' $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
-fi
 
 # modify displaylink-installer.sh
 sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$sysinitdaemon/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
