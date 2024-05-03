@@ -166,115 +166,47 @@ then
 # elementary OS
 elif [ "$lsb" == "elementary OS" ] || echo $lsb | grep -qi "elementary";
 then
-	if [ $codename == "freya" ] || [ $codename == "loki" ] || [ $codename == "juno" ] || [ $codename == "hera" ] || [ $codename == "odin" ] || [ $codename == "jolnir" ] || [ $codename == "horus" ];
-	then
-		echo -e "\nPlatform requirements satisfied, proceeding ..."
-	else
-		message
-		exit 1
-	fi
+	echo -e "\nPlatform requirements satisfied, proceeding ..."
 # Debian
 elif [ "$lsb" == "Debian" ];
 then
-	if [ $codename == "jessie" ] || [ $codename == "stretch" ] || [ $codename == "buster" ] || [ $codename == "bullseye" ] || [ $codename == "bookworm" ] || [ $codename == "trixie" ] || [ $codename == "sid" ] || [ $codename == "n/a" ];
-	then
-		echo -e "\nPlatform requirements satisfied, proceeding ..."
-	else
-		message
-		exit 1
-	fi
+	echo -e "\nPlatform requirements satisfied, proceeding ..."
 # Devuan
 elif [ "$lsb" == "Devuan" ]
 then
-    if [ "$codename" == "ascii" ] || [ "$codename" == "beowulf" ] || [ "$codename" == "chimaera" ];
-    then
-        echo -e "\nPlatform requirements satisfied, proceeding ..."
-    else
-        message
-        exit 1
-    fi
+	echo -e "\nPlatform requirements satisfied, proceeding ..."
 # Mint
-# Issue 464	
 elif echo $lsb | grep -qi "Linuxmint" ;
 then
-	if [ $codename == "sarah" ] || [ $codename == "rosa" ] || [ $codename == "petra" ] || [ $codename == "olivia" ] || [ $codename == "serena" ] || [ $codename == "sonya" ] || [ $codename == "sylvia" ] || [ $codename == "tara" ] || [ $codename == "tessa" ] || [ $codename == "betsy" ] || [ $codename == "cindy" ] || [ $codename == "tina" ] || [ $codename == "tricia" ] || [ $codename == "debbie" ] || [ $codename == "ulyana" ] || [ $codename == "ulyssa" ] || [ $codename == "uma" ] || [ $codename == "una" ] || [ $codename == "elsie" ] || [ $codename == "vanessa" ] || [ $codename == "vera" ] || [ $codename == "victoria" ] || [ $codename == "faye" ] || [ $codename == "virginia" ];
-	then
-		echo -e "\nPlatform requirements satisfied, proceeding ..."
-	else
-		message
-		exit 1
-	fi
+	echo -e "\nPlatform requirements satisfied, proceeding ..."
 # Kali
 elif [ "$lsb" == "Kali" ];
 then
-	# issue: 204
-	if [ $codename == "kali-rolling" ] || [ $codename == "2016.2" ] || [ $codename == "2017.3" ] || [ $codename == "2018.3" ] || [ $codename == "2018.4" ] || [ $codename == "2022.1" ] || [ $codename == "n/a" ] || [ $codename == "2022.2" ] || [ $codename == "2022.3" ] || [ $codename == "2022.4" ] || [ $codename == "2023.1" ];
-	then
-		echo -e "\nPlatform requirements satisfied, proceeding ..."
-	else
-		message
-		exit 1
-	fi
+	echo -e "\nPlatform requirements satisfied, proceeding ..."
 # Deepin
 elif [ "$lsb" == "Deepin" ] || [ "$lsb" == "Uos" ] ;
 then
-	if [ $codename == "unstable" ] || [ $codename == "stable" ] || [ $codename == "eagle" ] || [ $codename == "apricot" ] || [ $codename == "n/a" ];
-	then
-		echo -e "\nPlatform requirements satisfied, proceeding ..."
-	else
-		message
-		exit 1
-	fi
+	echo -e "\nPlatform requirements satisfied, proceeding ..."
 # MX Linux
 elif [ "$lsb" == "MX" ];
 then
-	if [ $codename == "Horizon" ] || [ $codename == "Continuum" ];
-	then
-		echo -e "\nPlatform requirements satisfied, proceeding ..."
-	else
-		message
-		exit 1
-	fi
+	echo -e "\nPlatform requirements satisfied, proceeding ..."
 # BunsenLabs
 elif [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "Bunsenlabs" ];
 then
-	if [ $codename == "helium" ] || [ $codename == "lithium" ] || [ $codename == "beryllium" ] || [ $codename == "boron" ];
-	then
-		echo -e "\nPlatform requirements satisfied, proceeding ..."
-	else
-		message
-		exit 1
-	fi
+	echo -e "\nPlatform requirements satisfied, proceeding ..."
 # Parrot
 elif [ "$lsb" == "Parrot" ];
 then
-	if [ $codename == "n/a" ] || [ $codename == "lts" ] || [ $codename == "ara" ] || [ $codename == "lory" ];
-	then
-		echo -e "\nPlatform requirements satisfied, proceeding ..."
-	else
-		message
-		exit 1
-	fi
+	echo -e "\nPlatform requirements satisfied, proceeding ..."
 # PureOS
 elif [ "$lsb" == "PureOS" ];
 then
-	if [ $codename == "amber" ] || [ $codename == "byzantium" ];
-	then
-		echo -e "\nPlatform requirements satisfied, proceeding ..."
-	else
-		message
-		exit 1
-	fi
+	echo -e "\nPlatform requirements satisfied, proceeding ..."
 # Nitrux
 elif [ "$lsb" == "Nitrux" ];
 then
-	if [ $codename == "nitrux" ];
-	then
-		echo -e "\nPlatform requirements satisfied, proceeding ..."
-	else
-		message
-		exit 1
-	fi	
+	echo -e "\nPlatform requirements satisfied, proceeding ..."
 # Zorin
 elif [ "$lsb" == "Zorin" ];
 then
