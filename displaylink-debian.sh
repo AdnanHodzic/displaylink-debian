@@ -456,7 +456,14 @@ modesetting(){
 test ! -d /etc/X11/xorg.conf.d && mkdir -p /etc/X11/xorg.conf.d
 drv=$(lspci -nnk | grep -i vga -A3 | grep 'in use'|cut -d":" -f2|sed 's/ //g')
 drv_nvidia=$(lspci | grep -i '3d controller' | sed 's/^.*: //' | awk '{print $1}')
-cardsub=$(lspci -nnk | grep -i vga -A3|grep Subsystem|cut -d" " -f5)
+
+# use different content in $cardsub to repair Intel Subsystem handling with kernel >= 6.6  (issue: 920)
+if [ "$(ver2int $kernel_check)" -ge "$(ver2int '6.6')" ];
+then
+    cardsub=$(lspci -nnk | grep -i vga -A3)
+else
+    cardsub=$(lspci -nnk | grep -i vga -A3|grep Subsystem|cut -d" " -f5)
+fi
 
 # intel displaylink xorg.conf
 xorg_intel(){
@@ -628,10 +635,17 @@ elif [ "$drv" == "amdgpu" ];
 then
 		xorg_amd
 # set xorg for Intel cards
+# use different content in $cardsub to repair Intel Subsystem handling with kernel >= 6.6  (issue: 920)
 elif [ "$drv" == "i915" ];
 then
 		# set xorg modesetting for Intel cards (issue: 179, 68, 88, 192)
-		if [ "$cardsub" == "v2/3rd" ] || [ "$cardsub" == "HD" ] || [ "$cardsub" == "620" ] || [ "$cardsub" == "530" ] || [ "$cardsub" == "540" ] || [ "$cardsub" == "UHD" ] || [ "$cardsub" == "GT2" ];
+                if [[ "$cardsub" == *"v2/3rd"* ]] ||
+                   [[ "$cardsub" == *"HD"* ]] || 
+                   [[ "$cardsub" == *"620"* ]] ||
+                   [[ "$cardsub" == *"530"* ]] ||
+                   [[ "$cardsub" == *"540"* ]] ||
+                   [[ "$cardsub" == *"UHD"* ]] || 
+                   [[ "$cardsub" == *"GT2"* ]];
 		then
 				if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $newgen_xorg)" ];
 				then
