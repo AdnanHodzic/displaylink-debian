@@ -78,6 +78,10 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
 
 ## Donate (PayPal or Bitcoin)
 
+##### Become Github Sponsor
+
+[Become a sponsor to Adnan Hodzic on Github](https://github.com/sponsors/AdnanHodzic) to acknowledge my efforts and help project's further open source development.
+
 Since I'm working on this project in free time without any support or reimbursement from DisplayLink, and [have saved some 100$](https://github.com/AdnanHodzic/displaylink-debian/issues/172#issuecomment-441384936). Please consider supporting this project by making a donation of any amount!
 
 ### PayPal
