@@ -196,6 +196,7 @@ _UNSUPPORTED_PLATFORM_MESSAGE_
 	fi
 }
 
+# checks if the Kconfig file exists
 function pre_install() {
 	if [ -f "$kconfig_file" ]; then
 		kconfig_exists=true
