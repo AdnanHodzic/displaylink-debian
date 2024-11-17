@@ -61,13 +61,13 @@ kconfig_file="/lib/modules/$kernel/build/Kconfig"
 # Using modules-load.d should always be preferred to 'modprobe evdi' in start
 # command
 
-separator(){
+function separator() {
 	sep="\n-------------------------------------------------------------------"
 	echo -e $sep
 }
 
 # Wrong key error message
-wrong_key(){
+function wrong_key() {
 	echo -e "\n-----------------------------"
 	echo -e "\nWrong value. Concentrate!\n"
 	echo -e "-----------------------------\n"
@@ -75,7 +75,7 @@ wrong_key(){
 	read key
 }
 
-root_check(){
+function root_check() {
 	# root check
 	if (( $EUID != 0 ));
 	then
@@ -87,7 +87,7 @@ root_check(){
 }
 
 # list all xorg related configs
-xconfig_list(){
+function xconfig_list() {
 	x11_etc="/etc/X11/"
 
 	if [ ! -d "${x11_etc}" ] ; then # No directory found
@@ -102,7 +102,7 @@ xconfig_list(){
 }
 
 # Dependencies
-dep_check() {
+function dep_check() {
 	echo -e "\nChecking dependencies\n"
 
 	dpkg_arch="$(dpkg --print-architecture)"
@@ -134,7 +134,7 @@ dep_check() {
 	done
 }
 
-distro_check(){
+function distro_check() {
 	separator
 	# RedHat
 	if [ -f /etc/redhat-release ];
@@ -218,8 +218,7 @@ distro_check(){
 	fi
 }
 
-pre_install() {
-
+function pre_install() {
 	if [ -f $kconfig_file ];
 	then
 		kconfig_exists="true"
@@ -227,10 +226,9 @@ pre_install() {
 		kconfig_exists="false"
 		touch $kconfig_file
 	fi
-
 }
 
-sysinitdaemon_get(){
+function sysinitdaemon_get() {
 	sysinitdaemon="systemd"
 
 	if [ "$lsb" == "Ubuntu" ];
@@ -254,7 +252,7 @@ sysinitdaemon_get(){
 	echo $sysinitdaemon
 }
 
-displaylink_service_check () {
+function displaylink_service_check () {
     sysinitdaemon=$(sysinitdaemon_get)
     if [ "$sysinitdaemon" == "systemd" ]
     then
@@ -266,7 +264,7 @@ displaylink_service_check () {
     fi
 }
 
-clean_up(){
+function clean_up() {
 	# remove obsolete/redundant files which can only hamper reinstalls
 
 	separator
@@ -286,10 +284,9 @@ clean_up(){
 		echo "Removing redundant: \"$driver_dir\" directory"
 		rm -r $driver_dir
 	fi
-
 }
 
-setup_complete(){
+function setup_complete() {
 	default=Y
 	ack=${ack:-$default}
 
@@ -310,7 +307,7 @@ setup_complete(){
 	done
 }
 
-download() {
+function download() {
 	default=y
 	echo -en "\nPlease read the Software License Agreement available at: \n$dlurl\nDo you accept?: [Y/n]: "
 	read ACCEPT
@@ -333,7 +330,7 @@ download() {
 	esac
 }
 
-install(){
+function install() {
 	separator
 	download
 
@@ -357,7 +354,6 @@ install(){
 	# get sysinitdaemon
 	sysinitdaemon=$(sysinitdaemon_get)
 
-
 	# modify displaylink-installer.sh
 	sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$sysinitdaemon/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 
@@ -378,12 +374,11 @@ install(){
 	cd $driver_dir/displaylink-driver-${version}
 	./displaylink-installer.sh install
 
-
 	# udlfb kernel version check
 	kernel_check="$(uname -r | grep -Eo '[0-9]+\.[0-9]+')"
 
 	# add udlfb to blacklist (issue #207)
-	udl_block(){
+	function udl_block() {
 
 		# if necessary create blacklist.conf
 		if [ ! -f $blacklist ]; then
@@ -413,7 +408,7 @@ install(){
 }
 
 # post install
-post_install(){
+function post_install() {
 	separator
 	echo -e "\nPerforming post install steps\n"
 
@@ -452,7 +447,7 @@ EOF
 	fi
 
 # setup xorg.conf depending on graphics card
-modesetting(){
+function modesetting() {
 	test ! -d /etc/X11/xorg.conf.d && mkdir -p /etc/X11/xorg.conf.d
 	drv=$(lspci -nnk | grep -i vga -A3 | grep 'in use'|cut -d":" -f2|sed 's/ //g')
 	drv_nvidia=$(lspci | grep -i '3d controller' | sed 's/^.*: //' | awk '{print $1}')
@@ -469,7 +464,7 @@ EOL
 	}
 
 	# modesetting displaylink xorg.conf
-	xorg_modesetting(){
+	function xorg_modesetting() {
 		cat > $xorg_config_displaylink <<EOL
 Section "Device"
 	Identifier  "DisplayLink"
@@ -480,7 +475,7 @@ EOL
 	}
 
 	# modesetting displaylink xorg.conf
-	xorg_modesetting_newgen(){
+	function xorg_modesetting_newgen() {
 		cat > $xorg_config_displaylink <<EOL
 Section "OutputClass"
 	Identifier  "DisplayLink"
@@ -491,10 +486,10 @@ EndSection
 EOL
 	}
 
-	nvidia_pregame(){
+	function nvidia_pregame() {
 		xsetup_loc="/usr/share/sddm/scripts/Xsetup"
 
-		nvidia_xrandr(){
+		function nvidia_xrandr() {
 			cat >> $xsetup_loc << EOL
 
 xrandr --setprovideroutputsource modesetting NVIDIA-0
@@ -502,7 +497,7 @@ xrandr --auto
 EOL
 		}
 
-		nvidia_xrandr_full(){
+		function nvidia_xrandr_full() {
 			cat >> $xsetup_loc << EOL
 #!/bin/sh
 # Xsetup - run as root before the login dialog appears
@@ -566,7 +561,7 @@ EOL
 	}
 
 	# nvidia displaylink xorg.conf (issue: 176)
-	xorg_nvidia(){
+	function xorg_nvidia() {
 		cat > $xorg_config_displaylink <<EOL
 Section "ServerLayout"
     Identifier "layout"
@@ -601,13 +596,13 @@ EOL
 	}
 
 		# issue: 204, 216
-		nvidia_hashcat(){
+		function nvidia_hashcat() {
 			echo "Installing hashcat-nvidia, 'contrib non-free' must be enabled in apt sources"
 			apt-get install hashcat-nvidia
 		}
 
 		# amd displaylink xorg.conf
-		xorg_amd(){
+		function xorg_amd() {
 			cat > $xorg_config_displaylink <<EOL
 Section "Device"
 	Identifier "AMDGPU"
@@ -675,7 +670,7 @@ EOL
 }
 
 # uninstall
-uninstall(){
+function uninstall() {
 	separator
 	echo -e "\nUninstalling ...\n"
 
@@ -711,7 +706,7 @@ uninstall(){
 }
 
 # debug: get system information for issue debug
-debug(){
+function debug() {
 	separator
 	echo -e "\nStarting Debug ...\n"
 
@@ -782,7 +777,7 @@ debug(){
 }
 
 # interactively asks for operation
-ask_operation(){
+function ask_operation() {
 	echo -e "\n--------------------------- displaylink-debian -------------------------------"
 	echo -e "\nDisplayLink driver installer for Debian and Ubuntu based Linux distributions:\n"
 	echo -e "* Debian, Ubuntu, Elementary OS, Mint, Kali, Deepin and many more!"
