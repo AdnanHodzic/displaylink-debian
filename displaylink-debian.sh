@@ -655,10 +655,6 @@ EOL
 		chmod 644 $xorg_config_displaylink
 	}
 
-	function ver2int {
-		echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
-	}
-
 	# depending on X11 version start modesetting func
 	if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $min_xorg)" ];
 	then
