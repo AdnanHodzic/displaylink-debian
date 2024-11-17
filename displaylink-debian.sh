@@ -559,22 +559,33 @@ _XORG_NVIDIA_CONFIG_
 # setup xorg.conf depending on graphics card
 function modesetting() {
 	test ! -d /etc/X11/xorg.conf.d && mkdir -p /etc/X11/xorg.conf.d
-	drv=$(lspci -nnk | grep -i vga -A3 | grep 'in use'|cut -d":" -f2|sed 's/ //g')
-	drv_nvidia=$(lspci | grep -i '3d controller' | sed 's/^.*: //' | awk '{print $1}')
-	cardsub=$(lspci -nnk | grep -i vga -A3|grep Subsystem|cut -d" " -f5)
+
+	local -r driver=$(lspci -nnk | grep -i vga -A3 | grep 'in use' | cut -d":" -f2 | sed 's/ //g')
+	local -r driver_nvidia=$(lspci | grep -i '3d controller' | sed 's/^.*: //' | awk '{print $1}')
+	local -r card_subsystem=$(lspci -nnk | grep -i vga -A3 | grep Subsystem | cut -d" " -f5)
 
 	# set xorg for Nvidia cards (issue: 176, 179, 211, 217, 596)
-	if [ "$drv_nvidia" == "NVIDIA" ] || [[ $drv == *"nvidia"* ]]; then
+	if [ "$driver_nvidia" == "NVIDIA" ] || [[ $driver == *"nvidia"* ]]; then
 		nvidia_pregame
 		xorg_nvidia
 		#nvidia_hashcat
 	# set xorg for AMD cards (issue: 180)
-	elif [ "$drv" == "amdgpu" ]; then
+	elif [ "$driver" == "amdgpu" ]; then
 		xorg_amd
 	# set xorg for Intel cards
-	elif [ "$drv" == "i915" ]; then
+	elif [ "$driver" == "i915" ]; then
 		# set xorg modesetting for Intel cards (issue: 179, 68, 88, 192)
-		if [ "$cardsub" == "v2/3rd" ] || [ "$cardsub" == "HD" ] || [ "$cardsub" == "620" ] || [ "$cardsub" == "530" ] || [ "$cardsub" == "540" ] || [ "$cardsub" == "UHD" ] || [ "$cardsub" == "GT2" ]; then
+		local -r supported_subsystems=(
+			'530'
+			'540'
+			'620'
+			'GT2'
+			'HD'
+			'UHD'
+			'v2/3rd'
+		)
+
+		if [ "${supported_subsystems[*]/$card_subsystem/}" != "${supported_subsystems[*]}" ]; then
 			if [ "$(ver2int "$xorg_vcheck")" -gt "$(ver2int "$newgen_xorg")" ]; then
 				# reference: issue #200
 				xorg_modesetting_newgen
