@@ -144,74 +144,43 @@ function dependencies_check() {
 	done
 }
 
+# checks if the script is running on a supported 
 function distro_check() {
 	separator
-	# RedHat
-	if [ -f /etc/redhat-release ];
-	then
-		echo "This is a Redhat based distro ..."
-		# ToDo:
-		# Add platform type message for RedHat
+	# check for Red Hat based distro
+	if [ -f /etc/redhat-release ]; then
+		echo -e "\nRed Hat based linux distributions are not supported."
+		separator
 		exit 1
-	else
+	fi
 
-		# Confirm dependencies are in place
-		dependencies_check
-		
-		# Ubuntu, Neon, PopOS
-		if [ "$lsb" == "Ubuntu" ] || [ "$lsb" == "Neon" ] || [ "$lsb" == "Pop" ];
-		then
-			echo -e "\nPlatform requirements satisfied, proceeding ..."
-		# elementary OS
-		elif [ "$lsb" == "elementary OS" ] || echo $lsb | grep -qi "elementary";
-		then
-			echo -e "\nPlatform requirements satisfied, proceeding ..."
-		# Debian
-		elif [ "$lsb" == "Debian" ];
-		then
-			echo -e "\nPlatform requirements satisfied, proceeding ..."
-		# Devuan
-		elif [ "$lsb" == "Devuan" ]
-		then
-			echo -e "\nPlatform requirements satisfied, proceeding ..."
-		# Mint
-		elif echo $lsb | grep -qi "Linuxmint" ;
-		then
-			echo -e "\nPlatform requirements satisfied, proceeding ..."
-		# Kali
-		elif [ "$lsb" == "Kali" ];
-		then
-			echo -e "\nPlatform requirements satisfied, proceeding ..."
-		# Deepin
-		elif [ "$lsb" == "Deepin" ] || [ "$lsb" == "Uos" ] ;
-		then
-			echo -e "\nPlatform requirements satisfied, proceeding ..."
-		# MX Linux
-		elif [ "$lsb" == "MX" ];
-		then
-			echo -e "\nPlatform requirements satisfied, proceeding ..."
-		# BunsenLabs
-		elif [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "Bunsenlabs" ];
-		then
-			echo -e "\nPlatform requirements satisfied, proceeding ..."
-		# Parrot
-		elif [ "$lsb" == "Parrot" ];
-		then
-			echo -e "\nPlatform requirements satisfied, proceeding ..."
-		# PureOS
-		elif [ "$lsb" == "PureOS" ];
-		then
-			echo -e "\nPlatform requirements satisfied, proceeding ..."
-		# Nitrux
-		elif [ "$lsb" == "Nitrux" ];
-		then
-			echo -e "\nPlatform requirements satisfied, proceeding ..."
-		# Zorin
-		elif [ "$lsb" == "Zorin" ];
-		then
-			echo -e "\nPlatform requirements satisfied, proceeding ..."
-		else
-			cat <<_UNSUPPORTED_PLATFORM_MESSAGE_
+	# confirm dependencies are in place
+	dependencies_check
+
+	# supported Debian based linux distributions
+	local -r supported_distributions=(
+		'BunsenLabs'
+		'Bunsenlabs'
+		'Debian'
+		'Deepin'
+		'Devuan'
+		'elementary OS'
+		'Kali'
+		'MX'
+		'Neon'
+		'Nitrux'
+		'Parrot'
+		'Pop'
+		'PureOS'
+		'Ubuntu'
+		'Uos' # Deepin alternative LSB string
+		'Zorin'
+	)
+
+	if [[ "${supported_distributions[*]/$lsb/}" != "${supported_distributions[*]}" ]] || [[ "$lsb" =~ (elementary|Linuxmint) ]]; then
+		echo -e "\nPlatform requirements satisfied, proceeding ..."
+	else
+		cat <<_UNSUPPORTED_PLATFORM_MESSAGE_
 
 ---------------------------------------------------------------
 
@@ -223,8 +192,7 @@ GitHub repo: https://github.com/AdnanHodzic/displaylink-debian/
 ---------------------------------------------------------------
 
 _UNSUPPORTED_PLATFORM_MESSAGE_
-			exit 1
-		fi
+		exit 1
 	fi
 }
 
