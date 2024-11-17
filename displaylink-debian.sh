@@ -106,35 +106,40 @@ function get_xconfig_list() {
 	fi
 }
 
-# Dependencies
-function dep_check() {
-	echo -e "\nChecking dependencies\n"
+# checks if script dependencies are installed
+# automatically installs missing script dependencies
+function dependencies_check() {
+	echo -e "\nChecking dependencies...\n"
 
-	dpkg_arch="$(dpkg --print-architecture)"
-	deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev:$dpkg_arch libelf-dev:$dpkg_arch git pciutils build-essential)
+	local dpkg_arch="$(dpkg --print-architecture)"
 
-	for dep in ${deps[@]}
-	do
-		if ! dpkg -s $dep | grep "Status: install ok installed" > /dev/null 2>&1
-		then
-			default=y
-			read -p "$dep not found! Install? [Y/n] " response
-			response=${response:-$default}
-			if [[ $response =~  ^(yes|y|Y)$ ]]
-			then
-				if ! apt install -y $dep
-				then
-					echo "$dep installation failed.  Aborting."
-					exit 1
-				fi
-			else
-				separator
-				echo -e "\nCannot continue without $dep.  Aborting."
-				separator
-				exit 1
-			fi
-		else
-			echo "$dep is installed"
+	# script dependencies
+	local dependencies=(
+		'unzip'
+		"linux-headers-$(uname -r)"
+		'dkms'
+		'lsb-release'
+		'linux-source'
+		'x11-xserver-utils'
+		'wget'
+		"libdrm-dev:$dpkg_arch"
+		"libelf-dev:$dpkg_arch"
+		'git'
+		'pciutils'
+		'build-essential'
+	)
+
+	for dependency in "${dependencies[@]}"; do
+		# skip dependency installation if dependency is already present
+		if dpkg -s "$dependency" | grep -q 'Status: install ok installed'; then
+			continue
+		fi
+
+		echo "installing dependency: $dependency"
+
+		if ! apt-get install -q=2 -y "$dependency"; then
+			echo "$dependency installation failed.  Aborting."
+			exit 1
 		fi
 	done
 }
@@ -162,7 +167,7 @@ function distro_check() {
 	else
 
 		# Confirm dependencies are in place
-		dep_check
+		dependencies_check
 		
 		# Ubuntu, Neon, PopOS
 		if [ "$lsb" == "Ubuntu" ] || [ "$lsb" == "Neon" ] || [ "$lsb" == "Pop" ];
