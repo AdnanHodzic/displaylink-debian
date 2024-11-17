@@ -224,7 +224,7 @@ function get_init_system() {
 			;;
 	esac
 
-	if [ -z "$init_system" ] && [[ "$lsb" = elementary ]] && [ "$codename" == "freya" ]; then
+	if [ -z "$init_system" ] && [[ "$lsb" =~ elementary ]] && [ "$codename" == "freya" ]; then
 		init_system='upstart'
 	fi
 
