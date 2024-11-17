@@ -380,7 +380,7 @@ install(){
 
 
 	# udlfb kernel version check
-	kernel_check="$(uname -r | egrep -o '[0-9]+\.[0-9]+')"
+	kernel_check="$(uname -r | grep -Eo '[0-9]+\.[0-9]+')"
 
 	# add udlfb to blacklist (issue #207)
 	udl_block(){
