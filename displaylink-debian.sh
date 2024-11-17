@@ -206,37 +206,41 @@ function pre_install() {
 	fi
 }
 
-function sysinitdaemon_get() {
-	sysinitdaemon="systemd"
+# retrieves the init system name
+function get_init_system() {
+	local init_system=''
 
-	if [ "$lsb" == "Ubuntu" ];
-	then
-		if [ $codename == "trusty" ];
-		then
-			sysinitdaemon="upstart"
-		fi
-	# Elementary
-	elif [ "$lsb" == "elementary OS" ] || echo $lsb | grep -qi "elementary";
-	then
-		if [ $codename == "freya" ];
-		then
-			sysinitdaemon="upstart"
-		fi
-	elif [ "$lsb" == "Devuan" ]
-	then
-		sysinitdaemon="sysvinit"
+	case "$lsb" in
+		'Devuan')
+			init_system='sysvinit'
+			;;
+
+		'elementary OS')
+			[ "$codename" == "freya" ] && init_system='upstart'
+			;;
+
+		'Ubuntu')
+			[ "$codename" == 'trusty' ] && init_system='upstart'
+			;;
+	esac
+
+	if [ -z "$init_system" ] && [[ "$lsb" = elementary ]] && [ "$codename" == "freya" ]; then
+		init_system='upstart'
 	fi
 
-	echo $sysinitdaemon
+	
+	[ -z "$init_system" ] && init_system='systemd'
+
+	echo "$init_system"
 }
 
 function displaylink_service_check () {
-    sysinitdaemon=$(sysinitdaemon_get)
-    if [ "$sysinitdaemon" == "systemd" ]
+    init_system=$(get_init_system)
+    if [ "$init_system" == "systemd" ]
     then
         systemctl is-active --quiet displaylink-driver.service && \
             echo up and running
-    elif [ "$sysinitdaemon" == "sysvinit" ]
+    elif [ "$init_system" == "sysvinit" ]
     then
         /etc/init.d/$init_script status
     fi
@@ -350,11 +354,11 @@ function install() {
 	chmod +x $driver_dir/displaylink-driver-${version}*.run
 	./$driver_dir/displaylink-driver-${version}*.run --keep --noexec
 	mv displaylink-driver-${version}*/ $driver_dir/displaylink-driver-${version}
-	# get sysinitdaemon
-	sysinitdaemon=$(sysinitdaemon_get)
+	# get init system
+	init_system=$(get_init_system)
 
 	# modify displaylink-installer.sh
-	sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$sysinitdaemon/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
+	sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$init_system/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
 
 	# issue: 227
 	if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "Bunsenlabs" ] || [ "$lsb" == "MX" ] || [ "$lsb" == "Uos" ];
@@ -597,14 +601,14 @@ function post_install() {
 		ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /opt/displaylink/libstdc++.so.6
 	fi
 
-	sysinitdaemon=$(sysinitdaemon_get)
-	if [ "$sysinitdaemon" == "systemd" ]; then
+	init_system=$(get_init_system)
+	if [ "$init_system" == "systemd" ]; then
 		# Fix inability to enable displaylink-driver.service
 		sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/displaylink-driver.service
 
 		echo "Enable displaylink-driver service"
 		systemctl enable displaylink-driver.service
-	elif [ "$sysinitdaemon" == "sysvinit" ]; then
+	elif [ "$init_system" == "sysvinit" ]; then
 		echo -e "Copying init script to /etc/init.d\n"
 		cp "$dir/$init_script" /etc/init.d/
 		chmod +x "/etc/init.d/$init_script"
@@ -639,7 +643,7 @@ function uninstall() {
 		fi
 	fi
 
-	if [ "$(sysinitdaemon_get)" == "sysvinit" ]
+	if [ "$(get_init_system)" == "sysvinit" ]
 	then
 		update-rc.d "$init_script" remove
 		rm -f "/etc/init.d/$init_script"
