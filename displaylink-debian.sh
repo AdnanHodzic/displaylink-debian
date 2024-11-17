@@ -75,15 +75,16 @@ function wrong_key() {
 	read key
 }
 
+# checks if the script is executed by root user
 function root_check() {
-	# root check
-	if (( $EUID != 0 ));
-	then
-		separator
-		echo -e "\nMust be run as root (i.e: 'sudo $0')."
-		separator
-		exit 1
-	fi
+	# perform root check and exit function early,
+	# if the script is executed by root user
+	[ $EUID -eq 0 ] && return
+
+	separator
+	echo -e "\nScript must be executed as root user (i.e: 'sudo $0')."
+	separator
+	exit 1
 }
 
 # list all xorg related configs
