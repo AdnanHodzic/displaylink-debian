@@ -66,13 +66,17 @@ function separator() {
 	echo -e $sep
 }
 
-# Wrong key error message
-function wrong_key() {
-	echo -e "\n-----------------------------"
-	echo -e "\nWrong value. Concentrate!\n"
-	echo -e "-----------------------------\n"
-	echo -e "Enter any key to continue"
-	read key
+# invalid option error message
+function invalid_option() {
+	separator
+	echo -e "\nInvalid option specified."
+	separator
+	read -rsn1 -p 'Enter any key to continue'
+	echo ''
+
+	# exit the script when an invalid
+	# option is specified by the user
+	exit 1
 }
 
 # checks if the script is executed by root user
@@ -303,7 +307,7 @@ function setup_complete() {
 		then
 			echo -e "\nReboot postponed, changes won't be applied until reboot"
 		else
-			wrong_key
+			invalid_option
 		fi
 	done
 }
@@ -707,7 +711,7 @@ function debug() {
 			echo -e "\nPlease read Post Installation Guide: https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md\n"
 			exit 1
 		else
-			wrong_key
+			invalid_option
 		fi
 	done
 
@@ -724,7 +728,7 @@ function debug() {
 			echo -e "\nPlease read Troubleshooting most common issues: https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/common-issues.md\n"
 			exit 1
 		else
-			wrong_key
+			invalid_option
 		fi
 	done
 
