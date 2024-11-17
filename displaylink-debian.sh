@@ -144,17 +144,6 @@ function dependencies_check() {
 	done
 }
 
-# unsupported platform message
-function message() {
-	echo -e "\n---------------------------------------------------------------\n"
-	echo -e "Unsuported platform: $platform"
-	echo -e "Full list of all supported platforms: http://bit.ly/2zrwz2u"
-	echo -e ""
-	echo -e "This tool is Open Source and feel free to extend it"
-	echo -e "GitHub repo: https://github.com/AdnanHodzic/displaylink-debian/"
-	echo -e "\n---------------------------------------------------------------\n"
-}
-
 function distro_check() {
 	separator
 	# RedHat
@@ -222,7 +211,18 @@ function distro_check() {
 		then
 			echo -e "\nPlatform requirements satisfied, proceeding ..."
 		else
-			message
+			cat <<_UNSUPPORTED_PLATFORM_MESSAGE_
+
+---------------------------------------------------------------
+
+Unsuported platform: $platform
+Full list of all supported platforms: http://bit.ly/2zrwz2u
+This tool is Open Source and feel free to extend it
+GitHub repo: https://github.com/AdnanHodzic/displaylink-debian/
+
+---------------------------------------------------------------
+
+_UNSUPPORTED_PLATFORM_MESSAGE_
 			exit 1
 		fi
 	fi
