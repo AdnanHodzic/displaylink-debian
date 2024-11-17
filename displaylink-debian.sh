@@ -408,7 +408,7 @@ function nvidia_hashcat() {
 }
 
 # appends nvidia xrandr specific script code (partial)
-function nvidia_xrandr() {
+function nvidia_xrandr_partial() {
 	cat >> "$1" <<_NVIDIA_XRANDR_SCRIPT_
 
 xrandr --setprovideroutputsource modesetting NVIDIA-0
@@ -428,7 +428,7 @@ if [ -e /sbin/prime-offload ]; then
 fi
 _NVIDIA_XRANDR_FULL_SCRIPT_
 
-	nvidia_xrandr "$1"
+	nvidia_xrandr_partial "$1"
 }
 
 # performs nvidia specific pre-setup operations
@@ -454,7 +454,7 @@ function nvidia_pregame() {
 		mv $xsetup_loc $xsetup_loc.org.bak
 		echo -e "\nMade backup of: $xsetup_loc file"
 		echo -e "\nLocation: $xsetup_loc.org.bak"
-		nvidia_xrandr "$xsetup_loc"
+		nvidia_xrandr_partial "$xsetup_loc"
 		chmod +x $xsetup_loc
 		echo -e "Wrote changes to $xsetup_loc"
 	fi
