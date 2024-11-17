@@ -117,7 +117,7 @@ function dep_check() {
 			response=${response:-$default}
 			if [[ $response =~  ^(yes|y|Y)$ ]]
 			then
-				if ! apt-get install $dep
+				if ! apt install -y $dep
 				then
 					echo "$dep installation failed.  Aborting."
 					exit 1
@@ -598,7 +598,7 @@ EOL
 		# issue: 204, 216
 		function nvidia_hashcat() {
 			echo "Installing hashcat-nvidia, 'contrib non-free' must be enabled in apt sources"
-			apt-get install hashcat-nvidia
+			apt install -y hashcat-nvidia
 		}
 
 		# amd displaylink xorg.conf
