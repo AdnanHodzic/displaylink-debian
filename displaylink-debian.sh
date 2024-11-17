@@ -453,29 +453,28 @@ function nvidia_pregame() {
 	if ! grep -q "setprovideroutputsource modesetting" $xsetup_loc; then
 		mv $xsetup_loc $xsetup_loc.org.bak
 		echo -e "\nMade backup of: $xsetup_loc file"
-		echo -e "\nLocation: $xsetup_loc.org.bak"
+		echo -e "\nLocation: ${xsetup_loc}.org.bak"
 		nvidia_xrandr_partial "$xsetup_loc"
 		chmod +x $xsetup_loc
 		echo -e "Wrote changes to $xsetup_loc"
 	fi
 
-	if [ -f "$xorg_config" ]; then
-		mv "$xorg_config" "${xorg_config}.org.bak"
-		echo -e "\nMade backup of: $xorg_config file"
-		echo -e "\nLocation: $xorg_config.org.bak"
-	fi
+	# config files to backup
+	local -r configs=(
+		"$xorg_config"
+		"$xorg_config_displaylink"
+		"$usr_xorg_config_displaylink"
+	)
 
-	if [ -f "$xorg_config_displaylink" ]; then
-		mv "$xorg_config_displaylink" "${xorg_config_displaylink}.org.bak"
-		echo -e "\nMade backup of: $xorg_config_displaylink file"
-		echo -e "\nLocation: $xorg_config_displaylink.org.bak"
-	fi
+	for config_file in "${configs[@]}"; do
+		# skip if config file does not exist
+		[ ! -f "$config_file" ] && continue
 
-	if [ -f "$usr_xorg_config_displaylink" ]; then
-		mv "$usr_xorg_config_displaylink" "${usr_xorg_config_displaylink}.org.bak"
-		echo -e "\nMade backup of: $usr_xorg_config_displaylink file"
-		echo -e "\nLocation: $usr_xorg_config_displaylink.org.bak"
-	fi
+		# backup config file
+		mv "$config_file" "${config_file}.org.bak"
+		echo -e "\nMade backup of: $config_file file"
+		echo -e "\nLocation: ${config_file}.org.bak"
+	done
 }
 
 # amd displaylink xorg.conf
