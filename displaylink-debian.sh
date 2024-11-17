@@ -61,9 +61,9 @@ kconfig_file="/lib/modules/$kernel/build/Kconfig"
 # Using modules-load.d should always be preferred to 'modprobe evdi' in start
 # command
 
+# writes a text separator line to the terminal
 function separator() {
-	sep="\n-------------------------------------------------------------------"
-	echo -e $sep
+	echo -e "\n-------------------------------------------------------------------"
 }
 
 # invalid option error message
