@@ -197,12 +197,11 @@ _UNSUPPORTED_PLATFORM_MESSAGE_
 }
 
 function pre_install() {
-	if [ -f $kconfig_file ];
-	then
-		kconfig_exists="true"
+	if [ -f "$kconfig_file" ]; then
+		kconfig_exists=true
 	else
-		kconfig_exists="false"
-		touch $kconfig_file
+		kconfig_exists=false
+		touch "$kconfig_file"
 	fi
 }
 
@@ -588,9 +587,8 @@ function post_install() {
 	separator
 	echo -e "\nPerforming post install steps\n"
 
-	if [ "$kconfig_exists" == "false" ]; then
-		rm "$kconfig_file"
-	fi
+	# remove Kconfig file if it does not exist?
+	[ "$kconfig_exists" = false ] && rm "$kconfig_file"
 
 	# fix: issue #42 (dlm.service can't start)
 	# note: for this to work libstdc++6 package needs to be installed from >= Stretch
