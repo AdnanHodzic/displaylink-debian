@@ -134,6 +134,17 @@ function dep_check() {
 	done
 }
 
+# unsupported platform message
+function message() {
+	echo -e "\n---------------------------------------------------------------\n"
+	echo -e "Unsuported platform: $platform"
+	echo -e "Full list of all supported platforms: http://bit.ly/2zrwz2u"
+	echo -e ""
+	echo -e "This tool is Open Source and feel free to extend it"
+	echo -e "GitHub repo: https://github.com/AdnanHodzic/displaylink-debian/"
+	echo -e "\n---------------------------------------------------------------\n"
+}
+
 function distro_check() {
 	separator
 	# RedHat
@@ -147,18 +158,7 @@ function distro_check() {
 
 		# Confirm dependencies are in place
 		dep_check
-
-		# Unsupported platform message
-		message(){
-			echo -e "\n---------------------------------------------------------------\n"
-			echo -e "Unsuported platform: $platform"
-			echo -e "Full list of all supported platforms: http://bit.ly/2zrwz2u"
-			echo -e ""
-			echo -e "This tool is Open Source and feel free to extend it"
-			echo -e "GitHub repo: https://github.com/AdnanHodzic/displaylink-debian/"
-			echo -e "\n---------------------------------------------------------------\n"
-		}
-
+		
 		# Ubuntu, Neon, PopOS
 		if [ "$lsb" == "Ubuntu" ] || [ "$lsb" == "Neon" ] || [ "$lsb" == "Pop" ];
 		then
@@ -330,6 +330,27 @@ function download() {
 	esac
 }
 
+# add udlfb to blacklist (issue #207)
+function udl_block() {
+	# if necessary create blacklist.conf
+	if [ ! -f $blacklist ]; then
+		touch $blacklist
+	fi
+
+	if ! grep -Fxq "blacklist udlfb" $blacklist
+	then
+		echo "Adding udlfb to blacklist"
+		echo "blacklist udlfb" >> $blacklist
+	fi
+
+	# add udl to blacklist (issue #207)
+	if ! grep -Fxq "blacklist udl" $blacklist
+	then
+		echo "Adding udl to blacklist"
+		echo "blacklist udl" >> $blacklist
+	fi
+}
+
 function install() {
 	separator
 	download
@@ -377,128 +398,30 @@ function install() {
 	# udlfb kernel version check
 	kernel_check="$(uname -r | grep -Eo '[0-9]+\.[0-9]+')"
 
-	# add udlfb to blacklist (issue #207)
-	function udl_block() {
-
-		# if necessary create blacklist.conf
-		if [ ! -f $blacklist ]; then
-			touch $blacklist
-		fi
-
-		if ! grep -Fxq "blacklist udlfb" $blacklist
-		then
-			echo "Adding udlfb to blacklist"
-			echo "blacklist udlfb" >> $blacklist
-		fi
-
-		# add udl to blacklist (issue #207)
-		if ! grep -Fxq "blacklist udl" $blacklist
-		then
-			echo "Adding udl to blacklist"
-			echo "blacklist udl" >> $blacklist
-		fi
-	}
-
 	# add udl/udlfb to blacklist depending on kernel version (issue #207)
 	if [ "$(ver2int $kernel_check)" -ge "$(ver2int '4.14.9')" ];
 	then
 		udl_block
 	fi
-
 }
 
-# post install
-function post_install() {
-	separator
-	echo -e "\nPerforming post install steps\n"
+# issue: 204, 216
+function nvidia_hashcat() {
+	echo "Installing hashcat-nvidia, 'contrib non-free' must be enabled in apt sources"
+	apt install -y hashcat-nvidia
+}
 
-	if [ "$kconfig_exists" == "false" ];
-	then
-		rm $kconfig_file
-	fi
-
-	# fix: issue #42 (dlm.service can't start)
-	# note: for this to work libstdc++6 package needs to be installed from >= Stretch
-	if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ];
-	then
-		ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /opt/displaylink/libstdc++.so.6
-	fi
-
-	sysinitdaemon=$(sysinitdaemon_get)
-	if [ "$sysinitdaemon" == "systemd" ]
-	then
-		# Fix inability to enable displaylink-driver.service
-		sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/displaylink-driver.service
-
-		echo "Enable displaylink-driver service"
-		systemctl enable displaylink-driver.service
-	elif [ "$sysinitdaemon" == "sysvinit" ]
-	then
-		echo "Copying init script to /etc/init.d\n"
-		cp "$dir/$init_script" /etc/init.d/
-		chmod +x "/etc/init.d/$init_script"
-		echo "Load evdi at startup"
-		cat > "$evdi_modprobe" <<EOF
-evdi
-EOF
-		echo "Enable and start displaylink service"
-		update-rc.d "$init_script" defaults
-		/etc/init.d/$init_script start
-	fi
-
-# setup xorg.conf depending on graphics card
-function modesetting() {
-	test ! -d /etc/X11/xorg.conf.d && mkdir -p /etc/X11/xorg.conf.d
-	drv=$(lspci -nnk | grep -i vga -A3 | grep 'in use'|cut -d":" -f2|sed 's/ //g')
-	drv_nvidia=$(lspci | grep -i '3d controller' | sed 's/^.*: //' | awk '{print $1}')
-	cardsub=$(lspci -nnk | grep -i vga -A3|grep Subsystem|cut -d" " -f5)
-
-	# intel displaylink xorg.conf
-	function xorg_intel() {
-		cat > $xorg_config_displaylink <<EOL
-Section "Device"
-	Identifier  "Intel"
-	Driver      "intel"
-EndSection
-EOL
-	}
-
-	# modesetting displaylink xorg.conf
-	function xorg_modesetting() {
-		cat > $xorg_config_displaylink <<EOL
-Section "Device"
-	Identifier  "DisplayLink"
-	Driver      "modesetting"
-	Option      "PageFlip" "false"
-EndSection
-EOL
-	}
-
-	# modesetting displaylink xorg.conf
-	function xorg_modesetting_newgen() {
-		cat > $xorg_config_displaylink <<EOL
-Section "OutputClass"
-	Identifier  "DisplayLink"
-	MatchDriver "evdi"
-	Driver      "modesetting"
-	Option      "AccelMethod" "none"
-EndSection
-EOL
-	}
-
-	function nvidia_pregame() {
-		xsetup_loc="/usr/share/sddm/scripts/Xsetup"
-
-		function nvidia_xrandr() {
-			cat >> $xsetup_loc << EOL
+# appends nvidia xrandr specific script code 
+function nvidia_xrandr() {
+	cat >> "$1" <<_NVIDIA_XRANDR_SCRIPT_
 
 xrandr --setprovideroutputsource modesetting NVIDIA-0
 xrandr --auto
-EOL
-		}
+_NVIDIA_XRANDR_SCRIPT_
+}
 
-		function nvidia_xrandr_full() {
-			cat >> $xsetup_loc << EOL
+function nvidia_xrandr_full() {
+	cat >> "$1" <<_NVIDIA_XRANDR_FULL_SCRIPT_
 #!/bin/sh
 # Xsetup - run as root before the login dialog appears
 
@@ -509,60 +432,103 @@ fi
 
 xrandr --setprovideroutputsource modesetting NVIDIA-0
 xrandr --auto
-EOL
-		}
+_NVIDIA_XRANDR_FULL_SCRIPT_
+}
 
-		# create Xsetup file if not there + make necessary changes (issue: #201, #206)
-		if [ ! -f $xsetup_loc ];
-		then
-			echo "$xsetup_loc not found, creating"
-			mkdir -p /usr/share/sddm/scripts/
-			touch $xsetup_loc
-			nvidia_xrandr_full
-			chmod +x $xsetup_loc
-			echo -e "Wrote changes to $xsetup_loc"
-		fi
+# performs nvidia specific pre-setup operations
+function nvidia_pregame() {
+	local xsetup_loc="/usr/share/sddm/scripts/Xsetup"
 
-		# make necessary changes to Xsetup
-		if ! grep -q "setprovideroutputsource modesetting" $xsetup_loc
-		then
-			mv $xsetup_loc $xsetup_loc.org.bak
-			echo -e "\nMade backup of: $xsetup_loc file"
-			echo -e "\nLocation: $xsetup_loc.org.bak"
-			nvidia_xrandr
-			chmod +x $xsetup_loc
-			echo -e "Wrote changes to $xsetup_loc"
-		fi
+	# xorg.conf ops
+	local xorg_config="/etc/x11/xorg.conf"
+	local usr_xorg_config_displaylink="/usr/share/X11/xorg.conf.d/20-displaylink.conf"
 
-		# xorg.conf ops
-		xorg_config="/etc/x11/xorg.conf"
-		usr_xorg_config_displaylink="/usr/share/X11/xorg.conf.d/20-displaylink.conf"
+	# create Xsetup file if not there + make necessary changes (issue: #201, #206)
+	if [ ! -f $xsetup_loc ]; then
+		echo "$xsetup_loc not found, creating"
+		mkdir -p /usr/share/sddm/scripts/
+		touch $xsetup_loc
+		nvidia_xrandr_full "$xsetup_loc"
+		chmod +x $xsetup_loc
+		echo -e "Wrote changes to $xsetup_loc"
+	fi
 
-		if [ -f $xorg_config ];
-		then
-			mv $xorg_config $xorg_config.org.bak
-			echo -e "\nMade backup of: $xorg_config file"
-			echo -e "\nLocation: $xorg_config.org.bak"
-		fi
+	# make necessary changes to Xsetup
+	if ! grep -q "setprovideroutputsource modesetting" $xsetup_loc; then
+		mv $xsetup_loc $xsetup_loc.org.bak
+		echo -e "\nMade backup of: $xsetup_loc file"
+		echo -e "\nLocation: $xsetup_loc.org.bak"
+		nvidia_xrandr "$xsetup_loc"
+		chmod +x $xsetup_loc
+		echo -e "Wrote changes to $xsetup_loc"
+	fi
 
-		if [ -f $xorg_config_displaylink ];
-		then
-			mv $xorg_config_displaylink $xorg_config_displaylink.org.bak
-			echo -e "\nMade backup of: $xorg_config_displaylink file"
-			echo -e "\nLocation: $xorg_config_displaylink.org.bak"
-		fi
+	if [ -f "$xorg_config" ]; then
+		mv "$xorg_config" "${xorg_config}.org.bak"
+		echo -e "\nMade backup of: $xorg_config file"
+		echo -e "\nLocation: $xorg_config.org.bak"
+	fi
 
-		if [ -f $usr_xorg_config_displaylink ];
-		then
-			mv $usr_xorg_config_displaylink $usr_xorg_config_displaylink.org.bak
-			echo -e "\nMade backup of: $usr_xorg_config_displaylink file"
-			echo -e "\nLocation: $usr_xorg_config_displaylink.org.bak"
-		fi
-	}
+	if [ -f "$xorg_config_displaylink" ]; then
+		mv "$xorg_config_displaylink" "${xorg_config_displaylink}.org.bak"
+		echo -e "\nMade backup of: $xorg_config_displaylink file"
+		echo -e "\nLocation: $xorg_config_displaylink.org.bak"
+	fi
 
-	# nvidia displaylink xorg.conf (issue: 176)
-	function xorg_nvidia() {
-		cat > $xorg_config_displaylink <<EOL
+	if [ -f "$usr_xorg_config_displaylink" ]; then
+		mv "$usr_xorg_config_displaylink" "${usr_xorg_config_displaylink}.org.bak"
+		echo -e "\nMade backup of: $usr_xorg_config_displaylink file"
+		echo -e "\nLocation: $usr_xorg_config_displaylink.org.bak"
+	fi
+}
+
+# amd displaylink xorg.conf
+function xorg_amd() {
+	cat > "$xorg_config_displaylink" <<_XORG_AMD_CONFIG_
+Section "Device"
+	Identifier "AMDGPU"
+	Driver     "amdgpu"
+	Option     "PageFlip" "false"
+EndSection
+_XORG_AMD_CONFIG_
+}
+
+# intel displaylink xorg.conf
+function xorg_intel() {
+	cat > "$xorg_config_displaylink" <<_XORG_INTEL_CONFIG_
+Section "Device"
+	Identifier  "Intel"
+	Driver      "intel"
+EndSection
+_XORG_INTEL_CONFIG_
+}
+
+# modesetting displaylink xorg.conf
+function xorg_modesetting() {
+	cat > "$xorg_config_displaylink" <<_XORG_MODESETTING_CONFIG_
+Section "Device"
+	Identifier  "DisplayLink"
+	Driver      "modesetting"
+	Option      "PageFlip" "false"
+EndSection
+_XORG_MODESETTING_CONFIG_
+}
+
+# modesetting displaylink xorg.conf
+function xorg_modesetting_newgen() {
+	cat > "$xorg_config_displaylink" <<_XORG_EVDI_CONFIG_
+Section "OutputClass"
+	Identifier  "DisplayLink"
+	MatchDriver "evdi"
+	Driver      "modesetting"
+	Option      "AccelMethod" "none"
+EndSection
+_XORG_EVDI_CONFIG_
+}
+
+# nvidia displaylink xorg.conf (issue: 176)
+function xorg_nvidia() {
+	cat > "$xorg_config_displaylink" <<_XORG_NVIDIA_CONFIG_
 Section "ServerLayout"
     Identifier "layout"
     Screen 0 "nvidia"
@@ -592,72 +558,90 @@ Section "Screen"
     Option "AllowEmptyInitialConfiguration" "on"
     Option "IgnoreDisplayDevices" "CRT"
 EndSection
-EOL
-	}
+_XORG_NVIDIA_CONFIG_
+}
 
-		# issue: 204, 216
-		function nvidia_hashcat() {
-			echo "Installing hashcat-nvidia, 'contrib non-free' must be enabled in apt sources"
-			apt install -y hashcat-nvidia
-		}
+# setup xorg.conf depending on graphics card
+function modesetting() {
+	test ! -d /etc/X11/xorg.conf.d && mkdir -p /etc/X11/xorg.conf.d
+	drv=$(lspci -nnk | grep -i vga -A3 | grep 'in use'|cut -d":" -f2|sed 's/ //g')
+	drv_nvidia=$(lspci | grep -i '3d controller' | sed 's/^.*: //' | awk '{print $1}')
+	cardsub=$(lspci -nnk | grep -i vga -A3|grep Subsystem|cut -d" " -f5)
 
-		# amd displaylink xorg.conf
-		function xorg_amd() {
-			cat > $xorg_config_displaylink <<EOL
-Section "Device"
-	Identifier "AMDGPU"
-	Driver     "amdgpu"
-	Option     "PageFlip" "false"
-EndSection
-EOL
-		}
-
-		# set xorg for Nvidia cards (issue: 176, 179, 211, 217, 596)
-		if [ "$drv_nvidia" == "NVIDIA" ] || [[ $drv == *"nvidia"* ]];
-		then
-			nvidia_pregame
-			xorg_nvidia
-			#nvidia_hashcat
-		# set xorg for AMD cards (issue: 180)
-		elif [ "$drv" == "amdgpu" ];
-		then
-			xorg_amd
-		# set xorg for Intel cards
-		elif [ "$drv" == "i915" ];
-		then
-			# set xorg modesetting for Intel cards (issue: 179, 68, 88, 192)
-			if [ "$cardsub" == "v2/3rd" ] || [ "$cardsub" == "HD" ] || [ "$cardsub" == "620" ] || [ "$cardsub" == "530" ] || [ "$cardsub" == "540" ] || [ "$cardsub" == "UHD" ] || [ "$cardsub" == "GT2" ];
-			then
-				if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $newgen_xorg)" ];
-				then
-					# reference: issue #200
-					xorg_modesetting_newgen
-				else
-					xorg_modesetting
-				fi
-			# generic intel
-			else
-				xorg_intel
-			fi
-		# default xorg modesetting
-		else
-			if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $newgen_xorg)" ];
-			then
+	# set xorg for Nvidia cards (issue: 176, 179, 211, 217, 596)
+	if [ "$drv_nvidia" == "NVIDIA" ] || [[ $drv == *"nvidia"* ]]; then
+		nvidia_pregame
+		xorg_nvidia
+		#nvidia_hashcat
+	# set xorg for AMD cards (issue: 180)
+	elif [ "$drv" == "amdgpu" ]; then
+		xorg_amd
+	# set xorg for Intel cards
+	elif [ "$drv" == "i915" ]; then
+		# set xorg modesetting for Intel cards (issue: 179, 68, 88, 192)
+		if [ "$cardsub" == "v2/3rd" ] || [ "$cardsub" == "HD" ] || [ "$cardsub" == "620" ] || [ "$cardsub" == "530" ] || [ "$cardsub" == "540" ] || [ "$cardsub" == "UHD" ] || [ "$cardsub" == "GT2" ]; then
+			if [ "$(ver2int "$xorg_vcheck")" -gt "$(ver2int "$newgen_xorg")" ]; then
 				# reference: issue #200
 				xorg_modesetting_newgen
 			else
 				xorg_modesetting
 			fi
+		# generic intel
+		else
+			xorg_intel
 		fi
+	# default xorg modesetting
+	else
+		if [ "$(ver2int "$xorg_vcheck")" -gt "$(ver2int "$newgen_xorg")" ]; then
+			# reference: issue #200
+			xorg_modesetting_newgen
+		else
+			xorg_modesetting
+		fi
+	fi
 
-		echo -e "Wrote X11 changes to: $xorg_config_displaylink"
-		chown root: $xorg_config_displaylink
-		chmod 644 $xorg_config_displaylink
-	}
+	echo -e "Wrote X11 changes to: $xorg_config_displaylink"
+	chown root: "$xorg_config_displaylink"
+	chmod 644 "$xorg_config_displaylink"
+}
+
+# post install
+function post_install() {
+	separator
+	echo -e "\nPerforming post install steps\n"
+
+	if [ "$kconfig_exists" == "false" ]; then
+		rm "$kconfig_file"
+	fi
+
+	# fix: issue #42 (dlm.service can't start)
+	# note: for this to work libstdc++6 package needs to be installed from >= Stretch
+	if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ]; then
+		ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /opt/displaylink/libstdc++.so.6
+	fi
+
+	sysinitdaemon=$(sysinitdaemon_get)
+	if [ "$sysinitdaemon" == "systemd" ]; then
+		# Fix inability to enable displaylink-driver.service
+		sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/displaylink-driver.service
+
+		echo "Enable displaylink-driver service"
+		systemctl enable displaylink-driver.service
+	elif [ "$sysinitdaemon" == "sysvinit" ]; then
+		echo -e "Copying init script to /etc/init.d\n"
+		cp "$dir/$init_script" /etc/init.d/
+		chmod +x "/etc/init.d/$init_script"
+		echo "Load evdi at startup"
+		cat > "$evdi_modprobe" <<_EVDI_MODPROBE_
+evdi
+_EVDI_MODPROBE_
+		echo "Enable and start displaylink service"
+		update-rc.d "$init_script" defaults
+		/etc/init.d/$init_script start
+	fi
 
 	# depending on X11 version start modesetting func
-	if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $min_xorg)" ];
-	then
+	if [ "$(ver2int "$xorg_vcheck")" -gt "$(ver2int "$min_xorg")" ]; then
 		echo "Setup DisplayLink xorg.conf depending on graphics card"
 		modesetting
 	else
