@@ -337,58 +337,68 @@ function udl_block() {
 	done
 }
 
+# installs the displaylink driver
 function install() {
 	separator
 	download
 
-	# prep
-	# Check whether prior drivers have been downloaded
-	if [ -d $driver_dir ]
-	then
-		echo "Removing prior: \"$driver_dir\" directory"
-		rm -r $driver_dir
+	local displaylink_driver_dir="${driver_dir}/displaylink-driver-${version}"
+    local installer_script="${displaylink_driver_dir}/displaylink-installer.sh"
+	local build_dir="/lib/modules/$(uname -r)/build"
+
+	# udlfb kernel version check
+	local kernel_check="$(uname -r | grep -Eo '[0-9]+\.[0-9]+')"
+
+	# get init system
+	local init_system="$(get_init_system)"
+
+	# prepare for installation
+	# check if prior drivers have been downloaded
+	if [ -d "$driver_dir" ]; then
+		echo "Removing prior: '$driver_dir' directory"
+		rm -r "$driver_dir"
 	fi
 
-	mkdir $driver_dir
+	mkdir -p "$driver_dir"
 
 	separator
 	echo -e "\nPreparing for install\n"
-	test -d $driver_dir && /bin/rm -Rf $driver_dir
-	unzip -d $driver_dir DisplayLink_Ubuntu_${version}.zip
+	test -d "$driver_dir" && /bin/rm -Rf "$driver_dir"
+	unzip -d "$driver_dir" "DisplayLink_Ubuntu_${version}.zip"
 	chmod +x $driver_dir/displaylink-driver-${version}*.run
 	./$driver_dir/displaylink-driver-${version}*.run --keep --noexec
-	mv displaylink-driver-${version}*/ $driver_dir/displaylink-driver-${version}
-	# get init system
-	init_system=$(get_init_system)
+	mv displaylink-driver-${version}*/ "$displaylink_driver_dir"
 
 	# modify displaylink-installer.sh
-	sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$init_system/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
+	sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$init_system/g" "$installer_script"
 
 	# issue: 227
-	if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "Bunsenlabs" ] || [ "$lsb" == "MX" ] || [ "$lsb" == "Uos" ];
-	then
-		sed -i 's#/lib/modules/$KVER/build/Kconfig#/lib/modules/$KVER/build/scripts/kconfig/conf#g' $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
-		ln -sf /lib/modules/$(uname -r)/build/Makefile /lib/modules/$(uname -r)/build/Kconfig
+	local -r distros=(
+		'BunsenLabs'
+		'Bunsenlabs'
+		'Debian'
+		'Deepin'
+		'Devuan'
+		'Kali'
+		'MX'
+		'Uos'
+	)
+
+	if [[ "${distros[*]/$lsb/}" != "${distros[*]}" ]]; then
+		sed -i 's#/lib/modules/$KVER/build/Kconfig#/lib/modules/$KVER/build/scripts/kconfig/conf#g' "$installer_script"
+		ln -sf "${build_dir}/Makefile" "${build_dir}/Kconfig"
 	fi
 
-	# Patch displaylink-installer.sh to prevent reboot before our script is done.
-	patchName="displaylink-installer.patch"
-	finalPatchPath="$resourcesDir$patchName"
-	patch -Np0 $driver_dir/displaylink-driver-${version}/displaylink-installer.sh <$finalPatchPath
+	# patch displaylink-installer.sh to prevent reboot before the script is done
+	patch -Np0 "$installer_script" < "${resourcesDir}displaylink-installer.patch"
 
 	# run displaylink install
 	echo -e "\nInstalling driver version: $version\n"
-	cd $driver_dir/displaylink-driver-${version}
+	cd "$displaylink_driver_dir"
 	./displaylink-installer.sh install
 
-	# udlfb kernel version check
-	kernel_check="$(uname -r | grep -Eo '[0-9]+\.[0-9]+')"
-
 	# add udl/udlfb to blacklist depending on kernel version (issue #207)
-	if [ "$(ver2int $kernel_check)" -ge "$(ver2int '4.14.9')" ];
-	then
-		udl_block
-	fi
+	[ "$(ver2int "$kernel_check")" -ge "$(ver2int '4.14.9')" ] && udl_block
 }
 
 # issue: 204, 216
