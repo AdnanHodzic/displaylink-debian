@@ -716,70 +716,92 @@ function debug() {
 	separator
 	echo -e "\nStarting Debug ...\n"
 
-	default=N
-	ack=${ack:-$default}
+	local -r default='N'
+	local answer="$default"
 
-	read -p "Did you read Post Installation Guide? https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md [y/N] " ack
-	ack=${ack:-$default}
+	local -r evdi_version_file='/sys/devices/evdi/version'
+	local evdi_version=''
 
-	for letter in "$ack"; do
-		if [[ "$letter" == [Yy] ]];
-		then
-			echo ""
-			continue
-		elif [[ "$letter" == [Nn] ]];
-		then
-			echo -e "\nPlease read Post Installation Guide: https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md\n"
-			exit 1
-		else
-			invalid_option
-		fi
+	local -A subject_urls=(
+		['Post Installation Guide']='https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md'
+		['Troubleshooting most common issues']='https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/common-issues.md'
+	)
+
+	# array contains subject types in their original order
+	local -r subjects=(
+		'Post Installation Guide'
+		'Troubleshooting most common issues'
+	)
+
+	local url=''
+
+	for subject in "${subjects[@]}"; do
+		url="${subject_urls[$subject]}"
+
+		read -p "Did you read ${subject}? ${url} [y/N] " answer
+		answer="${answer:-$default}"
+
+		case "$answer" in
+			'Y'|'y')
+				echo ''
+				continue
+				;;
+
+			'N'|'n')
+				echo -e "\nPlease read ${subject}: ${url}\n"
+				exit 1
+				;;
+
+			*)
+				invalid_option
+				;;
+		esac
 	done
 
-	read -p "Did you read Troubleshooting most common issues? https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/common-issues.md [y/N] " ack
-	ack=${ack:-$default}
-
-	for letter in "$ack"; do
-		if [[ "$letter" == [Yy] ]];
-		then
-			echo -e ""
-			continue
-		elif [[ "$letter" == [Nn] ]];
-		then
-			echo -e "\nPlease read Troubleshooting most common issues: https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/common-issues.md\n"
-			exit 1
-		else
-			invalid_option
-		fi
-	done
-
-	if [ -f /sys/devices/evdi/version ]
-	then
-		evdi_version="$(cat /sys/devices/evdi/version)"
+	if [ -f "$evdi_version_file" ]; then
+		evdi_version="$(cat "$evdi_version_file")"
 	else
-		evdi_version="/sys/devices/evdi/version not found"
+		evdi_version="$evdi_version_file not found"
 	fi
+	
+    # render debug info
+    cat <<_DEBUG_INFO_
+--------------- Linux system info ----------------
 
-	echo -e "--------------- Linux system info ----------------\n"
-	echo -e "Distro: $lsb"
-	echo -e "Release: $codename"
-	echo -e "Kernel: $kernel"
-	echo -e "\n---------------- DisplayLink info ----------------\n"
-	echo -e "Driver version: $sys_driver_version"
-	echo -e "DisplayLink service status: $(displaylink_service_check)"
-	echo -e "EVDI service version: $evdi_version"
-	echo -e "\n------------------ Graphics card -----------------\n"
-	echo -e "Vendor: $graphics_vendor"
-	echo -e "Subsystem: $graphics_subcard"
-	echo -e "VGA: $vga_info"
-	echo -e "VGA (3D): $vga_info_3d"
-	echo -e "X11 version: $xorg_vcheck"
-	get_xconfig_list
-	echo -e "\n-------------- DisplayLink xorg.conf -------------\n"
-	echo -e "File: $xorg_config_displaylink"
-	echo -e "Contents:\n $(cat $xorg_config_displaylink)"
-	echo -e "\n-------------------- Monitors --------------------\n"
-	echo -e "$providers"
+Distro:  $lsb
+Release: $codename
+Kernel:  $kernel
+
+---------------- DisplayLink info ----------------
+
+Driver version:             $sys_driver_version
+DisplayLink service status: $(displaylink_service_check || echo '[SERVICE NOT FOUND]')
+EVDI service version:       $evdi_version
+
+------------------ Graphics card -----------------
+
+Vendor:      $graphics_vendor
+Subsystem:   $graphics_subcard
+VGA:         $vga_info
+VGA (3D):    $vga_info_3d
+X11 version: $xorg_vcheck
+
+_DEBUG_INFO_
+
+	# render xorg config file paths
+    get_xconfig_list
+
+    # render more debug info
+    cat <<_DEBUG_INFO_
+-------------- DisplayLink xorg.conf -------------
+
+File: $xorg_config_displaylink
+$([ -f "$xorg_config_displaylink" ] && echo -e "Contents:\n$(cat $xorg_config_displaylink)" || echo "[CONFIG FILE NOT FOUND]")
+
+-------------------- Monitors --------------------
+
+$providers
+_DEBUG_INFO_
 }
 
 # interactively asks for operation
