@@ -247,25 +247,24 @@ function displaylink_service_check () {
 	esac
 }
 
+# performs post-installation clean-up by removing obsolete/redundant files which can only hamper reinstalls
 function clean_up() {
-	# remove obsolete/redundant files which can only hamper reinstalls
-
 	separator
 	echo -e "\nPerforming clean-up"
+
+	local zip_file="DisplayLink_Ubuntu_$version.zip"
 
 	# go back to displaylink-debian
 	cd - &> /dev/null
 
-	if [ -f "DisplayLink_Ubuntu_$version.zip" ]
-	then
-		echo "Removing redundant: \"DisplayLink_Ubuntu_$version.zip\" file"
-		rm "DisplayLink_Ubuntu_$version.zip"
+	if [ -f "$zip_file" ]; then
+		echo "Removing redundant: '$zip_file' file"
+		rm "$zip_file"
 	fi
 
-	if [ -d $driver_dir ]
-	then
-		echo "Removing redundant: \"$driver_dir\" directory"
-		rm -r $driver_dir
+	if [ -d "$driver_dir" ]; then
+		echo "Removing redundant: '$driver_dir' directory"
+		rm -r "$driver_dir"
 	fi
 }
 
