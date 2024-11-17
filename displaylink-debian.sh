@@ -16,7 +16,7 @@ set -eu
 # set -o pipefail # TODO: Some code still fails this check, fix before enabling.
 IFS=$'\n\t'
 
-kernel_check="$(uname -r | egrep -o '^[0-9]+\.[0-9]+')"
+kernel_check="$(uname -r | grep -Eo '^[0-9]+\.[0-9]+')"
 
 function ver2int {
 	echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
