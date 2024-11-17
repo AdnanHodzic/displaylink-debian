@@ -611,7 +611,7 @@ function modesetting() {
 	chmod 644 "$xorg_config_displaylink"
 }
 
-# post install
+# performs post-installation steps
 function post_install() {
 	separator
 	echo -e "\nPerforming post install steps\n"
@@ -621,29 +621,44 @@ function post_install() {
 
 	# fix: issue #42 (dlm.service can't start)
 	# note: for this to work libstdc++6 package needs to be installed from >= Stretch
-	if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ]; then
-		ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /opt/displaylink/libstdc++.so.6
+	if [[ "$lsb" =~ ^(Debian|Devuan|Kali)$ ]]; then
+		# partially addresses meta issue #931
+		local -r displaylink_dir='/opt/displaylink'
+		[ ! -d "$displaylink_dir" ] && mkdir -p "$displaylink_dir"
+		ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 "$displaylink_dir/libstdc++.so.6"
 	fi
 
-	init_system=$(get_init_system)
-	if [ "$init_system" == "systemd" ]; then
-		# Fix inability to enable displaylink-driver.service
-		sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/displaylink-driver.service
+	case "$(get_init_system)" in
+		'systemd')
+			local -r displaylink_driver_service='/lib/systemd/system/displaylink-driver.service'
+            if [ ! -f "$displaylink_driver_service" ]; then
+                echo -e "DisplayLink driver service not found!\nInstallation failed!\nExiting..."
+                exit 1
+            fi
 
-		echo "Enable displaylink-driver service"
-		systemctl enable displaylink-driver.service
-	elif [ "$init_system" == "sysvinit" ]; then
-		echo -e "Copying init script to /etc/init.d\n"
-		cp "$dir/$init_script" /etc/init.d/
-		chmod +x "/etc/init.d/$init_script"
-		echo "Load evdi at startup"
-		cat > "$evdi_modprobe" <<_EVDI_MODPROBE_
+			# Fix inability to enable displaylink-driver.service
+			sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" "$displaylink_driver_service"
+
+			echo "Enable displaylink-driver service"
+			systemctl enable displaylink-driver.service
+			;;
+
+		'sysvinit')
+			local -r init_script_path="/etc/init.d/${init_script}"
+
+			echo -e "Copying init script to /etc/init.d\n"
+			cp "$dir/$init_script" /etc/init.d/
+			chmod +x "$init_script_path"
+
+			echo "Load evdi at startup"
+			cat > "$evdi_modprobe" <<_EVDI_MODPROBE_
 evdi
 _EVDI_MODPROBE_
-		echo "Enable and start displaylink service"
-		update-rc.d "$init_script" defaults
-		/etc/init.d/$init_script start
-	fi
+			echo "Enable and start displaylink service"
+			update-rc.d "$init_script" defaults
+			"$init_script_path" start
+			;;
+	esac
 
 	# depending on X11 version start modesetting func
 	if [ "$(ver2int "$xorg_vcheck")" -gt "$(ver2int "$min_xorg")" ]; then
