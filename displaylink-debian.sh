@@ -268,25 +268,28 @@ function clean_up() {
 	fi
 }
 
+# called when the driver setup is complete
 function setup_complete() {
-	default=Y
-	ack=${ack:-$default}
+	local default='Y'
+	local reboot_choice="$default"
 
-	read -p "Reboot now? [Y/n] " ack
-	ack=${ack:-$default}
+	read -p "Reboot now? [Y/n] " reboot_choice
+	reboot_choice="${reboot_choice:-$default}"
 
-	for letter in "$ack"; do
-		if [[ "$letter" == [Yy] ]];
-		then
+	case "$reboot_choice" in
+		'y'|'Y')
 			echo "Rebooting ..."
 			reboot
-		elif [[ "$letter" == [Nn] ]];
-		then
-			echo -e "\nReboot postponed, changes won't be applied until reboot"
-		else
+			;;
+
+		'n'|'N')
+			echo -e '\nReboot postponed, changes will not be applied until reboot.'
+			;;
+
+		*)
 			invalid_option
-		fi
-	done
+			;;
+	esac
 }
 
 function download() {
