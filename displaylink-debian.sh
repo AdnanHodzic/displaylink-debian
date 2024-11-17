@@ -234,16 +234,17 @@ function get_init_system() {
 	echo "$init_system"
 }
 
-function displaylink_service_check () {
-    init_system=$(get_init_system)
-    if [ "$init_system" == "systemd" ]
-    then
-        systemctl is-active --quiet displaylink-driver.service && \
-            echo up and running
-    elif [ "$init_system" == "sysvinit" ]
-    then
-        /etc/init.d/$init_script status
-    fi
+# checks if the Displaylink service is running
+function displaylink_service_check () {	
+	case "$(get_init_system)" in
+		'systemd')
+			systemctl is-active --quiet displaylink-driver.service && echo 'up and running'
+			;;
+
+		'sysvinit')
+			"/etc/init.d/${init_script}" status
+			;;
+	esac
 }
 
 function clean_up() {
