@@ -404,7 +404,7 @@ function install() {
 # issue: 204, 216
 function nvidia_hashcat() {
 	echo "Installing hashcat-nvidia, 'contrib non-free' must be enabled in apt sources"
-	apt install -y hashcat-nvidia
+	apt-get install -y hashcat-nvidia
 }
 
 # appends nvidia xrandr specific script code 
