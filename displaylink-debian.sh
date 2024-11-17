@@ -292,27 +292,27 @@ function setup_complete() {
 	esac
 }
 
+# downloads the DisplayLink driver
 function download() {
-	default=y
+	local default='y'
+
 	echo -en "\nPlease read the Software License Agreement available at: \n$dlurl\nDo you accept?: [Y/n]: "
-	read ACCEPT
-	ACCEPT=${ACCEPT:-$default}
-	case $ACCEPT in
-		y*|Y*)
-			echo -e "\nDownloading DisplayLink Ubuntu driver:\n"
-			wget -O DisplayLink_Ubuntu_${version}.zip "${driver_url}"
-			# make sure file is downloaded before continuing
-			if [ $? -ne 0 ]
-			then
-				echo -e "\nUnable to download Displaylink driver\n"
-				exit
-			fi
-			;;
-		*)
-			echo "Can't download the driver without accepting the license agreement!"
-			exit 1
-			;;
-	esac
+	read accept_license_agreement
+	accept_license_agreement=${accept_license_agreement:-$default}
+
+	# exit the script if the user did not accept the software license agreement
+	if [[ ! "$accept_license_agreement" =~ ^(y|Y)$ ]]; then
+		echo "Can't download the driver without accepting the license agreement!"
+		exit 1
+	fi
+
+	echo -e "\nDownloading DisplayLink Ubuntu driver:\n"
+
+	# make sure file is downloaded before continuing
+	if ! wget -O "DisplayLink_Ubuntu_${version}.zip" "${driver_url}"; then
+		echo -e "\nUnable to download Displaylink driver\n"
+		exit
+	fi
 }
 
 # add udlfb to blacklist (issue #207)
