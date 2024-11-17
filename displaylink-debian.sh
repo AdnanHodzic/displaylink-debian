@@ -454,7 +454,7 @@ function modesetting() {
 	cardsub=$(lspci -nnk | grep -i vga -A3|grep Subsystem|cut -d" " -f5)
 
 	# intel displaylink xorg.conf
-	xorg_intel(){
+	function xorg_intel() {
 		cat > $xorg_config_displaylink <<EOL
 Section "Device"
 	Identifier  "Intel"
