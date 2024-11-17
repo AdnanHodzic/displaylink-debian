@@ -28,6 +28,8 @@ DisplayLink drivers tailored to work for most of the Debian based Linux distribu
     ```
 2. Then consult the [Post Install Guide][PostInstall] to make sure everything works as intended.
 
+## Usage
+Run this command to view the help menu: `sudo ./displaylink-debian.sh --help`
 
 ## Troubleshooting and debugging
 
@@ -58,7 +60,7 @@ Before submitting a bug report in the [issue tracker](https://github.com/AdnanHo
   * Zorin
 
   Regardless of which Linux kernel version (>4.15) you're using.
-  
+
   If your distribution or version is not on the list, make sure to include debug information by running: `sudo ./displaylink-debian.sh --debug` and [submit a request to add support for it](https://github.com/AdnanHodzic/displaylink-debian/issues/new).
 
 ## Technical
