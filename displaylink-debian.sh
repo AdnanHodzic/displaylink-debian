@@ -407,7 +407,7 @@ function nvidia_hashcat() {
 	apt-get install -y hashcat-nvidia
 }
 
-# appends nvidia xrandr specific script code 
+# appends nvidia xrandr specific script code (partial)
 function nvidia_xrandr() {
 	cat >> "$1" <<_NVIDIA_XRANDR_SCRIPT_
 
@@ -416,8 +416,9 @@ xrandr --auto
 _NVIDIA_XRANDR_SCRIPT_
 }
 
+# writes nvidia xrandr specific script code (full)
 function nvidia_xrandr_full() {
-	cat >> "$1" <<_NVIDIA_XRANDR_FULL_SCRIPT_
+	cat > "$1" <<_NVIDIA_XRANDR_FULL_SCRIPT_
 #!/bin/sh
 # Xsetup - run as root before the login dialog appears
 
@@ -425,10 +426,9 @@ if [ -e /sbin/prime-offload ]; then
     echo running NVIDIA Prime setup /sbin/prime-offload
     /sbin/prime-offload
 fi
-
-xrandr --setprovideroutputsource modesetting NVIDIA-0
-xrandr --auto
 _NVIDIA_XRANDR_FULL_SCRIPT_
+
+	nvidia_xrandr "$1"
 }
 
 # performs nvidia specific pre-setup operations
