@@ -318,22 +318,23 @@ function download() {
 # add udlfb to blacklist (issue #207)
 function udl_block() {
 	# if necessary create blacklist.conf
-	if [ ! -f $blacklist ]; then
-		touch $blacklist
-	fi
+	[ ! -f "$blacklist" ] && touch "$blacklist"
 
-	if ! grep -Fxq "blacklist udlfb" $blacklist
-	then
-		echo "Adding udlfb to blacklist"
-		echo "blacklist udlfb" >> $blacklist
-	fi
+	local -r blacklist_items=(
+		'udlfb'
+		'udl' # add udl to blacklist (issue #207)
+	)
 
-	# add udl to blacklist (issue #207)
-	if ! grep -Fxq "blacklist udl" $blacklist
-	then
-		echo "Adding udl to blacklist"
-		echo "blacklist udl" >> $blacklist
-	fi
+	for blacklist_item in "${blacklist_items[@]}"; do
+		# skip if item already blacklisted
+		if grep -Fxq "blacklist $blacklist_item" "$blacklist"; then
+			continue
+		fi
+
+		# add item to blacklist
+		echo "Adding $blacklist_item to blacklist"
+		echo "blacklist $blacklist_item" >> "$blacklist"
+	done
 }
 
 function install() {
