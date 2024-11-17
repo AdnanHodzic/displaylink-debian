@@ -669,21 +669,29 @@ _EVDI_MODPROBE_
 	fi
 }
 
-# uninstall
+# uninstalls the displaylink driver
 function uninstall() {
 	separator
 	echo -e "\nUninstalling ...\n"
 
 	# displaylink-installer uninstall
-	if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "Bunsenlabs" ] || [ "$lsb" == "Uos" ];
-	then
-		if [ -f /lib/modules/$(uname -r)/build/Kconfig ]; then
-			rm /lib/modules/$(uname -r)/build/Kconfig
-		fi
+	local -r kconfig_file="/lib/modules/$(uname -r)/build/Kconfig"
+
+	local -r distros=(
+		'BunsenLabs'
+		'Bunsenlabs'
+		'Debian'
+		'Devuan'
+		'Deepin'
+		'Kali'
+		'Uos'
+	)
+
+	if [[ "${distros[*]/$lsb/}" != "${distros[*]}" ]] && [ -f "$kconfig_file" ]; then
+		rm "$kconfig_file"
 	fi
 
-	if [ "$(get_init_system)" == "sysvinit" ]
-	then
+	if [ "$(get_init_system)" == "sysvinit" ]; then
 		update-rc.d "$init_script" remove
 		rm -f "/etc/init.d/$init_script"
 		rm -f "$evdi_modprobe"
@@ -693,16 +701,14 @@ function uninstall() {
 	bash /opt/displaylink/displaylink-installer.sh uninstall && 2>&1>/dev/null
 
 	# remove modesetting file
-	if [ -f $xorg_config_displaylink ]
-	then
+	if [ -f "$xorg_config_displaylink" ]; then
 		echo "Removing Displaylink Xorg config file"
-		rm $xorg_config_displaylink
+		rm "$xorg_config_displaylink"
 	fi
 
 	# delete udl/udlfb from blacklist (issue #207)
 	sed -i '/blacklist udlfb/d' $blacklist
 	sed -i '/blacklist udl/d' $blacklist
-
 }
 
 # debug: get system information for issue debug
