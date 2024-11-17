@@ -92,17 +92,17 @@ function root_check() {
 }
 
 # list all xorg related configs
-function xconfig_list() {
-	x11_etc="/etc/X11/"
+function get_xconfig_list() {
+	local x11_etc='/etc/X11/'
 
-	if [ ! -d "${x11_etc}" ] ; then # No directory found
-		echo "X11 configs: None"
+	# No directory found
+	if [ ! -d "$x11_etc" ]; then
+		echo 'X11 configs: None'
 		return 0
 	fi
 
-	count_conf_in_etc=$(find $x11_etc -maxdepth 2 -name "*.conf" | wc -l)
-	if [ $count_conf_in_etc -gt 0 ]; then
-		find $x11_etc -type f -name "*.conf" | xargs echo "X11 configs:"
+	if [ "$(find "$x11_etc" -maxdepth 2 -name "*.conf" | wc -l)" -gt 0 ]; then
+		find "$x11_etc" -type f -name "*.conf" | xargs echo 'X11 configs:'
 	fi
 }
 
@@ -753,7 +753,7 @@ function debug() {
 	echo -e "VGA: $vga_info"
 	echo -e "VGA (3D): $vga_info_3d"
 	echo -e "X11 version: $xorg_vcheck"
-	xconfig_list
+	get_xconfig_list
 	echo -e "\n-------------- DisplayLink xorg.conf -------------\n"
 	echo -e "File: $xorg_config_displaylink"
 	echo -e "Contents:\n $(cat $xorg_config_displaylink)"
