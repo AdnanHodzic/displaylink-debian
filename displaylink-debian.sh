@@ -833,17 +833,59 @@ function ask_operation() {
 Select a key: [i/d/r/u/q]: " answer
 }
 
+# Prints the help menu to the terminal.
+function show_help_menu() {
+	local -r omit_script_description="$1"
+
+	if [ -z "$omit_script_description" ] || [ "$omit_script_description" = false ]; then
+		echo "$script_description" 
+	else
+		separator
+		echo -e "\nViewing help menu..."
+		separator
+	fi
+
+    cat <<_HELP_TEXT_
+NOTES:
+    - This script must be executed by the root user.
+    - All options are optional.
+    - If no options are specfied, then an options menu will be presented.
+
+USAGE:
+    sudo $0 [OPTIONS]
+
+OPTIONS:
+    --debug
+        Prints debug information to the terminal.
+
+    --help
+        Prints this help menu.
+
+    --install
+        Installs the DisplayLink driver.
+
+    --reinstall
+        Re-installs the DisplayLink driver.
+
+    --uninstall
+        Uninstalls the DisplayLink driver.
+
+_HELP_TEXT_
+}
+
 # script entry-point
 function main() {
     # check if script is executed by root user
 	root_check
 
+	local interactive_menu=false
 	local script_option=''
 
     # render interactive menu if no script parameter is specified
 	if [[ "$#" -lt 1 ]]; then
-		cat <<_INTERACTIVE_MENU_HEADER_
+		interactive_menu=true
 
+		cat <<_INTERACTIVE_MENU_HEADER_
 $script_description
 Options:
 _INTERACTIVE_MENU_HEADER_
@@ -851,26 +893,34 @@ _INTERACTIVE_MENU_HEADER_
         read -p "
 [I]nstall
 [D]ebug
+[H]elp
 [R]e-install
 [U]ninstall
 [Q]uit
 
-Select a key: [i/d/r/u/q]: " script_option
+Select a key: [i/d/h/r/u/q]: " script_option
 
 	# parse script parameters
 	else
 		case "${1}" in
+			'--debug')
+				script_option='d'
+				;;
+
+			'--help')
+				script_option='h'
+				;;
+
 			'--install')
 				script_option='i'
 				;;
-			'--uninstall')
-				script_option='u'
-				;;
+
 			'--reinstall')
 				script_option='r'
 				;;
-			'--debug')
-				script_option='d'
+
+			'--uninstall')
+				script_option='u'
 				;;
 			*)
 				script_option='n'
@@ -893,6 +943,13 @@ After reboot, make sure to consult post-install guide! https://github.com/AdnanH
 			separator
 			echo ''
 			;;
+
+        # Help
+        # > Prints the script help menu to the terminal.
+        'h')
+            show_help_menu "$interactive_menu"
+            exit 0
+            ;;
 		
         # Install
         # > Installs the DisplayLink driver.
