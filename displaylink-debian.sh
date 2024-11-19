@@ -811,93 +811,104 @@ function ask_operation() {
 	echo -e "* Debian, Ubuntu, Elementary OS, Mint, Kali, Deepin and many more!"
 	echo -e "* Full list of all supported platforms: http://bit.ly/2zrwz2u"
 	echo -e "* When submitting a new issue, include Debug information"
-	echo -e "\nOptions:\n"
-	read -p "[I]nstall
-	[D]ebug
-	[R]e-install
-	[U]ninstall
-	[Q]uit
+	echo -e "\nOptions:"
+	read -p "
+[I]nstall
+[D]ebug
+[R]e-install
+[U]ninstall
+[Q]uit
 
-	Select a key: [i/d/r/u/q]: " answer
+Select a key: [i/d/r/u/q]: " answer
 }
 
-root_check
+# script entry-point
+function main() {
+    # check if script is executed by root user
+	root_check
 
-if [[ "$#" -lt 1 ]];
-then
-  ask_operation
-else
-  case "${1}" in
-    "--install")
-        answer="i"
-        ;;
-    "--uninstall")
-        answer="u"
-        ;;
-    "--reinstall")
-        answer="r"
-        ;;
-    "--debug")
-        answer="d"
-        ;;
-    *)
-        answer="n"
-        ;;
-  esac
-fi
+	local answer=''
 
-if [[ $answer == [Ii] ]];
-then
-	distro_check
-	pre_install
-	install
-	post_install
-	clean_up
-	separator
-	echo -e "\nInstall complete, please reboot to apply the changes"
-	echo -e "After reboot, make sure to consult post-install guide! https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md"
-	setup_complete
-	separator
-	echo ""
-elif [[ $answer == [Uu] ]];
-then
-	distro_check
-	uninstall
-	clean_up
-	separator
-	echo -e "\nUninstall complete, please reboot to apply the changes"
-	setup_complete
-	separator
-	echo ""
-elif [[ $answer == [Rr] ]];
-then
-	distro_check
-	uninstall
-	clean_up
-	distro_check
-	pre_install
-	install
-	post_install
-	clean_up
-	separator
-	echo -e "\nInstall complete, please reboot to apply the changes"
-	echo -e "After reboot, make sure to consult post-install guide! https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md"
-	setup_complete
-	separator
-	echo ""
-elif [[ $answer == [Dd] ]];
-then
-	debug
-	separator
-	echo -e "\nUse this information when submitting an issue (http://bit.ly/2GLDlpY)"
-	separator
-	echo ""
-elif [[ $answer == [Qq] ]];
-then
-	separator
-	echo ""
-	exit 0
-else
-	echo -e "\nWrong key, aborting ...\n"
-	exit 1
-fi
+	if [[ "$#" -lt 1 ]];
+	then
+		ask_operation
+	else
+		case "${1}" in
+			"--install")
+				answer="i"
+				;;
+			"--uninstall")
+				answer="u"
+				;;
+			"--reinstall")
+				answer="r"
+				;;
+			"--debug")
+				answer="d"
+				;;
+			*)
+				answer="n"
+				;;
+		esac
+	fi
+
+	if [[ $answer == [Ii] ]];
+	then
+		distro_check
+		pre_install
+		install
+		post_install
+		clean_up
+		separator
+		echo -e "\nInstall complete, please reboot to apply the changes"
+		echo -e "After reboot, make sure to consult post-install guide! https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md"
+		setup_complete
+		separator
+		echo ""
+	elif [[ $answer == [Uu] ]];
+	then
+		distro_check
+		uninstall
+		clean_up
+		separator
+		echo -e "\nUninstall complete, please reboot to apply the changes"
+		setup_complete
+		separator
+		echo ""
+	elif [[ $answer == [Rr] ]];
+	then
+		distro_check
+		uninstall
+		clean_up
+		distro_check
+		pre_install
+		install
+		post_install
+		clean_up
+		separator
+		echo -e "\nInstall complete, please reboot to apply the changes"
+		echo -e "After reboot, make sure to consult post-install guide! https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md"
+		setup_complete
+		separator
+		echo ""
+	elif [[ $answer == [Dd] ]];
+	then
+		debug
+		separator
+		echo -e "\nUse this information when submitting an issue (http://bit.ly/2GLDlpY)"
+		separator
+		echo ""
+	elif [[ $answer == [Qq] ]];
+	then
+		separator
+		echo ""
+		exit 0
+	else
+		echo -e "\nWrong key, aborting ...\n"
+		exit 1
+	fi
+}
+
+# run script entry-point
+main "$@"
+
