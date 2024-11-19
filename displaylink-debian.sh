@@ -18,9 +18,13 @@ IFS=$'\n\t'
 
 kernel_check="$(uname -r | grep -Eo '^[0-9]+\.[0-9]+')"
 
-function ver2int {
-	echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
-}
+# URLs
+synaptics_url="https://www.synaptics.com"
+displaylink_driver_url="${synaptics_url}/products/displaylink-graphics/downloads/ubuntu"
+platform_list_url='http://bit.ly/2zrwz2u'
+repo_issue_url='http://bit.ly/2GLDlpY'
+repo_url='https://github.com/AdnanHodzic/displaylink-debian'
+post_install_guide_url="${repo_url}/blob/master/docs/post-install-guide.md"
 
 # script description text used when rendering the script help menu or interactive script menu
 script_description="
@@ -29,21 +33,21 @@ script_description="
 DisplayLink driver installer for Debian and Ubuntu based Linux distributions:
 
 * Debian, Ubuntu, Elementary OS, Mint, Kali, Deepin and many more!
-* Full list of all supported platforms: http://bit.ly/2zrwz2u
+* Full list of all supported platforms: $platform_list_url
 * When submitting a new issue, include Debug information
 "
 
 # Get latest versions
-versions=$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 2 | perl -pe '($_)=/([0-9]+([.][0-9]+)+(\ Beta)*)/; exit if $. > 1;')
+versions=$(wget -q -O - "$displaylink_driver_url" | grep "<p>Release: " | head -n 2 | perl -pe '($_)=/([0-9]+([.][0-9]+)+(\ Beta)*)/; exit if $. > 1;')
 # if versions contains "Beta", try to download previous version
 if [[ $versions =~ Beta ]]; then
-    version=$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 2 | perl -pe '($_)=/([0-9]+([.][0-9]+)+(?!\ Beta))/; exit if $. > 1;')
-    dlurl="https://www.synaptics.com/$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep -B 2 $version'-Release' | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
-    driver_url="https://www.synaptics.com/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
+    version=$(wget -q -O - "$displaylink_driver_url" | grep "<p>Release: " | head -n 2 | perl -pe '($_)=/([0-9]+([.][0-9]+)+(?!\ Beta))/; exit if $. > 1;')
+    dlurl="${synaptics_url}/$(wget -q -O - "$displaylink_driver_url" | grep -B 2 $version'-Release' | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
+    driver_url="${synaptics_url}/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
 else
-    version=`wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 1 | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/; exit if $. > 1;'`
-    dlurl="https://www.synaptics.com/$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep -B 2 $version'-Release' | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
-    driver_url="https://www.synaptics.com/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
+    version=`wget -q -O - "$displaylink_driver_url" | grep "<p>Release: " | head -n 1 | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/; exit if $. > 1;'`
+    dlurl="${synaptics_url}$(wget -q -O - "$displaylink_driver_url" | grep -B 2 $version'-Release' | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
+    driver_url="${synaptics_url}/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
 fi
 driver_dir=$version
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/" && pwd )"
@@ -196,9 +200,9 @@ function distro_check() {
 ---------------------------------------------------------------
 
 Unsuported platform: $platform
-Full list of all supported platforms: http://bit.ly/2zrwz2u
+Full list of all supported platforms: $platform_list_url
 This tool is Open Source and feel free to extend it
-GitHub repo: https://github.com/AdnanHodzic/displaylink-debian/
+GitHub repo: $repo_url
 
 ---------------------------------------------------------------
 
@@ -346,6 +350,11 @@ function udl_block() {
 		echo "Adding $blacklist_item to blacklist"
 		echo "blacklist $blacklist_item" >> "$blacklist"
 	done
+}
+
+# returns the integer representation of the specified version string
+function ver2int {
+	echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }'
 }
 
 # installs the displaylink driver
@@ -734,8 +743,8 @@ function debug() {
 	local evdi_version=''
 
 	local -A subject_urls=(
-		['Post Installation Guide']='https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md'
-		['Troubleshooting most common issues']='https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/common-issues.md'
+		['Post Installation Guide']="$post_install_guide_url"
+		['Troubleshooting most common issues']="${repo_url}/blob/master/docs/common-issues.md"
 	)
 
 	# array contains subject types in their original order
@@ -913,7 +922,7 @@ Select a key: [i/d/h/r/u/q]: " script_option
 	local -r installation_completed_message="
 
 Installation completed, please reboot to apply the changes.
-After reboot, make sure to consult post-install guide! https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md"
+After reboot, make sure to consult post-install guide! $post_install_guide_url"
 
 	case "$script_option" in
         # Debug
@@ -921,7 +930,7 @@ After reboot, make sure to consult post-install guide! https://github.com/AdnanH
 		'd'|'D')
 			debug
 			separator
-			echo -e "\nUse this information when submitting an issue (http://bit.ly/2GLDlpY)"
+			echo -e "\nUse this information when submitting an issue ($repo_issue_url)"
 			separator
 			echo ''
 			;;
