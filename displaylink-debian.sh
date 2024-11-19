@@ -22,6 +22,17 @@ function ver2int {
 	echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
 }
 
+# script description text used when rendering the script help menu or interactive script menu
+script_description="
+--------------------------- displaylink-debian -------------------------------
+
+DisplayLink driver installer for Debian and Ubuntu based Linux distributions:
+
+* Debian, Ubuntu, Elementary OS, Mint, Kali, Deepin and many more!
+* Full list of all supported platforms: http://bit.ly/2zrwz2u
+* When submitting a new issue, include Debug information
+"
+
 # Get latest versions
 versions=$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 2 | perl -pe '($_)=/([0-9]+([.][0-9]+)+(\ Beta)*)/; exit if $. > 1;')
 # if versions contains "Beta", try to download previous version
@@ -827,86 +838,115 @@ function main() {
     # check if script is executed by root user
 	root_check
 
-	local answer=''
+	local script_option=''
 
-	if [[ "$#" -lt 1 ]];
-	then
-		ask_operation
+    # render interactive menu if no script parameter is specified
+	if [[ "$#" -lt 1 ]]; then
+		cat <<_INTERACTIVE_MENU_HEADER_
+
+$script_description
+Options:
+_INTERACTIVE_MENU_HEADER_
+
+        read -p "
+[I]nstall
+[D]ebug
+[R]e-install
+[U]ninstall
+[Q]uit
+
+Select a key: [i/d/r/u/q]: " script_option
+
+	# parse script parameters
 	else
 		case "${1}" in
-			"--install")
-				answer="i"
+			'--install')
+				script_option='i'
 				;;
-			"--uninstall")
-				answer="u"
+			'--uninstall')
+				script_option='u'
 				;;
-			"--reinstall")
-				answer="r"
+			'--reinstall')
+				script_option='r'
 				;;
-			"--debug")
-				answer="d"
+			'--debug')
+				script_option='d'
 				;;
 			*)
-				answer="n"
+				script_option='n'
 				;;
 		esac
 	fi
 
-	if [[ $answer == [Ii] ]];
-	then
-		distro_check
-		pre_install
-		install
-		post_install
-		clean_up
-		separator
-		echo -e "\nInstall complete, please reboot to apply the changes"
-		echo -e "After reboot, make sure to consult post-install guide! https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md"
-		setup_complete
-		separator
-		echo ""
-	elif [[ $answer == [Uu] ]];
-	then
-		distro_check
-		uninstall
-		clean_up
-		separator
-		echo -e "\nUninstall complete, please reboot to apply the changes"
-		setup_complete
-		separator
-		echo ""
-	elif [[ $answer == [Rr] ]];
-	then
-		distro_check
-		uninstall
-		clean_up
-		distro_check
-		pre_install
-		install
-		post_install
-		clean_up
-		separator
-		echo -e "\nInstall complete, please reboot to apply the changes"
-		echo -e "After reboot, make sure to consult post-install guide! https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md"
-		setup_complete
-		separator
-		echo ""
-	elif [[ $answer == [Dd] ]];
-	then
-		debug
-		separator
-		echo -e "\nUse this information when submitting an issue (http://bit.ly/2GLDlpY)"
-		separator
-		echo ""
-	elif [[ $answer == [Qq] ]];
-	then
-		separator
-		echo ""
-		exit 0
-	else
-		echo -e "\nWrong key, aborting ...\n"
-		exit 1
-	fi
+	local -r installation_completed_message="
+
+Installation completed, please reboot to apply the changes.
+After reboot, make sure to consult post-install guide! https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md"
+
+	case "$script_option" in
+        # Debug
+        # > Prints debug information (system info, driver info, etc) to the terminal.
+		'd'|'D')
+			debug
+			separator
+			echo -e "\nUse this information when submitting an issue (http://bit.ly/2GLDlpY)"
+			separator
+			echo ''
+			;;
+		
+        # Install
+        # > Installs the DisplayLink driver.
+        'i'|'I')
+			distro_check
+			pre_install
+			install
+			post_install
+			clean_up
+			separator
+			echo "$installation_completed_message"
+			setup_complete
+			separator
+			echo ''
+			;;
+
+        # Re-Install
+        # > Re-installs the DisplayLink driver.
+        'r'|'R')
+			distro_check
+			uninstall
+			clean_up
+			distro_check
+			pre_install
+			install
+			post_install
+			clean_up
+			separator
+			echo "$installation_completed_message"
+			setup_complete
+			separator
+			echo ''
+			;;
+
+        # Uninstall
+        # > Uninstalls the DisplayLink driver.
+        'u'|'U')
+			distro_check
+			uninstall
+			clean_up
+			separator
+			echo -e "\nUninstall complete, please reboot to apply the changes."
+			setup_complete
+			separator
+			echo ''
+			;;
+
+        # Unknown option
+        *)
+            echo -e '\nUnknown option selected.  Exiting...'
+            echo ''
+            exit 1
+            ;;
+	esac
 }
 
 # run script entry-point
