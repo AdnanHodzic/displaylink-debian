@@ -815,24 +815,6 @@ $providers
 _DEBUG_INFO_
 }
 
-# interactively asks for operation
-function ask_operation() {
-	echo -e "\n--------------------------- displaylink-debian -------------------------------"
-	echo -e "\nDisplayLink driver installer for Debian and Ubuntu based Linux distributions:\n"
-	echo -e "* Debian, Ubuntu, Elementary OS, Mint, Kali, Deepin and many more!"
-	echo -e "* Full list of all supported platforms: http://bit.ly/2zrwz2u"
-	echo -e "* When submitting a new issue, include Debug information"
-	echo -e "\nOptions:"
-	read -p "
-[I]nstall
-[D]ebug
-[R]e-install
-[U]ninstall
-[Q]uit
-
-Select a key: [i/d/r/u/q]: " answer
-}
-
 # Prints the help menu to the terminal.
 function show_help_menu() {
 	local -r omit_script_description="$1"
