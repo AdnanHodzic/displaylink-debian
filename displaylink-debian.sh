@@ -745,6 +745,7 @@ function uninstall() {
 	echo -e '\nUninstalling ...\n'
 
 	# displaylink-installer uninstall
+	local -r installer_script="${opt_displaylink_dir}/displaylink-installer.sh"
 
 	local -r distros=(
 		'BunsenLabs'
@@ -766,8 +767,13 @@ function uninstall() {
 		rm -f "$evdi_modprobe"
 	fi
 
-	# run unintsall script
-	bash /opt/displaylink/displaylink-installer.sh uninstall && 2>&1>/dev/null
+	# run uninstall script if it exists
+	if [ ! -f "$installer_script" ]; then
+		echo -e "\nDisplayLink installer script not found: ${installer_script}\nAborting ..."
+		exit 1
+	fi
+
+	bash "$installer_script" uninstall && 2>&1>/dev/null
 
 	# remove modesetting file
 	if [ -f "$xorg_config_displaylink" ]; then
