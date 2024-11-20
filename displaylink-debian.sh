@@ -338,7 +338,7 @@ function download() {
 	accept_license_agreement=${accept_license_agreement:-$default}
 
 	# exit the script if the user did not accept the software license agreement
-	if [[ ! "$accept_license_agreement" =~ ^(y|Y)$ ]]; then
+	if [[ ! "$accept_license_agreement" =~ ^[yY]$ ]]; then
 		echo 'Cannot download the driver without accepting the license agreement!'
 		exit 1
 	fi
@@ -945,7 +945,7 @@ Select a key: [i/d/h/r/u/q]: " script_option
 	fi
 
 	# exit early if the user decided to quit the script
-	[[ "$script_option" =~ ^(q|Q)$ ]] && echo -e '\nExiting...\n' && exit 0
+	[[ "$script_option" =~ ^[qQ]$ ]] && echo -e '\nExiting...\n' && exit 0
 
 	local -r installation_completed_message="
 
