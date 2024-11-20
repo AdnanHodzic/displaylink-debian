@@ -35,9 +35,6 @@ DisplayLink driver installer for Debian and Ubuntu based Linux distributions:
 * When submitting a new issue, include Debug information
 "
 
-dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/" && pwd )"
-resources_dir="$(pwd)/resources/"
-
 # globalvars
 lsb="$(lsb_release -is)"
 codename="$(lsb_release -cs)"
@@ -57,11 +54,44 @@ newgen_xorg=1.19.6
 init_script='displaylink.sh'
 evdi_modprobe='/etc/modules-load.d/evdi.conf'
 kconfig_file="/lib/modules/${kernel_release}/build/Kconfig"
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/" && pwd )"
+resources_dir="$(pwd)/resources/"
 opt_displaylink_dir='/opt/displaylink'
 etc_init_dir='/etc/init.d'
 
 # Using modules-load.d should always be preferred to 'modprobe evdi' in start
 # command
+
+# retrieves the system init daemon name
+# TODO: find a proper way to detect init daemon as opposed to relying on LSB and codename
+function get_system_init_daemon() {
+	local init_system=''
+
+	case "$lsb" in
+		'Devuan')
+			init_system='sysvinit'
+			;;
+
+		'elementary OS')
+			[ "$codename" == 'freya' ] && init_system='upstart'
+			;;
+
+		'Ubuntu')
+			[ "$codename" == 'trusty' ] && init_system='upstart'
+			;;
+	esac
+
+	if [ -z "$init_system" ] && [[ "$lsb" =~ elementary ]] && [ "$codename" == 'freya' ]; then
+		init_system='upstart'
+	fi
+
+	# if init system not detected, then fallback to systemd
+	[ -z "$init_system" ] && init_system='systemd'
+
+	echo "$init_system"
+}
+
+system_init_daemon="$(get_system_init_daemon)"
 
 # creates a backup of a specified file
 function backup_file() {
@@ -254,37 +284,9 @@ function pre_install() {
 	fi
 }
 
-# retrieves the init system name
-function get_init_system() {
-	local init_system=''
-
-	case "$lsb" in
-		'Devuan')
-			init_system='sysvinit'
-			;;
-
-		'elementary OS')
-			[ "$codename" == 'freya' ] && init_system='upstart'
-			;;
-
-		'Ubuntu')
-			[ "$codename" == 'trusty' ] && init_system='upstart'
-			;;
-	esac
-
-	if [ -z "$init_system" ] && [[ "$lsb" =~ elementary ]] && [ "$codename" == 'freya' ]; then
-		init_system='upstart'
-	fi
-
-	# if init system not detected, then fallback to systemd
-	[ -z "$init_system" ] && init_system='systemd'
-
-	echo "$init_system"
-}
-
 # checks if the Displaylink service is running
 function displaylink_service_check () {
-	case "$(get_init_system)" in
+	case "$system_init_daemon" in
 		'systemd')
 			systemctl is-active --quiet displaylink-driver.service && echo 'up and running'
 			;;
@@ -420,9 +422,6 @@ function install() {
 	# udlfb kernel version check
 	local -r kernel_version="$(echo "$kernel_release" | grep -Eo '[0-9]+\.[0-9]+')"
 
-	# get init system
-	local -r init_system="$(get_init_system)"
-
 	# prepare for installation
 	# check if prior drivers have been downloaded
 	if [ -d "$driver_dir" ]; then
@@ -441,7 +440,7 @@ function install() {
 	mv displaylink-driver-${version}*/ "$displaylink_driver_dir"
 
 	# modify displaylink-installer.sh
-	sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$init_system/g" "$installer_script"
+	sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$system_init_daemon/g" "$installer_script"
 
 	# issue: 227
 	local -r distros=(
@@ -695,7 +694,7 @@ function post_install() {
 		ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 "${opt_displaylink_dir}/libstdc++.so.6"
 	fi
 
-	case "$(get_init_system)" in
+	case "$system_init_daemon" in
 		'systemd')
 			# partially addresses meta issue #931
 			local -r displaylink_driver_service='/lib/systemd/system/displaylink-driver.service'
@@ -761,7 +760,7 @@ function uninstall() {
 		rm "$kconfig_file"
 	fi
 
-	if [ "$(get_init_system)" == 'sysvinit' ]; then
+	if [ "$system_init_daemon" == 'sysvinit' ]; then
 		update-rc.d "$init_script" remove
 		rm -f "${etc_init_dir}/${init_script}"
 		rm -f "$evdi_modprobe"
