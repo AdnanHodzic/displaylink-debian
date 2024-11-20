@@ -74,6 +74,25 @@ kconfig_file="/lib/modules/$kernel/build/Kconfig"
 # Using modules-load.d should always be preferred to 'modprobe evdi' in start
 # command
 
+# creates a backup of a specified file
+function backup_file() {
+	local -r file_name="$1"
+
+	if [ -z "$file_name" ]; then
+		echo -e '\nFile must be specified for backup.  Skipping backup...'
+		return 1
+	fi
+
+	if [ ! -f "$file_name" ]; then
+		echo -e "\nFile does not exist: $file_name  Skipping backup..."
+		return 1
+	fi
+
+	mv "$file_name" "${file_name}.org.bak"
+	echo -e "\nMade backup of: $file_name file"
+	echo -e "\nLocation: ${file_name}.org.bak"
+}
+
 # writes a text separator line to the terminal
 function separator() {
 	echo -e '\n-------------------------------------------------------------------'
@@ -471,9 +490,7 @@ function nvidia_pregame() {
 
 	# make necessary changes to Xsetup
 	if ! grep -q 'setprovideroutputsource modesetting' "$xsetup_loc"; then
-		mv "$xsetup_loc" "${xsetup_loc}.org.bak"
-		echo -e "\nMade backup of: $xsetup_loc file"
-		echo -e "\nLocation: ${xsetup_loc}.org.bak"
+		backup_file "$xsetup_loc"
 		nvidia_xrandr_partial "$xsetup_loc"
 		chmod +x "$xsetup_loc"
 		echo -e "Wrote changes to $xsetup_loc"
@@ -491,9 +508,7 @@ function nvidia_pregame() {
 		[ ! -f "$config_file" ] && continue
 
 		# backup config file
-		mv "$config_file" "${config_file}.org.bak"
-		echo -e "\nMade backup of: $config_file file"
-		echo -e "\nLocation: ${config_file}.org.bak"
+		backup_file "$config_file"
 	done
 }
 
