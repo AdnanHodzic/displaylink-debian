@@ -58,6 +58,7 @@ dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/" && pwd )"
 resources_dir="$(pwd)/resources/"
 opt_displaylink_dir='/opt/displaylink'
 etc_init_dir='/etc/init.d'
+evdi_version_file='/sys/devices/evdi/version'
 
 # Using modules-load.d should always be preferred to 'modprobe evdi' in start
 # command
@@ -354,6 +355,7 @@ function setup_complete() {
 # downloads the DisplayLink driver
 function download() {
 	local -r version="$1"
+	local -r force_accept="$2"
 
 	local -r default='y'
 	local accept_license_agreement="$default"
@@ -361,14 +363,16 @@ function download() {
 	local -r download_url="${synaptics_url}/$(wget -q -O - "$displaylink_driver_url" | grep -B 2 "${version}-Release" | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
 	local -r driver_url="${synaptics_url}/$(wget -q -O - "$download_url" | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
 
-	echo -en "\nPlease read the Software License Agreement available at: \n${download_url}\nDo you accept?: [Y/n]: "
-	read accept_license_agreement
-	accept_license_agreement=${accept_license_agreement:-$default}
+	if [ "$force_accept" = false ]; then
+		echo -en "\nPlease read the Software License Agreement available at: \n${download_url}\nDo you accept?: [Y/n]: "
+		read accept_license_agreement
+		accept_license_agreement=${accept_license_agreement:-$default}
 
-	# exit the script if the user did not accept the software license agreement
-	if [[ ! "$accept_license_agreement" =~ ^[yY]$ ]]; then
-		echo 'Cannot download the driver without accepting the license agreement!'
-		exit 1
+		# exit the script if the user did not accept the software license agreement
+		if [[ ! "$accept_license_agreement" =~ ^[yY]$ ]]; then
+			echo 'Cannot download the driver without accepting the license agreement!'
+			exit 1
+		fi
 	fi
 
 	echo -e '\nDownloading DisplayLink Ubuntu driver:\n'
@@ -411,9 +415,11 @@ function ver2int {
 function install() {
 	local -r version="$1"
 	local -r driver_dir="$2"
+	local -r default_accept=false
+	local -r force_accept="${3-:$default_accept}"
 
 	separator
-	download "$version"
+	download "$version" "$force_accept"
 
 	local -r displaylink_driver_dir="${driver_dir}/displaylink-driver-${version}"
     local -r installer_script="${displaylink_driver_dir}/displaylink-installer.sh"
@@ -787,49 +793,52 @@ function uninstall() {
 
 # debug: get system information for issue debug
 function debug() {
+    local -r default_accept=false
+    local -r force_accept="${1:-$default_accept}"
+
 	separator
 	echo -e '\nStarting Debug ...\n'
 
-	local -r default='N'
-	local answer="$default"
+	if [ "$force_accept" = false ]; then
+		local -r default='N'
+		local answer="$default"
 
-	local -r evdi_version_file='/sys/devices/evdi/version'
+		local -A subject_urls=(
+			['Post Installation Guide']="$post_install_guide_url"
+			['Troubleshooting most common issues']="${repo_url}/blob/master/docs/common-issues.md"
+		)
 
-	local -A subject_urls=(
-		['Post Installation Guide']="$post_install_guide_url"
-		['Troubleshooting most common issues']="${repo_url}/blob/master/docs/common-issues.md"
-	)
+		# array contains subject types in their original order
+		local -r subjects=(
+			'Post Installation Guide'
+			'Troubleshooting most common issues'
+		)
 
-	# array contains subject types in their original order
-	local -r subjects=(
-		'Post Installation Guide'
-		'Troubleshooting most common issues'
-	)
+		local url=''
 
-	local url=''
+		for subject in "${subjects[@]}"; do
+			url="${subject_urls[$subject]}"
 
-	for subject in "${subjects[@]}"; do
-		url="${subject_urls[$subject]}"
+			read -p "Did you read ${subject}? ${url} [y/N] " answer
+			answer="${answer:-$default}"
 
-		read -p "Did you read ${subject}? ${url} [y/N] " answer
-		answer="${answer:-$default}"
+			case "$answer" in
+				[yY])
+					echo ''
+					continue
+					;;
 
-		case "$answer" in
-			[yY])
-				echo ''
-				continue
-				;;
+				[nN])
+					echo -e "\nPlease read ${subject}: ${url}\n"
+					exit 1
+					;;
 
-			[nN])
-				echo -e "\nPlease read ${subject}: ${url}\n"
-				exit 1
-				;;
-
-			*)
-				invalid_option
-				;;
-		esac
-	done
+				*)
+					invalid_option
+					;;
+			esac
+		done
+	fi
 
 	local -r evdi_version="$(
 		[ -f "$evdi_version_file" ] && \
@@ -906,6 +915,12 @@ OPTIONS:
     -d,  --debug
         Prints debug information to the terminal.
 
+    -f,  --force
+        >> USE WITH CAUTION! <<
+            Skips all questions and accepts all license agreements.
+            Works with the --debug, --install, and --reinstall options.
+            Does not work with the options menu!
+
     -h,  --help
         Prints this help menu.
 
@@ -924,6 +939,7 @@ _HELP_TEXT_
 # script entry-point
 function main() {
 	local interactive_menu=false
+	local force_accept=false
 	local script_option=''
 
     # render interactive menu if no script parameter is specified
@@ -947,30 +963,53 @@ Select a key: [i/d/h/r/u/q]: " script_option
 
 	# parse script parameters
 	else
-		case "${1}" in
-			'-d'|'--debug')
-				script_option='d'
-				;;
+		while [ "$#" -gt 0 ]; do
+			# process parameter if script option is already set
+			if [ -n "$script_option" ]; then
+				# process --force flag
+				[[ "$1" =~ ^-(f|-force)$ ]] && force_accept=true
 
-			'-h'|'--help')
-				script_option='h'
-				;;
+				# shift pass current parameter because script option is already set
+				shift
+				continue
+			fi
 
-			'-i'|'--install')
-				script_option='i'
-				;;
+			case "$1" in
+				'-d'|'--debug')
+					script_option='d'
+					shift
+					;;
 
-			'-r'|'--reinstall')
-				script_option='r'
-				;;
+				'-f'|'--force')
+					force_accept=true
+					shift
+					;;
 
-			'-u'|'--uninstall')
-				script_option='u'
-				;;
-			*)
-				script_option='n'
-				;;
-		esac
+				'-h'|'--help')
+					script_option='h'
+					shift
+					;;
+
+				'-i'|'--install')
+					script_option='i'
+					shift
+					;;
+
+				'-r'|'--reinstall')
+					script_option='r'
+					shift
+					;;
+
+				'-u'|'--uninstall')
+					script_option='u'
+					shift
+					;;
+				*)
+                    echo -e "\nInvalid option, exiting ...\n"
+            	    exit 1
+                    ;;
+			esac
+		done
 	fi
 
 	# exit early if the user decided to quit the script
@@ -991,6 +1030,18 @@ Select a key: [i/d/h/r/u/q]: " script_option
 		driver_dir="$(realpath "./${version}")"
 	fi
 
+    if [ "$force_accept" = true ]; then
+		# render warning message for options that do not support the force option
+		if [[ ! "$script_option" =~ ^[dDiIrR]$ ]]; then
+        	echo -e "\nNOTICE: '--force' parameter is only available for debug, install, and re-install options!"
+		else
+			separator
+			echo -e "\n>> CAUTION: force flag detected, you better know what you are doing! <<"
+			# provide the user with a couple of seconds to change their mind
+			sleep 5s
+		fi
+	fi
+
 	local -r installation_completed_message="
 
 Installation completed, please reboot to apply the changes.
@@ -1000,7 +1051,7 @@ After reboot, make sure to consult post-install guide! $post_install_guide_url"
         # Debug
         # > Prints debug information (system info, driver info, etc) to the terminal.
 		[dD])
-			debug
+			debug "$force_accept"
 			separator
 			echo -e "\nUse this information when submitting an issue ($repo_issue_url)"
 			separator
@@ -1018,7 +1069,7 @@ After reboot, make sure to consult post-install guide! $post_install_guide_url"
         # > Installs the DisplayLink driver.
         [iI])
 			pre_install
-			install "$version" "$driver_dir"
+			install "$version" "$driver_dir" "$force_accept"
 			post_install
 			clean_up "$version" "$driver_dir"
 			separator
@@ -1034,7 +1085,7 @@ After reboot, make sure to consult post-install guide! $post_install_guide_url"
 			uninstall
 			clean_up "$version" "$driver_dir"
 			pre_install
-			install "$version" "$driver_dir"
+			install "$version" "$driver_dir" "$force_accept"
 			post_install
 			clean_up "$version" "$driver_dir"
 			separator
