@@ -847,19 +847,19 @@ USAGE:
     sudo $0 [OPTIONS]
 
 OPTIONS:
-    --debug
+    -d,  --debug
         Prints debug information to the terminal.
 
-    --help
+    -h,  --help
         Prints this help menu.
 
-    --install
+    -u,  --install
         Installs the DisplayLink driver.
 
-    --reinstall
+    -r,  --reinstall
         Re-installs the DisplayLink driver.
 
-    --uninstall
+    -u,  --uninstall
         Uninstalls the DisplayLink driver.
 
 _HELP_TEXT_
@@ -895,23 +895,23 @@ Select a key: [i/d/h/r/u/q]: " script_option
 	# parse script parameters
 	else
 		case "${1}" in
-			'--debug')
+			'-d'|'--debug')
 				script_option='d'
 				;;
 
-			'--help')
+			'-h'|'--help')
 				script_option='h'
 				;;
 
-			'--install')
+			'-i'|'--install')
 				script_option='i'
 				;;
 
-			'--reinstall')
+			'-r'|'--reinstall')
 				script_option='r'
 				;;
 
-			'--uninstall')
+			'-u'|'--uninstall')
 				script_option='u'
 				;;
 			*)
