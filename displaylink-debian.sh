@@ -1025,6 +1025,7 @@ Select a key: [i/d/h/r/u/q]: " script_option
 	local version=''
 
 	# get the latest DisplayLink driver version for installs, reinstalls, and uninstalls only
+	# TODO: detect version for uninstalls instead of downloading version details
 	if [[ "$script_option" =~ ^[iIrRuU]$ ]]; then
 		version="$(get_latest_displaylink_driver_version)"
 		driver_dir="$(realpath "./${version}")"
