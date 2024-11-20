@@ -56,15 +56,15 @@ lsb="$(lsb_release -is)"
 codename="$(lsb_release -cs)"
 platform="$(lsb_release -ics | sed '$!s/$/ /' | tr -d '\n')"
 kernel="$(uname -r)"
-xorg_config_displaylink="/etc/X11/xorg.conf.d/20-displaylink.conf"
-blacklist="/etc/modprobe.d/blacklist.conf"
-sys_driver_version="$(ls /usr/src/ | grep "evdi" | cut -d "-" -f2)"
+xorg_config_displaylink='/etc/X11/xorg.conf.d/20-displaylink.conf'
+blacklist='/etc/modprobe.d/blacklist.conf'
+sys_driver_version="$(ls /usr/src/ | grep 'evdi' | cut -d '-' -f2)"
 vga_info="$(lspci | grep -oP '(?<=VGA compatible controller: ).*')" || :
 vga_info_3d="$(lspci | grep -i '3d controller' | sed 's/^.*: //')"
 graphics_vendor="$(lspci -nnk | grep -i vga -A3 | grep 'in use' | cut -d ':' -f2 | sed 's/ //g')"
 graphics_subcard="$(lspci -nnk | grep -i vga -A3 | grep Subsystem | cut -d ' ' -f5)"
 providers="$(xrandr --listproviders)"
-xorg_vcheck="$(dpkg -l | grep "ii  xserver-xorg-core" | awk '{print $3}' | sed 's/[^,:]*://g')"
+xorg_vcheck="$(dpkg -l | grep 'ii  xserver-xorg-core' | awk '{print $3}' | sed 's/[^,:]*://g')"
 min_xorg=1.18.3
 newgen_xorg=1.19.6
 init_script='displaylink.sh'
@@ -76,13 +76,13 @@ kconfig_file="/lib/modules/$kernel/build/Kconfig"
 
 # writes a text separator line to the terminal
 function separator() {
-	echo -e "\n-------------------------------------------------------------------"
+	echo -e '\n-------------------------------------------------------------------'
 }
 
 # invalid option error message
 function invalid_option() {
 	separator
-	echo -e "\nInvalid option specified."
+	echo -e '\nInvalid option specified.'
 	separator
 	read -rsn1 -p 'Enter any key to continue'
 	echo ''
@@ -122,7 +122,7 @@ function get_xconfig_list() {
 # checks if script dependencies are installed
 # automatically installs missing script dependencies
 function dependencies_check() {
-	echo -e "\nChecking dependencies...\n"
+	echo -e '\nChecking dependencies...\n'
 
 	local -r dpkg_arch="$(dpkg --print-architecture)"
 
@@ -163,7 +163,7 @@ function distro_check() {
 	separator
 	# check for Red Hat based distro
 	if [ -f /etc/redhat-release ]; then
-		echo -e "\nRed Hat based linux distributions are not supported."
+		echo -e '\nRed Hat based linux distributions are not supported.'
 		separator
 		exit 1
 	fi
@@ -192,7 +192,7 @@ function distro_check() {
 	)
 
 	if [[ "${supported_distributions[*]/$lsb/}" != "${supported_distributions[*]}" ]] || [[ "$lsb" =~ (elementary|Linuxmint) ]]; then
-		echo -e "\nPlatform requirements satisfied, proceeding ..."
+		echo -e '\nPlatform requirements satisfied, proceeding ...'
 	else
 		cat <<_UNSUPPORTED_PLATFORM_MESSAGE_
 
@@ -230,7 +230,7 @@ function get_init_system() {
 			;;
 
 		'elementary OS')
-			[ "$codename" == "freya" ] && init_system='upstart'
+			[ "$codename" == 'freya' ] && init_system='upstart'
 			;;
 
 		'Ubuntu')
@@ -264,7 +264,7 @@ function displaylink_service_check () {
 # performs post-installation clean-up by removing obsolete/redundant files which can only hamper reinstalls
 function clean_up() {
 	separator
-	echo -e "\nPerforming clean-up"
+	echo -e '\nPerforming clean-up'
 
 	local -r zip_file="DisplayLink_Ubuntu_${version}.zip"
 
@@ -287,12 +287,12 @@ function setup_complete() {
 	local -r default='Y'
 	local reboot_choice="$default"
 
-	read -p "Reboot now? [Y/n] " reboot_choice
+	read -p 'Reboot now? [Y/n] ' reboot_choice
 	reboot_choice="${reboot_choice:-$default}"
 
 	case "$reboot_choice" in
 		'y'|'Y')
-			echo "Rebooting ..."
+			echo 'Rebooting ...'
 			reboot
 			;;
 
@@ -317,16 +317,16 @@ function download() {
 
 	# exit the script if the user did not accept the software license agreement
 	if [[ ! "$accept_license_agreement" =~ ^(y|Y)$ ]]; then
-		echo "Can't download the driver without accepting the license agreement!"
+		echo 'Cannot download the driver without accepting the license agreement!'
 		exit 1
 	fi
 
-	echo -e "\nDownloading DisplayLink Ubuntu driver:\n"
+	echo -e '\nDownloading DisplayLink Ubuntu driver:\n'
 
 	# make sure file is downloaded before continuing
 	if ! wget -O "DisplayLink_Ubuntu_${version}.zip" "${driver_url}"; then
-		echo -e "\nUnable to download Displaylink driver\n"
-		exit
+		echo -e '\nUnable to download Displaylink driver\n'
+		exit 1
 	fi
 }
 
@@ -382,7 +382,7 @@ function install() {
 	mkdir -p "$driver_dir"
 
 	separator
-	echo -e "\nPreparing for install\n"
+	echo -e '\nPreparing for install\n'
 	test -d "$driver_dir" && /bin/rm -Rf "$driver_dir"
 	unzip -d "$driver_dir" "DisplayLink_Ubuntu_${version}.zip"
 	chmod +x $driver_dir/displaylink-driver-${version}*.run
@@ -443,7 +443,7 @@ function nvidia_xrandr_full() {
 # Xsetup - run as root before the login dialog appears
 
 if [ -e /sbin/prime-offload ]; then
-    echo running NVIDIA Prime setup /sbin/prime-offload
+    echo 'running NVIDIA Prime setup /sbin/prime-offload'
     /sbin/prime-offload
 fi
 _NVIDIA_XRANDR_FULL_SCRIPT_
@@ -453,11 +453,11 @@ _NVIDIA_XRANDR_FULL_SCRIPT_
 
 # performs nvidia specific pre-setup operations
 function nvidia_pregame() {
-	local -r xsetup_loc="/usr/share/sddm/scripts/Xsetup"
+	local -r xsetup_loc='/usr/share/sddm/scripts/Xsetup'
 
 	# xorg.conf ops
-	local -r xorg_config="/etc/x11/xorg.conf"
-	local -r usr_xorg_config_displaylink="/usr/share/X11/xorg.conf.d/20-displaylink.conf"
+	local -r xorg_config='/etc/x11/xorg.conf'
+	local -r usr_xorg_config_displaylink='/usr/share/X11/xorg.conf.d/20-displaylink.conf'
 
 	# create Xsetup file if not there + make necessary changes (issue: #201, #206)
 	if [ ! -f "$xsetup_loc" ]; then
@@ -470,7 +470,7 @@ function nvidia_pregame() {
 	fi
 
 	# make necessary changes to Xsetup
-	if ! grep -q "setprovideroutputsource modesetting" $xsetup_loc; then
+	if ! grep -q 'setprovideroutputsource modesetting' "$xsetup_loc"; then
 		mv "$xsetup_loc" "${xsetup_loc}.org.bak"
 		echo -e "\nMade backup of: $xsetup_loc file"
 		echo -e "\nLocation: ${xsetup_loc}.org.bak"
@@ -580,9 +580,9 @@ _XORG_NVIDIA_CONFIG_
 function modesetting() {
 	test ! -d /etc/X11/xorg.conf.d && mkdir -p /etc/X11/xorg.conf.d
 
-	local -r driver=$(lspci -nnk | grep -i vga -A3 | grep 'in use' | cut -d":" -f2 | sed 's/ //g')
+	local -r driver=$(lspci -nnk | grep -i vga -A3 | grep 'in use' | cut -d':' -f2 | sed 's/ //g')
 	local -r driver_nvidia=$(lspci | grep -i '3d controller' | sed 's/^.*: //' | awk '{print $1}')
-	local -r card_subsystem=$(lspci -nnk | grep -i vga -A3 | grep Subsystem | cut -d" " -f5)
+	local -r card_subsystem=$(lspci -nnk | grep -i vga -A3 | grep Subsystem | cut -d' ' -f5)
 
 	# set xorg for Nvidia cards (issue: 176, 179, 211, 217, 596)
 	if [ "$driver_nvidia" == 'NVIDIA' ] || [[ $driver == *"nvidia"* ]]; then
@@ -634,7 +634,7 @@ function modesetting() {
 # performs post-installation steps
 function post_install() {
 	separator
-	echo -e "\nPerforming post install steps\n"
+	echo -e '\nPerforming post-install steps\n'
 
 	# remove Kconfig file if it does not exist?
 	[ "$kconfig_exists" = false ] && rm "$kconfig_file"
@@ -646,7 +646,7 @@ function post_install() {
 		local -r displaylink_dir='/opt/displaylink'
 		[ ! -d "$displaylink_dir" ] && mkdir -p "$displaylink_dir"
 
-		ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 "$displaylink_dir/libstdc++.so.6"
+		ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 "${displaylink_dir}/libstdc++.so.6"
 	fi
 
 	case "$(get_init_system)" in
@@ -654,47 +654,49 @@ function post_install() {
 			# partially addresses meta issue #931
 			local -r displaylink_driver_service='/lib/systemd/system/displaylink-driver.service'
             if [ ! -f "$displaylink_driver_service" ]; then
-                echo -e "DisplayLink driver service not found!\nInstallation failed!\nExiting..."
+                echo -e 'DisplayLink driver service not found!\nInstallation failed!\nExiting...'
                 exit 1
             fi
 
 			# Fix inability to enable displaylink-driver.service
-			sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" "$displaylink_driver_service"
+			sed -i '/RestartSec=5/a[Install]\nWantedBy=multi-user.target' "$displaylink_driver_service"
 
-			echo "Enable displaylink-driver service"
+			echo 'Enabling displaylink-driver service ...'
 			systemctl enable displaylink-driver.service
 			;;
 
 		'sysvinit')
 			local -r init_script_path="/etc/init.d/${init_script}"
 
-			echo -e "Copying init script to /etc/init.d\n"
+			echo -e 'Copying init script to /etc/init.d\n'
 			cp "${dir}/${init_script}" /etc/init.d/
 			chmod +x "$init_script_path"
 
-			echo "Load evdi at startup"
+			echo 'Load evdi at startup'
 			cat > "$evdi_modprobe" <<_EVDI_MODPROBE_
 evdi
 _EVDI_MODPROBE_
-			echo "Enable and start displaylink service"
+			echo 'Enabling displaylink service ...'
 			update-rc.d "$init_script" defaults
+
+			echo 'Starting displaylink service ...'
 			"$init_script_path" start
 			;;
 	esac
 
 	# depending on X11 version start modesetting func
 	if [ "$(ver2int "$xorg_vcheck")" -gt "$(ver2int "$min_xorg")" ]; then
-		echo "Setup DisplayLink xorg.conf depending on graphics card"
+		echo 'Setup DisplayLink xorg.conf depending on graphics card'
 		modesetting
 	else
-		echo "No need to disable PageFlip for modesetting"
+		echo 'No need to disable PageFlip for modesetting'
 	fi
 }
 
 # uninstalls the displaylink driver
 function uninstall() {
 	separator
-	echo -e "\nUninstalling ...\n"
+	echo -e '\nUninstalling ...\n'
 
 	# displaylink-installer uninstall
 	local -r kconfig_file="/lib/modules/$(uname -r)/build/Kconfig"
@@ -709,11 +711,11 @@ function uninstall() {
 		'Uos'
 	)
 
-	if [[ "${distros[*]/$lsb/}" != "${distros[*]}" ]] && [ -f "$kconfig_file" ]; then
+	if [ -f "$kconfig_file" ] && [[ "${distros[*]/$lsb/}" != "${distros[*]}" ]]; then
 		rm "$kconfig_file"
 	fi
 
-	if [ "$(get_init_system)" == "sysvinit" ]; then
+	if [ "$(get_init_system)" == 'sysvinit' ]; then
 		update-rc.d "$init_script" remove
 		rm -f "/etc/init.d/${init_script}"
 		rm -f "$evdi_modprobe"
@@ -724,7 +726,7 @@ function uninstall() {
 
 	# remove modesetting file
 	if [ -f "$xorg_config_displaylink" ]; then
-		echo 'Removing Displaylink Xorg config file'
+		echo 'Removing Displaylink Xorg config file ...'
 		rm "$xorg_config_displaylink"
 	fi
 
@@ -736,7 +738,7 @@ function uninstall() {
 # debug: get system information for issue debug
 function debug() {
 	separator
-	echo -e "\nStarting Debug ...\n"
+	echo -e '\nStarting Debug ...\n'
 
 	local -r default='N'
 	local answer="$default"
@@ -804,7 +806,7 @@ EVDI service version:       $evdi_version
 Vendor:      $graphics_vendor
 Subsystem:   $graphics_subcard
 VGA:         $vga_info
-VGA (3D):    $vga_info_3d
+VGA (3D):    ${vga_info_3d:-N/A}
 X11 version: $xorg_vcheck
 
 _DEBUG_INFO_
@@ -816,8 +818,12 @@ _DEBUG_INFO_
     cat <<_DEBUG_INFO_
 -------------- DisplayLink xorg.conf -------------
 
-File: $xorg_config_displaylink
-$([ -f "$xorg_config_displaylink" ] && echo -e "Contents:\n$(cat $xorg_config_displaylink)" || echo '[CONFIG FILE NOT FOUND]')
+File:     $xorg_config_displaylink
+Contents: $(
+	[ -f "$xorg_config_displaylink" ] && \
+		echo -e "\n$(cat "$xorg_config_displaylink")" || \
+		echo '[CONFIG FILE NOT FOUND]'
+)
 
 -------------------- Monitors --------------------
 
@@ -833,7 +839,7 @@ function show_help_menu() {
 		echo "$script_description" 
 	else
 		separator
-		echo -e "\nViewing help menu..."
+		echo -e '\nViewing help menu...'
 		separator
 	fi
 
@@ -920,6 +926,9 @@ Select a key: [i/d/h/r/u/q]: " script_option
 		esac
 	fi
 
+	# exit early if the user decided to quit the script
+	[[ "$script_option" =~ ^(q|Q)$ ]] && echo -e '\nExiting...\n' && exit 0
+
 	local -r installation_completed_message="
 
 Installation completed, please reboot to apply the changes.
@@ -983,7 +992,7 @@ After reboot, make sure to consult post-install guide! $post_install_guide_url"
 			uninstall
 			clean_up
 			separator
-			echo -e "\nUninstall complete, please reboot to apply the changes."
+			echo -e '\nUninstall complete, please reboot to apply the changes.'
 			setup_complete
 			separator
 			echo ''
