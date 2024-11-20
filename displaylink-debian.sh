@@ -891,9 +891,6 @@ _HELP_TEXT_
 
 # script entry-point
 function main() {
-    # check if script is executed by root user
-	root_check
-
 	local interactive_menu=false
 	local script_option=''
 
@@ -946,6 +943,9 @@ Select a key: [i/d/h/r/u/q]: " script_option
 
 	# exit early if the user decided to quit the script
 	[[ "$script_option" =~ ^[qQ]$ ]] && echo -e '\nExiting...\n' && exit 0
+
+    # check if script is executed by root user (skip check for help menu)
+	[[ ! "$script_option" =~ ^[hH]$ ]] && root_check
 
 	local -r installation_completed_message="
 
