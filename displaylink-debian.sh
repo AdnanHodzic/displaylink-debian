@@ -290,15 +290,18 @@ function clean_up() {
 	# go back to displaylink-debian
 	cd - &> /dev/null
 
-	if [ -f "$zip_file" ]; then
-		echo "Removing redundant: '$zip_file' file"
-		rm "$zip_file"
-	fi
+	local -r clean_up_targets=(
+		"$zip_file"
+		"$driver_dir"
+	)
 
-	if [ -d "$driver_dir" ]; then
-		echo "Removing redundant: '$driver_dir' directory"
-		rm -r "$driver_dir"
-	fi
+	for clean_up_target in "${clean_up_targets[@]}"; do
+		# skip if file or directory does not exist
+		[ ! -e "$clean_up_target" ] && continue
+
+		echo "Removing redundant: '$clean_up_target'"
+		rm -r "$clean_up_target"
+	done
 }
 
 # called when the driver setup is complete
