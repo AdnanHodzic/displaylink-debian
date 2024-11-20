@@ -947,6 +947,9 @@ Select a key: [i/d/h/r/u/q]: " script_option
     # check if script is executed by root user (skip check for help menu)
 	[[ ! "$script_option" =~ ^[hH]$ ]] && root_check
 
+	# run distro check for debug, install, reinstall, and uninstall options
+	[[ "$script_option" =~ ^[dDiIrRuU]$ ]] && distro_check
+
 	local -r installation_completed_message="
 
 Installation completed, please reboot to apply the changes.
@@ -973,7 +976,6 @@ After reboot, make sure to consult post-install guide! $post_install_guide_url"
         # Install
         # > Installs the DisplayLink driver.
         [iI])
-			distro_check
 			pre_install
 			install
 			post_install
@@ -988,10 +990,8 @@ After reboot, make sure to consult post-install guide! $post_install_guide_url"
         # Re-Install
         # > Re-installs the DisplayLink driver.
         [rR])
-			distro_check
 			uninstall
 			clean_up
-			distro_check
 			pre_install
 			install
 			post_install
@@ -1006,7 +1006,6 @@ After reboot, make sure to consult post-install guide! $post_install_guide_url"
         # Uninstall
         # > Uninstalls the DisplayLink driver.
         [uU])
-			distro_check
 			uninstall
 			clean_up
 			separator
