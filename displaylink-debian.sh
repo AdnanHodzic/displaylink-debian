@@ -42,7 +42,7 @@ resources_dir="$(pwd)/resources/"
 lsb="$(lsb_release -is)"
 codename="$(lsb_release -cs)"
 platform="$(lsb_release -ics | sed '$!s/$/ /' | tr -d '\n')"
-kernel="$(uname -r)"
+kernel_release="$(uname -r)"
 xorg_config_displaylink='/etc/X11/xorg.conf.d/20-displaylink.conf'
 blacklist='/etc/modprobe.d/blacklist.conf'
 sys_driver_version="$(ls /usr/src/ | grep 'evdi' | cut -d '-' -f2)"
@@ -56,7 +56,9 @@ min_xorg=1.18.3
 newgen_xorg=1.19.6
 init_script='displaylink.sh'
 evdi_modprobe='/etc/modules-load.d/evdi.conf'
-kconfig_file="/lib/modules/$kernel/build/Kconfig"
+kconfig_file="/lib/modules/${kernel_release}/build/Kconfig"
+opt_displaylink_dir='/opt/displaylink'
+etc_init_dir='/etc/init.d'
 
 # Using modules-load.d should always be preferred to 'modprobe evdi' in start
 # command
@@ -161,14 +163,14 @@ function dependencies_check() {
 	# script dependencies
 	local -r dependencies=(
 		'unzip'
-		"linux-headers-$(uname -r)"
+		"linux-headers-${kernel_release}"
 		'dkms'
 		'lsb-release'
 		'linux-source'
 		'x11-xserver-utils'
 		'wget'
-		"libdrm-dev:$dpkg_arch"
-		"libelf-dev:$dpkg_arch"
+		"libdrm-dev:${dpkg_arch}"
+		"libelf-dev:${dpkg_arch}"
 		'git'
 		'pciutils'
 		'build-essential'
@@ -288,7 +290,7 @@ function displaylink_service_check () {
 			;;
 
 		'sysvinit')
-			"/etc/init.d/${init_script}" status
+			"${etc_init_dir}/${init_script}" status
 			;;
 	esac
 }
@@ -413,10 +415,10 @@ function install() {
 
 	local -r displaylink_driver_dir="${driver_dir}/displaylink-driver-${version}"
     local -r installer_script="${displaylink_driver_dir}/displaylink-installer.sh"
-	local -r build_dir="/lib/modules/$(uname -r)/build"
+	local -r build_dir="$(dirname "$kconfig_file")"
 
 	# udlfb kernel version check
-	local -r kernel_version="$(uname -r | grep -Eo '[0-9]+\.[0-9]+')"
+	local -r kernel_version="$(echo "$kernel_release" | grep -Eo '[0-9]+\.[0-9]+')"
 
 	# get init system
 	local -r init_system="$(get_init_system)"
@@ -688,10 +690,9 @@ function post_install() {
 	# note: for this to work libstdc++6 package needs to be installed from >= Stretch
 	if [[ "$lsb" =~ ^(Debian|Devuan|Kali)$ ]]; then
 		# partially addresses meta issue #931
-		local -r displaylink_dir='/opt/displaylink'
-		[ ! -d "$displaylink_dir" ] && mkdir -p "$displaylink_dir"
+		[ ! -d "$opt_displaylink_dir" ] && mkdir -p "$opt_displaylink_dir"
 
-		ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 "${displaylink_dir}/libstdc++.so.6"
+		ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 "${opt_displaylink_dir}/libstdc++.so.6"
 	fi
 
 	case "$(get_init_system)" in
@@ -711,10 +712,10 @@ function post_install() {
 			;;
 
 		'sysvinit')
-			local -r init_script_path="/etc/init.d/${init_script}"
+			local -r init_script_path="${etc_init_dir}/${init_script}"
 
-			echo -e 'Copying init script to /etc/init.d\n'
-			cp "${dir}/${init_script}" /etc/init.d/
+			echo -e "Copying init script to ${etc_init_dir}\n"
+			cp "${dir}/${init_script}" "${etc_init_dir}/"
 			chmod +x "$init_script_path"
 
 			echo 'Load evdi at startup'
@@ -744,7 +745,6 @@ function uninstall() {
 	echo -e '\nUninstalling ...\n'
 
 	# displaylink-installer uninstall
-	local -r kconfig_file="/lib/modules/$(uname -r)/build/Kconfig"
 
 	local -r distros=(
 		'BunsenLabs'
@@ -762,7 +762,7 @@ function uninstall() {
 
 	if [ "$(get_init_system)" == 'sysvinit' ]; then
 		update-rc.d "$init_script" remove
-		rm -f "/etc/init.d/${init_script}"
+		rm -f "${etc_init_dir}/${init_script}"
 		rm -f "$evdi_modprobe"
 	fi
 
@@ -838,7 +838,7 @@ function debug() {
 
 Distro:  $lsb
 Release: $codename
-Kernel:  $kernel
+Kernel:  $kernel_release
 
 ---------------- DisplayLink info ----------------
 
