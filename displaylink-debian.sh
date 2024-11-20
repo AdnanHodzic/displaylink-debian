@@ -16,8 +16,6 @@ set -eu
 # set -o pipefail # TODO: Some code still fails this check, fix before enabling.
 IFS=$'\n\t'
 
-kernel_check="$(uname -r | grep -Eo '^[0-9]+\.[0-9]+')"
-
 # URLs
 synaptics_url="https://www.synaptics.com"
 displaylink_driver_url="${synaptics_url}/products/displaylink-graphics/downloads/ubuntu"
@@ -51,7 +49,7 @@ else
 fi
 driver_dir=$version
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/" && pwd )"
-resourcesDir="$(pwd)/resources/"
+resources_dir="$(pwd)/resources/"
 
 # globalvars
 lsb="$(lsb_release -is)"
@@ -108,7 +106,7 @@ function root_check() {
 
 # list all xorg related configs
 function get_xconfig_list() {
-	local x11_etc='/etc/X11/'
+	local -r x11_etc='/etc/X11/'
 
 	# No directory found
 	if [ ! -d "$x11_etc" ]; then
@@ -126,10 +124,10 @@ function get_xconfig_list() {
 function dependencies_check() {
 	echo -e "\nChecking dependencies...\n"
 
-	local dpkg_arch="$(dpkg --print-architecture)"
+	local -r dpkg_arch="$(dpkg --print-architecture)"
 
 	# script dependencies
-	local dependencies=(
+	local -r dependencies=(
 		'unzip'
 		"linux-headers-$(uname -r)"
 		'dkms'
@@ -152,6 +150,7 @@ function dependencies_check() {
 
 		echo "installing dependency: $dependency"
 
+		# attempt to install missing dependency
 		if ! apt-get install -q=2 -y "$dependency"; then
 			echo "$dependency installation failed.  Aborting."
 			exit 1
@@ -239,11 +238,11 @@ function get_init_system() {
 			;;
 	esac
 
-	if [ -z "$init_system" ] && [[ "$lsb" =~ elementary ]] && [ "$codename" == "freya" ]; then
+	if [ -z "$init_system" ] && [[ "$lsb" =~ elementary ]] && [ "$codename" == 'freya' ]; then
 		init_system='upstart'
 	fi
 
-	
+	# if init system not detected, then fallback to systemd
 	[ -z "$init_system" ] && init_system='systemd'
 
 	echo "$init_system"
@@ -267,7 +266,7 @@ function clean_up() {
 	separator
 	echo -e "\nPerforming clean-up"
 
-	local zip_file="DisplayLink_Ubuntu_$version.zip"
+	local -r zip_file="DisplayLink_Ubuntu_${version}.zip"
 
 	# go back to displaylink-debian
 	cd - &> /dev/null
@@ -285,7 +284,7 @@ function clean_up() {
 
 # called when the driver setup is complete
 function setup_complete() {
-	local default='Y'
+	local -r default='Y'
 	local reboot_choice="$default"
 
 	read -p "Reboot now? [Y/n] " reboot_choice
@@ -309,7 +308,8 @@ function setup_complete() {
 
 # downloads the DisplayLink driver
 function download() {
-	local default='y'
+	local -r default='y'
+	local accept_license_agreement="$default"
 
 	echo -en "\nPlease read the Software License Agreement available at: \n$dlurl\nDo you accept?: [Y/n]: "
 	read accept_license_agreement
@@ -362,15 +362,15 @@ function install() {
 	separator
 	download
 
-	local displaylink_driver_dir="${driver_dir}/displaylink-driver-${version}"
-    local installer_script="${displaylink_driver_dir}/displaylink-installer.sh"
-	local build_dir="/lib/modules/$(uname -r)/build"
+	local -r displaylink_driver_dir="${driver_dir}/displaylink-driver-${version}"
+    local -r installer_script="${displaylink_driver_dir}/displaylink-installer.sh"
+	local -r build_dir="/lib/modules/$(uname -r)/build"
 
 	# udlfb kernel version check
-	local kernel_check="$(uname -r | grep -Eo '[0-9]+\.[0-9]+')"
+	local -r kernel_version="$(uname -r | grep -Eo '[0-9]+\.[0-9]+')"
 
 	# get init system
-	local init_system="$(get_init_system)"
+	local -r init_system="$(get_init_system)"
 
 	# prepare for installation
 	# check if prior drivers have been downloaded
@@ -410,7 +410,7 @@ function install() {
 	fi
 
 	# patch displaylink-installer.sh to prevent reboot before the script is done
-	patch -Np0 "$installer_script" < "${resourcesDir}displaylink-installer.patch"
+	patch -Np0 "$installer_script" < "${resources_dir}displaylink-installer.patch"
 
 	# run displaylink install
 	echo -e "\nInstalling driver version: $version\n"
@@ -418,7 +418,7 @@ function install() {
 	./displaylink-installer.sh install
 
 	# add udl/udlfb to blacklist depending on kernel version (issue #207)
-	[ "$(ver2int "$kernel_check")" -ge "$(ver2int '4.14.9')" ] && udl_block
+	[ "$(ver2int "$kernel_version")" -ge "$(ver2int '4.14.9')" ] && udl_block
 }
 
 # issue: 204, 216
@@ -453,29 +453,29 @@ _NVIDIA_XRANDR_FULL_SCRIPT_
 
 # performs nvidia specific pre-setup operations
 function nvidia_pregame() {
-	local xsetup_loc="/usr/share/sddm/scripts/Xsetup"
+	local -r xsetup_loc="/usr/share/sddm/scripts/Xsetup"
 
 	# xorg.conf ops
-	local xorg_config="/etc/x11/xorg.conf"
-	local usr_xorg_config_displaylink="/usr/share/X11/xorg.conf.d/20-displaylink.conf"
+	local -r xorg_config="/etc/x11/xorg.conf"
+	local -r usr_xorg_config_displaylink="/usr/share/X11/xorg.conf.d/20-displaylink.conf"
 
 	# create Xsetup file if not there + make necessary changes (issue: #201, #206)
-	if [ ! -f $xsetup_loc ]; then
+	if [ ! -f "$xsetup_loc" ]; then
 		echo "$xsetup_loc not found, creating"
 		mkdir -p /usr/share/sddm/scripts/
-		touch $xsetup_loc
+		touch "$xsetup_loc"
 		nvidia_xrandr_full "$xsetup_loc"
-		chmod +x $xsetup_loc
+		chmod +x "$xsetup_loc"
 		echo -e "Wrote changes to $xsetup_loc"
 	fi
 
 	# make necessary changes to Xsetup
 	if ! grep -q "setprovideroutputsource modesetting" $xsetup_loc; then
-		mv $xsetup_loc $xsetup_loc.org.bak
+		mv "$xsetup_loc" "${xsetup_loc}.org.bak"
 		echo -e "\nMade backup of: $xsetup_loc file"
 		echo -e "\nLocation: ${xsetup_loc}.org.bak"
 		nvidia_xrandr_partial "$xsetup_loc"
-		chmod +x $xsetup_loc
+		chmod +x "$xsetup_loc"
 		echo -e "Wrote changes to $xsetup_loc"
 	fi
 
@@ -585,15 +585,15 @@ function modesetting() {
 	local -r card_subsystem=$(lspci -nnk | grep -i vga -A3 | grep Subsystem | cut -d" " -f5)
 
 	# set xorg for Nvidia cards (issue: 176, 179, 211, 217, 596)
-	if [ "$driver_nvidia" == "NVIDIA" ] || [[ $driver == *"nvidia"* ]]; then
+	if [ "$driver_nvidia" == 'NVIDIA' ] || [[ $driver == *"nvidia"* ]]; then
 		nvidia_pregame
 		xorg_nvidia
 		#nvidia_hashcat
 	# set xorg for AMD cards (issue: 180)
-	elif [ "$driver" == "amdgpu" ]; then
+	elif [ "$driver" == 'amdgpu' ]; then
 		xorg_amd
 	# set xorg for Intel cards
-	elif [ "$driver" == "i915" ]; then
+	elif [ "$driver" == 'i915' ]; then
 		# set xorg modesetting for Intel cards (issue: 179, 68, 88, 192)
 		local -r supported_subsystems=(
 			'530'
@@ -645,11 +645,13 @@ function post_install() {
 		# partially addresses meta issue #931
 		local -r displaylink_dir='/opt/displaylink'
 		[ ! -d "$displaylink_dir" ] && mkdir -p "$displaylink_dir"
+
 		ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 "$displaylink_dir/libstdc++.so.6"
 	fi
 
 	case "$(get_init_system)" in
 		'systemd')
+			# partially addresses meta issue #931
 			local -r displaylink_driver_service='/lib/systemd/system/displaylink-driver.service'
             if [ ! -f "$displaylink_driver_service" ]; then
                 echo -e "DisplayLink driver service not found!\nInstallation failed!\nExiting..."
@@ -667,7 +669,7 @@ function post_install() {
 			local -r init_script_path="/etc/init.d/${init_script}"
 
 			echo -e "Copying init script to /etc/init.d\n"
-			cp "$dir/$init_script" /etc/init.d/
+			cp "${dir}/${init_script}" /etc/init.d/
 			chmod +x "$init_script_path"
 
 			echo "Load evdi at startup"
@@ -713,7 +715,7 @@ function uninstall() {
 
 	if [ "$(get_init_system)" == "sysvinit" ]; then
 		update-rc.d "$init_script" remove
-		rm -f "/etc/init.d/$init_script"
+		rm -f "/etc/init.d/${init_script}"
 		rm -f "$evdi_modprobe"
 	fi
 
@@ -722,13 +724,13 @@ function uninstall() {
 
 	# remove modesetting file
 	if [ -f "$xorg_config_displaylink" ]; then
-		echo "Removing Displaylink Xorg config file"
+		echo 'Removing Displaylink Xorg config file'
 		rm "$xorg_config_displaylink"
 	fi
 
 	# delete udl/udlfb from blacklist (issue #207)
-	sed -i '/blacklist udlfb/d' $blacklist
-	sed -i '/blacklist udl/d' $blacklist
+	sed -i '/blacklist udlfb/d' "$blacklist"
+	sed -i '/blacklist udl/d' "$blacklist"
 }
 
 # debug: get system information for issue debug
@@ -740,7 +742,6 @@ function debug() {
 	local answer="$default"
 
 	local -r evdi_version_file='/sys/devices/evdi/version'
-	local evdi_version=''
 
 	local -A subject_urls=(
 		['Post Installation Guide']="$post_install_guide_url"
@@ -778,11 +779,11 @@ function debug() {
 		esac
 	done
 
-	if [ -f "$evdi_version_file" ]; then
-		evdi_version="$(cat "$evdi_version_file")"
-	else
-		evdi_version="$evdi_version_file not found"
-	fi
+	local -r evdi_version="$(
+		[ -f "$evdi_version_file" ] && \
+			cat "$evdi_version_file" || \
+			echo "$evdi_version_file not found"
+	)"
 	
     # render debug info
     cat <<_DEBUG_INFO_
@@ -816,7 +817,7 @@ _DEBUG_INFO_
 -------------- DisplayLink xorg.conf -------------
 
 File: $xorg_config_displaylink
-$([ -f "$xorg_config_displaylink" ] && echo -e "Contents:\n$(cat $xorg_config_displaylink)" || echo "[CONFIG FILE NOT FOUND]")
+$([ -f "$xorg_config_displaylink" ] && echo -e "Contents:\n$(cat $xorg_config_displaylink)" || echo '[CONFIG FILE NOT FOUND]')
 
 -------------------- Monitors --------------------
 
