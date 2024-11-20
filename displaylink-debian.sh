@@ -313,12 +313,12 @@ function setup_complete() {
 	reboot_choice="${reboot_choice:-$default}"
 
 	case "$reboot_choice" in
-		'y'|'Y')
+		[yY])
 			echo 'Rebooting ...'
 			reboot
 			;;
 
-		'n'|'N')
+		[nN])
 			echo -e '\nReboot postponed, changes will not be applied until reboot.'
 			;;
 
@@ -783,12 +783,12 @@ function debug() {
 		answer="${answer:-$default}"
 
 		case "$answer" in
-			'Y'|'y')
+			[yY])
 				echo ''
 				continue
 				;;
 
-			'N'|'n')
+			[nN])
 				echo -e "\nPlease read ${subject}: ${url}\n"
 				exit 1
 				;;
@@ -955,7 +955,7 @@ After reboot, make sure to consult post-install guide! $post_install_guide_url"
 	case "$script_option" in
         # Debug
         # > Prints debug information (system info, driver info, etc) to the terminal.
-		'd'|'D')
+		[dD])
 			debug
 			separator
 			echo -e "\nUse this information when submitting an issue ($repo_issue_url)"
@@ -965,14 +965,14 @@ After reboot, make sure to consult post-install guide! $post_install_guide_url"
 
         # Help
         # > Prints the script help menu to the terminal.
-        'h')
+        [hH])
             show_help_menu "$interactive_menu"
             exit 0
             ;;
 		
         # Install
         # > Installs the DisplayLink driver.
-        'i'|'I')
+        [iI])
 			distro_check
 			pre_install
 			install
@@ -987,7 +987,7 @@ After reboot, make sure to consult post-install guide! $post_install_guide_url"
 
         # Re-Install
         # > Re-installs the DisplayLink driver.
-        'r'|'R')
+        [rR])
 			distro_check
 			uninstall
 			clean_up
@@ -1005,7 +1005,7 @@ After reboot, make sure to consult post-install guide! $post_install_guide_url"
 
         # Uninstall
         # > Uninstalls the DisplayLink driver.
-        'u'|'U')
+        [uU])
 			distro_check
 			uninstall
 			clean_up
