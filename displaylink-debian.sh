@@ -35,19 +35,6 @@ DisplayLink driver installer for Debian and Ubuntu based Linux distributions:
 * When submitting a new issue, include Debug information
 "
 
-# Get latest versions
-versions=$(wget -q -O - "$displaylink_driver_url" | grep "<p>Release: " | head -n 2 | perl -pe '($_)=/([0-9]+([.][0-9]+)+(\ Beta)*)/; exit if $. > 1;')
-# if versions contains "Beta", try to download previous version
-if [[ $versions =~ Beta ]]; then
-    version=$(wget -q -O - "$displaylink_driver_url" | grep "<p>Release: " | head -n 2 | perl -pe '($_)=/([0-9]+([.][0-9]+)+(?!\ Beta))/; exit if $. > 1;')
-    dlurl="${synaptics_url}/$(wget -q -O - "$displaylink_driver_url" | grep -B 2 $version'-Release' | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
-    driver_url="${synaptics_url}/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
-else
-    version=`wget -q -O - "$displaylink_driver_url" | grep "<p>Release: " | head -n 1 | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/; exit if $. > 1;'`
-    dlurl="${synaptics_url}$(wget -q -O - "$displaylink_driver_url" | grep -B 2 $version'-Release' | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
-    driver_url="${synaptics_url}/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
-fi
-driver_dir=$version
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/" && pwd )"
 resources_dir="$(pwd)/resources/"
 
@@ -91,6 +78,32 @@ function backup_file() {
 	mv "$file_name" "${file_name}.org.bak"
 	echo -e "\nMade backup of: $file_name file"
 	echo -e "\nLocation: ${file_name}.org.bak"
+}
+
+# retrieves a DisplayLink driver version
+function get_displaylink_driver_version() {
+	local -r head_lines="$1"
+	local -r perl_command="$2"
+
+	wget -q -O - "$displaylink_driver_url" | grep '<p>Release: ' | head -n "$head_lines" | perl -pe "$perl_command"
+}
+
+# retrieves the latest DisplayLink driver version
+function get_latest_displaylink_driver_version() {
+    # Get latest displaylink driver versions
+    local -r versions=$(get_displaylink_driver_version 2 '($_)=/([0-9]+([.][0-9]+)+(\ Beta)*)/; exit if $. > 1;')
+
+    local head_lines=1
+    local perl_command='($_)=/([0-9]+([.][0-9]+)+)/; exit if $. > 1;'
+
+    # if versions contains "Beta", set parameters to try and download previous version
+    if [[ "$versions" =~ 'Beta' ]]; then
+        head_lines=2
+        perl_command='($_)=/([0-9]+([.][0-9]+)+(?!\ Beta))/; exit if $. > 1;'
+    fi
+
+	# return the latest driver version
+    get_displaylink_driver_version "$head_lines" "$perl_command"
 }
 
 # writes a text separator line to the terminal
@@ -177,7 +190,7 @@ function dependencies_check() {
 	done
 }
 
-# checks if the script is running on a supported 
+# checks if the script is running on a supported
 function distro_check() {
 	separator
 	# check for Red Hat based distro
@@ -268,7 +281,7 @@ function get_init_system() {
 }
 
 # checks if the Displaylink service is running
-function displaylink_service_check () {	
+function displaylink_service_check () {
 	case "$(get_init_system)" in
 		'systemd')
 			systemctl is-active --quiet displaylink-driver.service && echo 'up and running'
@@ -282,6 +295,9 @@ function displaylink_service_check () {
 
 # performs post-installation clean-up by removing obsolete/redundant files which can only hamper reinstalls
 function clean_up() {
+	local -r version="$1"
+	local -r driver_dir="$2"
+
 	separator
 	echo -e '\nPerforming clean-up'
 
@@ -299,8 +315,11 @@ function clean_up() {
 		# skip if file or directory does not exist
 		[ ! -e "$clean_up_target" ] && continue
 
-		echo "Removing redundant: '$clean_up_target'"
-		rm -r "$clean_up_target"
+		echo "Removing: '$clean_up_target' ..."
+
+		if ! rm -r "$clean_up_target"; then
+			echo -e "\nUnable to remove: $clean_up_target"
+		fi
 	done
 }
 
@@ -330,10 +349,15 @@ function setup_complete() {
 
 # downloads the DisplayLink driver
 function download() {
+	local -r version="$1"
+
 	local -r default='y'
 	local accept_license_agreement="$default"
 
-	echo -en "\nPlease read the Software License Agreement available at: \n$dlurl\nDo you accept?: [Y/n]: "
+	local -r download_url="${synaptics_url}/$(wget -q -O - "$displaylink_driver_url" | grep -B 2 "${version}-Release" | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
+	local -r driver_url="${synaptics_url}/$(wget -q -O - "$download_url" | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
+
+	echo -en "\nPlease read the Software License Agreement available at: \n${download_url}\nDo you accept?: [Y/n]: "
 	read accept_license_agreement
 	accept_license_agreement=${accept_license_agreement:-$default}
 
@@ -381,8 +405,11 @@ function ver2int {
 
 # installs the displaylink driver
 function install() {
+	local -r version="$1"
+	local -r driver_dir="$2"
+
 	separator
-	download
+	download "$version"
 
 	local -r displaylink_driver_dir="${driver_dir}/displaylink-driver-${version}"
     local -r installer_script="${displaylink_driver_dir}/displaylink-installer.sh"
@@ -408,7 +435,7 @@ function install() {
 	test -d "$driver_dir" && /bin/rm -Rf "$driver_dir"
 	unzip -d "$driver_dir" "DisplayLink_Ubuntu_${version}.zip"
 	chmod +x $driver_dir/displaylink-driver-${version}*.run
-	./$driver_dir/displaylink-driver-${version}*.run --keep --noexec
+	$driver_dir/displaylink-driver-${version}*.run --keep --noexec
 	mv displaylink-driver-${version}*/ "$displaylink_driver_dir"
 
 	# modify displaylink-installer.sh
@@ -804,7 +831,7 @@ function debug() {
 			cat "$evdi_version_file" || \
 			echo "$evdi_version_file not found"
 	)"
-	
+
     # render debug info
     cat <<_DEBUG_INFO_
 --------------- Linux system info ----------------
@@ -854,7 +881,7 @@ function show_help_menu() {
 	local -r omit_script_description="$1"
 
 	if [ -z "$omit_script_description" ] || [ "$omit_script_description" = false ]; then
-		echo "$script_description" 
+		echo "$script_description"
 	else
 		separator
 		echo -e '\nViewing help menu...'
@@ -950,6 +977,15 @@ Select a key: [i/d/h/r/u/q]: " script_option
 	# run distro check for debug, install, reinstall, and uninstall options
 	[[ "$script_option" =~ ^[dDiIrRuU]$ ]] && distro_check
 
+	local driver_dir=''
+	local version=''
+
+	# get the latest DisplayLink driver version for installs, reinstalls, and uninstalls only
+	if [[ "$script_option" =~ ^[iIrRuU]$ ]]; then
+		version="$(get_latest_displaylink_driver_version)"
+		driver_dir="$(realpath "./${version}")"
+	fi
+
 	local -r installation_completed_message="
 
 Installation completed, please reboot to apply the changes.
@@ -972,14 +1008,14 @@ After reboot, make sure to consult post-install guide! $post_install_guide_url"
             show_help_menu "$interactive_menu"
             exit 0
             ;;
-		
+
         # Install
         # > Installs the DisplayLink driver.
         [iI])
 			pre_install
-			install
+			install "$version" "$driver_dir"
 			post_install
-			clean_up
+			clean_up "$version" "$driver_dir"
 			separator
 			echo "$installation_completed_message"
 			setup_complete
@@ -991,11 +1027,11 @@ After reboot, make sure to consult post-install guide! $post_install_guide_url"
         # > Re-installs the DisplayLink driver.
         [rR])
 			uninstall
-			clean_up
+			clean_up "$version" "$driver_dir"
 			pre_install
-			install
+			install "$version" "$driver_dir"
 			post_install
-			clean_up
+			clean_up "$version" "$driver_dir"
 			separator
 			echo "$installation_completed_message"
 			setup_complete
@@ -1007,7 +1043,7 @@ After reboot, make sure to consult post-install guide! $post_install_guide_url"
         # > Uninstalls the DisplayLink driver.
         [uU])
 			uninstall
-			clean_up
+			clean_up "$version" "$driver_dir"
 			separator
 			echo -e '\nUninstall complete, please reboot to apply the changes.'
 			setup_complete
