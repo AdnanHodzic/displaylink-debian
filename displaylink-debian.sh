@@ -123,20 +123,20 @@ function get_displaylink_driver_version() {
 
 # retrieves the latest DisplayLink driver version
 function get_latest_displaylink_driver_version() {
-    # Get latest displaylink driver versions
-    local -r versions=$(get_displaylink_driver_version 2 '($_)=/([0-9]+([.][0-9]+)+(\ Beta)*)/; exit if $. > 1;')
+	# Get latest displaylink driver versions
+	local -r versions=$(get_displaylink_driver_version 2 '($_)=/([0-9]+([.][0-9]+)+(\ Beta)*)/; exit if $. > 1;')
 
-    local head_lines=1
-    local perl_command='($_)=/([0-9]+([.][0-9]+)+)/; exit if $. > 1;'
+	local head_lines=1
+	local perl_command='($_)=/([0-9]+([.][0-9]+)+)/; exit if $. > 1;'
 
-    # if versions contains "Beta", set parameters to try and download previous version
-    if [[ "$versions" =~ 'Beta' ]]; then
-        head_lines=2
-        perl_command='($_)=/([0-9]+([.][0-9]+)+(?!\ Beta))/; exit if $. > 1;'
-    fi
+	# if versions contains "Beta", set parameters to try and download previous version
+	if [[ "$versions" =~ 'Beta' ]]; then
+		head_lines=2
+		perl_command='($_)=/([0-9]+([.][0-9]+)+(?!\ Beta))/; exit if $. > 1;'
+	fi
 
 	# return the latest driver version
-    get_displaylink_driver_version "$head_lines" "$perl_command"
+	get_displaylink_driver_version "$head_lines" "$perl_command"
 }
 
 # writes a text separator line to the terminal
@@ -422,7 +422,7 @@ function install() {
 	download "$version" "$force_accept"
 
 	local -r displaylink_driver_dir="${driver_dir}/displaylink-driver-${version}"
-    local -r installer_script="${displaylink_driver_dir}/displaylink-installer.sh"
+	local -r installer_script="${displaylink_driver_dir}/displaylink-installer.sh"
 	local -r build_dir="$(dirname "$kconfig_file")"
 
 	# udlfb kernel version check
@@ -704,10 +704,10 @@ function post_install() {
 		'systemd')
 			# partially addresses meta issue #931
 			local -r displaylink_driver_service='/lib/systemd/system/displaylink-driver.service'
-            if [ ! -f "$displaylink_driver_service" ]; then
-                echo -e 'DisplayLink driver service not found!\nInstallation failed!\nExiting...'
-                exit 1
-            fi
+			if [ ! -f "$displaylink_driver_service" ]; then
+				echo -e 'DisplayLink driver service not found!\nInstallation failed!\nExiting...'
+				exit 1
+			fi
 
 			# Fix inability to enable displaylink-driver.service
 			sed -i '/RestartSec=5/a[Install]\nWantedBy=multi-user.target' "$displaylink_driver_service"
@@ -1005,9 +1005,9 @@ Select a key: [i/d/h/r/u/q]: " script_option
 					shift
 					;;
 				*)
-                    echo -e "\nInvalid option, exiting ...\n"
-            	    exit 1
-                    ;;
+					echo -e "\nInvalid option, exiting ...\n"
+					exit 1
+					;;
 			esac
 		done
 	fi
@@ -1015,7 +1015,7 @@ Select a key: [i/d/h/r/u/q]: " script_option
 	# exit early if the user decided to quit the script
 	[[ "$script_option" =~ ^[qQ]$ ]] && echo -e '\nExiting...\n' && exit 0
 
-    # check if script is executed by root user (skip check for help menu)
+	# check if script is executed by root user (skip check for help menu)
 	[[ ! "$script_option" =~ ^[hH]$ ]] && root_check
 
 	# run distro check for debug, install, reinstall, and uninstall options
@@ -1031,7 +1031,7 @@ Select a key: [i/d/h/r/u/q]: " script_option
 		driver_dir="$(realpath "./${version}")"
 	fi
 
-    if [ "$force_accept" = true ]; then
+	if [ "$force_accept" = true ]; then
 		# render warning message for options that do not support the force option
 		if [[ ! "$script_option" =~ ^[dDiIrR]$ ]]; then
         	echo -e "\nNOTICE: '--force' parameter is only available for debug, install, and re-install options!"
@@ -1049,8 +1049,8 @@ Installation completed, please reboot to apply the changes.
 After reboot, make sure to consult post-install guide! $post_install_guide_url"
 
 	case "$script_option" in
-        # Debug
-        # > Prints debug information (system info, driver info, etc) to the terminal.
+		# Debug
+		# > Prints debug information (system info, driver info, etc) to the terminal.
 		[dD])
 			debug "$force_accept"
 			separator
@@ -1059,16 +1059,16 @@ After reboot, make sure to consult post-install guide! $post_install_guide_url"
 			echo ''
 			;;
 
-        # Help
-        # > Prints the script help menu to the terminal.
-        [hH])
-            show_help_menu "$interactive_menu"
-            exit 0
-            ;;
+		# Help
+		# > Prints the script help menu to the terminal.
+		[hH])
+			show_help_menu "$interactive_menu"
+			exit 0
+			;;
 
-        # Install
-        # > Installs the DisplayLink driver.
-        [iI])
+		# Install
+		# > Installs the DisplayLink driver.
+		[iI])
 			pre_install
 			install "$version" "$driver_dir" "$force_accept"
 			post_install
@@ -1080,9 +1080,9 @@ After reboot, make sure to consult post-install guide! $post_install_guide_url"
 			echo ''
 			;;
 
-        # Re-Install
-        # > Re-installs the DisplayLink driver.
-        [rR])
+		# Re-Install
+		# > Re-installs the DisplayLink driver.
+		[rR])
 			uninstall
 			clean_up "$version" "$driver_dir"
 			pre_install
@@ -1096,9 +1096,9 @@ After reboot, make sure to consult post-install guide! $post_install_guide_url"
 			echo ''
 			;;
 
-        # Uninstall
-        # > Uninstalls the DisplayLink driver.
-        [uU])
+		# Uninstall
+		# > Uninstalls the DisplayLink driver.
+		[uU])
 			uninstall
 			clean_up "$version" "$driver_dir"
 			separator
@@ -1108,12 +1108,12 @@ After reboot, make sure to consult post-install guide! $post_install_guide_url"
 			echo ''
 			;;
 
-        # Unknown option
-        *)
-            echo -e '\nUnknown option selected.  Exiting...'
-            echo ''
-            exit 1
-            ;;
+		# Unknown option
+		*)
+			echo -e '\nUnknown option selected.  Exiting...'
+			echo ''
+			exit 1
+			;;
 	esac
 }
 
