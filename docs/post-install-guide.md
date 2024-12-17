@@ -124,6 +124,21 @@ alias one="xrandr --output VIRTUAL1 --off --output DVI-1-0 --off --output DP1 --
 
 Note, in case you're editting ```~/.bashrc```, make sure you run ```source ~/.bashrc``` to appy the changes without having to log in/out.
 
+---
+Alternatively, one can add an Xsession script, so the providers are automatically bound to the default output:
+```bash
+# File: /etc/X11/Xsession.d/45displaylink-provider-settings
+# Bind any existing 'modesetting' provider output to the default source
+
+providers=$(xrandr --listproviders | grep "modesetting" | cut -d: -f 1 | cut -d ' ' -f 2 | grep -v 0)
+
+for provider in $providers; do
+    xrandr --setprovideroutputsource $provider 0
+done
+```
+
+With the above script, one doesn't need to manually run the `xrandr --setprovideroutputsource`, as they are registered at the X11 start and the screen layout can be persisted set in user setting.
+
 ## Upgrading your OS or updating displaylink
 It's recommended to run the uninstall and install procedure separately instead of relying on the reinstall option.
 1. `sudo ./displaylink-debian.sh --uninstall`
