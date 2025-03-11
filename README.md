@@ -92,7 +92,9 @@ Since I'm working on this project in free time without any support or reimbursem
 
 [![bitcoin](https://foolcontrol.org/wp-content/uploads/2019/08/btc-donate-displaylink-debian.png)](bitcoin:bc1qlncmgdjyqy8pe4gad4k2s6xtyr8f2r3ehrnl87)
 
+## Sponsors
 
+* Benedikt Wildenhain [@bwildenhain](http://github.com/bwildenhain)
 
 
 
