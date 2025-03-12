@@ -16,558 +16,586 @@ set -eu
 # set -o pipefail # TODO: Some code still fails this check, fix before enabling.
 IFS=$'\n\t'
 
-kernel_check="$(uname -r | egrep -o '^[0-9]+\.[0-9]+')"
+# URLs
+synaptics_url="https://www.synaptics.com"
+displaylink_driver_url="${synaptics_url}/products/displaylink-graphics/downloads/ubuntu"
+platform_list_url='http://bit.ly/2zrwz2u'
+repo_issue_url='http://bit.ly/2GLDlpY'
+repo_url='https://github.com/AdnanHodzic/displaylink-debian'
+post_install_guide_url="${repo_url}/blob/master/docs/post-install-guide.md"
 
-function ver2int {
-echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
-}
+# script description text used when rendering the script help menu or interactive script menu
+script_description="
+--------------------------- displaylink-debian -------------------------------
 
-# Get latest versions
-versions=$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 2 | perl -pe '($_)=/([0-9]+([.][0-9]+)+(\ Beta)*)/; exit if $. > 1;')
-# if versions contains "Beta", try to download previous version
-if [[ $versions =~ Beta ]]; then
-    version=$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 2 | perl -pe '($_)=/([0-9]+([.][0-9]+)+(?!\ Beta))/; exit if $. > 1;')
-    dlurl="https://www.synaptics.com/$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep -B 2 $version'-Release' | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
-    driver_url="https://www.synaptics.com/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
-else
-    version=`wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep "<p>Release: " | head -n 1 | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/; exit if $. > 1;'`
-    dlurl="https://www.synaptics.com/$(wget -q -O - https://www.synaptics.com/products/displaylink-graphics/downloads/ubuntu | grep -B 2 $version'-Release' | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
-    driver_url="https://www.synaptics.com/$(wget -q -O - ${dlurl} | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
-fi
-driver_dir=$version
-dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/" && pwd )"
-resourcesDir="$(pwd)/resources/"
+DisplayLink driver installer for Debian and Ubuntu based Linux distributions:
+
+* Debian, Ubuntu, Elementary OS, Mint, Kali, Deepin and many more!
+* Full list of all supported platforms: $platform_list_url
+* When submitting a new issue, include Debug information
+"
 
 # globalvars
 lsb="$(lsb_release -is)"
 codename="$(lsb_release -cs)"
 platform="$(lsb_release -ics | sed '$!s/$/ /' | tr -d '\n')"
-kernel="$(uname -r)"
-xorg_config_displaylink="/etc/X11/xorg.conf.d/20-displaylink.conf"
-blacklist="/etc/modprobe.d/blacklist.conf"
-sys_driver_version="$(ls /usr/src/ | grep "evdi" | cut -d "-" -f2)"
+kernel_release="$(uname -r)"
+xorg_config_displaylink='/etc/X11/xorg.conf.d/20-displaylink.conf'
+blacklist='/etc/modprobe.d/blacklist.conf'
+sys_driver_version="$(ls /usr/src/ | grep 'evdi' | cut -d '-' -f2)"
 vga_info="$(lspci | grep -oP '(?<=VGA compatible controller: ).*')" || :
 vga_info_3d="$(lspci | grep -i '3d controller' | sed 's/^.*: //')"
 graphics_vendor="$(lspci -nnk | grep -i vga -A3 | grep 'in use' | cut -d ':' -f2 | sed 's/ //g')"
 graphics_subcard="$(lspci -nnk | grep -i vga -A3 | grep Subsystem | cut -d ' ' -f5)"
 providers="$(xrandr --listproviders)"
-xorg_vcheck="$(dpkg -l | grep "ii  xserver-xorg-core" | awk '{print $3}' | sed 's/[^,:]*://g')"
+xorg_vcheck="$(dpkg -l | grep 'ii  xserver-xorg-core' | awk '{print $3}' | sed 's/[^,:]*://g')"
 min_xorg=1.18.3
 newgen_xorg=1.19.6
 init_script='displaylink.sh'
 evdi_modprobe='/etc/modules-load.d/evdi.conf'
-kconfig_file="/lib/modules/$kernel/build/Kconfig"
+kconfig_file="/lib/modules/${kernel_release}/build/Kconfig"
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/" && pwd )"
+resources_dir="$(pwd)/resources/"
+opt_displaylink_dir='/opt/displaylink'
+etc_init_dir='/etc/init.d'
+evdi_version_file='/sys/devices/evdi/version'
 
 # Using modules-load.d should always be preferred to 'modprobe evdi' in start
 # command
 
-separator(){
-sep="\n-------------------------------------------------------------------"
-echo -e $sep
+# retrieves the system init daemon name
+# TODO: find a proper way to detect init daemon as opposed to relying on LSB and codename
+function get_system_init_daemon() {
+	local init_system=''
+
+	case "$lsb" in
+		'Devuan')
+			init_system='sysvinit'
+			;;
+
+		'elementary OS')
+			[ "$codename" == 'freya' ] && init_system='upstart'
+			;;
+
+		'Ubuntu')
+			[ "$codename" == 'trusty' ] && init_system='upstart'
+			;;
+	esac
+
+	if [ -z "$init_system" ] && [[ "$lsb" =~ elementary ]] && [ "$codename" == 'freya' ]; then
+		init_system='upstart'
+	fi
+
+	# if init system not detected, then fallback to systemd
+	[ -z "$init_system" ] && init_system='systemd'
+
+	echo "$init_system"
 }
 
-# Wrong key error message
-wrong_key(){
-echo -e "\n-----------------------------"
-echo -e "\nWrong value. Concentrate!\n"
-echo -e "-----------------------------\n"
-echo -e "Enter any key to continue"
-read key
+system_init_daemon="$(get_system_init_daemon)"
+
+# creates a backup of a specified file
+function backup_file() {
+	local -r file_name="$1"
+
+	if [ -z "$file_name" ]; then
+		echo -e '\nFile must be specified for backup.  Skipping backup...'
+		return 1
+	fi
+
+	if [ ! -f "$file_name" ]; then
+		echo -e "\nFile does not exist: $file_name  Skipping backup..."
+		return 1
+	fi
+
+	mv "$file_name" "${file_name}.org.bak"
+	echo -e "\nMade backup of: $file_name file"
+	echo -e "\nLocation: ${file_name}.org.bak"
 }
 
-root_check(){
-# root check
-if (( $EUID != 0 ));
-then
+# retrieves a DisplayLink driver version
+function get_displaylink_driver_version() {
+	local -r head_lines="$1"
+	local -r perl_command="$2"
+
+	wget -q -O - "$displaylink_driver_url" | grep '<p>Release: ' | head -n "$head_lines" | perl -pe "$perl_command"
+}
+
+# retrieves the latest DisplayLink driver version
+function get_latest_displaylink_driver_version() {
+	# Get latest displaylink driver versions
+	local -r versions=$(get_displaylink_driver_version 2 '($_)=/([0-9]+([.][0-9]+)+(\ Beta)*)/; exit if $. > 1;')
+
+	local head_lines=1
+	local perl_command='($_)=/([0-9]+([.][0-9]+)+)/; exit if $. > 1;'
+
+	# if versions contains "Beta", set parameters to try and download previous version
+	if [[ "$versions" =~ 'Beta' ]]; then
+		head_lines=2
+		perl_command='($_)=/([0-9]+([.][0-9]+)+(?!\ Beta))/; exit if $. > 1;'
+	fi
+
+	# return the latest driver version
+	get_displaylink_driver_version "$head_lines" "$perl_command"
+}
+
+# writes a text separator line to the terminal
+function separator() {
+	echo -e '\n-------------------------------------------------------------------'
+}
+
+# invalid option error message
+function invalid_option() {
 	separator
-	echo -e "\nMust be run as root (i.e: 'sudo $0')."
+	echo -e '\nInvalid option specified.'
+	separator
+	read -rsn1 -p 'Enter any key to continue'
+	echo ''
+
+	# exit the script when an invalid
+	# option is specified by the user
+	exit 1
+}
+
+# checks if the script is executed by root user
+function root_check() {
+	# perform root check and exit function early,
+	# if the script is executed by root user
+	[ $EUID -eq 0 ] && return
+
+	separator
+	echo -e "\nScript must be executed as root user (i.e: 'sudo $0')."
 	separator
 	exit 1
-fi
 }
 
 # list all xorg related configs
-xconfig_list(){
-x11_etc="/etc/X11/"
+function get_xconfig_list() {
+	local -r x11_etc='/etc/X11/'
 
-if [ ! -d "${x11_etc}" ] ; then # No directory found
-	echo "X11 configs: None"
-	return 0
-fi
+	# No directory found
+	if [ ! -d "$x11_etc" ]; then
+		echo 'X11 configs: None'
+		return 0
+	fi
 
-count_conf_in_etc=$(find $x11_etc -maxdepth 2 -name "*.conf" | wc -l)
-if [ $count_conf_in_etc -gt 0 ]; then
-	find $x11_etc -type f -name "*.conf" | xargs echo "X11 configs:"
-fi
+	if [ "$(find "$x11_etc" -maxdepth 2 -name "*.conf" | wc -l)" -gt 0 ]; then
+		find "$x11_etc" -type f -name "*.conf" | xargs echo 'X11 configs:'
+	fi
 }
 
-# Dependencies
-dep_check() {
-echo -e "\nChecking dependencies\n"
+# checks if script dependencies are installed
+# automatically installs missing script dependencies
+function dependencies_check() {
+	echo -e '\nChecking dependencies...\n'
 
-dpkg_arch="$(dpkg --print-architecture)"
-deps=(unzip linux-headers-$(uname -r) dkms lsb-release linux-source x11-xserver-utils wget libdrm-dev:$dpkg_arch libelf-dev:$dpkg_arch git pciutils build-essential)
+	local -r dpkg_arch="$(dpkg --print-architecture)"
 
-for dep in ${deps[@]}
-do
-	if ! dpkg -s $dep | grep "Status: install ok installed" > /dev/null 2>&1
-	then
-		default=y
-		read -p "$dep not found! Install? [Y/n] " response
-		response=${response:-$default}
-		if [[ $response =~  ^(yes|y|Y)$ ]]
-		then
-			if ! apt-get install $dep
-			then
-				echo "$dep installation failed.  Aborting."
-				exit 1
-			fi
-		else
-			separator
-			echo -e "\nCannot continue without $dep.  Aborting."
-			separator
-		exit 1
+	# script dependencies
+	local -r dependencies=(
+		'unzip'
+		"linux-headers-${kernel_release}"
+		'dkms'
+		'lsb-release'
+		'linux-source'
+		'x11-xserver-utils'
+		'wget'
+		"libdrm-dev:${dpkg_arch}"
+		"libelf-dev:${dpkg_arch}"
+		'git'
+		'pciutils'
+		'build-essential'
+	)
+
+	for dependency in "${dependencies[@]}"; do
+		# skip dependency installation if dependency is already present
+		if dpkg -s "$dependency" | grep -q 'Status: install ok installed'; then
+			continue
 		fi
+
+		echo "installing dependency: $dependency"
+
+		# attempt to install missing dependency
+		if ! apt-get install -q=2 -y "$dependency"; then
+			echo "$dependency installation failed.  Aborting."
+			exit 1
+		fi
+	done
+}
+
+# checks if the script is running on a supported
+function distro_check() {
+	separator
+	# check for Red Hat based distro
+	if [ -f /etc/redhat-release ]; then
+		echo -e '\nRed Hat based linux distributions are not supported.'
+		separator
+		exit 1
+	fi
+
+	# confirm dependencies are in place
+	dependencies_check
+
+	# supported Debian based linux distributions
+	local -r supported_distributions=(
+		'BunsenLabs'
+		'Bunsenlabs'
+		'Debian'
+		'Deepin'
+		'Devuan'
+		'elementary OS'
+		'Kali'
+		'MX'
+		'Neon'
+		'Nitrux'
+		'Parrot'
+		'Pop'
+		'PureOS'
+		'Ubuntu'
+		'Uos' # Deepin alternative LSB string
+		'Zorin'
+	)
+
+	if [[ "${supported_distributions[*]/$lsb/}" != "${supported_distributions[*]}" ]] || [[ "$lsb" =~ (elementary|Linuxmint) ]]; then
+		echo -e '\nPlatform requirements satisfied, proceeding ...'
 	else
-		echo "$dep is installed"
+		cat <<_UNSUPPORTED_PLATFORM_MESSAGE_
+
+---------------------------------------------------------------
+
+Unsuported platform: $platform
+Full list of all supported platforms: $platform_list_url
+This tool is Open Source and feel free to extend it
+GitHub repo: $repo_url
+
+---------------------------------------------------------------
+
+_UNSUPPORTED_PLATFORM_MESSAGE_
+		exit 1
 	fi
-done
 }
 
-distro_check(){
-separator
-# RedHat
-if [ -f /etc/redhat-release ];
-then
-	echo "This is a Redhat based distro ..."
-	# ToDo:
-	# Add platform type message for RedHat
-	exit 1
-else
-
-# Confirm dependencies are in place
-dep_check
-
-# Unsupported platform message
-message(){
-echo -e "\n---------------------------------------------------------------\n"
-echo -e "Unsuported platform: $platform"
-echo -e "Full list of all supported platforms: http://bit.ly/2zrwz2u"
-echo -e ""
-echo -e "This tool is Open Source and feel free to extend it"
-echo -e "GitHub repo: https://github.com/AdnanHodzic/displaylink-debian/"
-echo -e "\n---------------------------------------------------------------\n"
-}
-
-# Ubuntu, Neon, PopOS
-if [ "$lsb" == "Ubuntu" ] || [ "$lsb" == "Neon" ] || [ "$lsb" == "Pop" ];
-then
-	echo -e "\nPlatform requirements satisfied, proceeding ..."
-# elementary OS
-elif [ "$lsb" == "elementary OS" ] || echo $lsb | grep -qi "elementary";
-then
-	echo -e "\nPlatform requirements satisfied, proceeding ..."
-# Debian
-elif [ "$lsb" == "Debian" ];
-then
-	echo -e "\nPlatform requirements satisfied, proceeding ..."
-# Devuan
-elif [ "$lsb" == "Devuan" ]
-then
-	echo -e "\nPlatform requirements satisfied, proceeding ..."
-# Mint
-elif echo $lsb | grep -qi "Linuxmint" ;
-then
-	echo -e "\nPlatform requirements satisfied, proceeding ..."
-# Kali
-elif [ "$lsb" == "Kali" ];
-then
-	echo -e "\nPlatform requirements satisfied, proceeding ..."
-# Deepin
-elif [ "$lsb" == "Deepin" ] || [ "$lsb" == "Uos" ] ;
-then
-	echo -e "\nPlatform requirements satisfied, proceeding ..."
-# MX Linux
-elif [ "$lsb" == "MX" ];
-then
-	echo -e "\nPlatform requirements satisfied, proceeding ..."
-# BunsenLabs
-elif [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "Bunsenlabs" ];
-then
-	echo -e "\nPlatform requirements satisfied, proceeding ..."
-# Parrot
-elif [ "$lsb" == "Parrot" ];
-then
-	echo -e "\nPlatform requirements satisfied, proceeding ..."
-# PureOS
-elif [ "$lsb" == "PureOS" ];
-then
-	echo -e "\nPlatform requirements satisfied, proceeding ..."
-# Nitrux
-elif [ "$lsb" == "Nitrux" ];
-then
-	echo -e "\nPlatform requirements satisfied, proceeding ..."
-# Zorin
-elif [ "$lsb" == "Zorin" ];
-then
-	echo -e "\nPlatform requirements satisfied, proceeding ..."
-else
-	message
-	exit 1
-fi
-fi
-}
-
-pre_install() {
-
-if [ -f $kconfig_file ];
-then
-  kconfig_exists="true"
-else
-  kconfig_exists="false"
-  touch $kconfig_file
-fi
-
-}
-
-sysinitdaemon_get(){
-sysinitdaemon="systemd"
-
-if [ "$lsb" == "Ubuntu" ];
-then
-	if [ $codename == "trusty" ];
-	then
-        sysinitdaemon="upstart"
+# checks if the Kconfig file exists
+function pre_install() {
+	if [ -f "$kconfig_file" ]; then
+		kconfig_exists=true
+	else
+		kconfig_exists=false
+		touch "$kconfig_file"
 	fi
-# Elementary
-elif [ "$lsb" == "elementary OS" ] || echo $lsb | grep -qi "elementary";
-then
-    if [ $codename == "freya" ];
-    then
-        sysinitdaemon="upstart"
-    fi
-elif [ "$lsb" == "Devuan" ]
-then
-    sysinitdaemon="sysvinit"
-fi
-
-echo $sysinitdaemon
 }
 
-displaylink_service_check () {
-    sysinitdaemon=$(sysinitdaemon_get)
-    if [ "$sysinitdaemon" == "systemd" ]
-    then
-        systemctl is-active --quiet displaylink-driver.service && \
-            echo up and running
-    elif [ "$sysinitdaemon" == "sysvinit" ]
-    then
-        /etc/init.d/$init_script status
-    fi
+# checks if the Displaylink service is running
+function displaylink_service_check () {
+	case "$system_init_daemon" in
+		'systemd')
+			systemctl is-active --quiet displaylink-driver.service && echo 'up and running'
+			;;
+
+		'sysvinit')
+			"${etc_init_dir}/${init_script}" status
+			;;
+	esac
 }
 
-clean_up(){
-# remove obsolete/redundant files which can only hamper reinstalls
+# performs post-installation clean-up by removing obsolete/redundant files which can only hamper reinstalls
+function clean_up() {
+	local -r version="$1"
+	local -r driver_dir="$2"
 
-separator
-echo -e "\nPerforming clean-up"
+	separator
+	echo -e '\nPerforming clean-up'
 
-# go back to displaylink-debian
-cd - &> /dev/null
+	local -r zip_file="DisplayLink_Ubuntu_${version}.zip"
 
-if [ -f "DisplayLink_Ubuntu_$version.zip" ]
-then
-	echo "Removing redundant: \"DisplayLink_Ubuntu_$version.zip\" file"
-	rm "DisplayLink_Ubuntu_$version.zip"
-fi
+	# go back to displaylink-debian
+	cd - &> /dev/null
 
-if [ -d $driver_dir ]
-then
-	echo "Removing redundant: \"$driver_dir\" directory"
-	rm -r $driver_dir
-fi
+	local -r clean_up_targets=(
+		"$zip_file"
+		"$driver_dir"
+	)
 
+	for clean_up_target in "${clean_up_targets[@]}"; do
+		# skip if file or directory does not exist
+		[ ! -e "$clean_up_target" ] && continue
+
+		echo "Removing: '$clean_up_target' ..."
+
+		if ! rm -r "$clean_up_target"; then
+			echo -e "\nUnable to remove: $clean_up_target"
+		fi
+	done
 }
 
-setup_complete(){
-default=Y
-ack=${ack:-$default}
+# called when the driver setup is complete
+function setup_complete() {
+	local -r default='Y'
+	local reboot_choice="$default"
 
-read -p "Reboot now? [Y/n] " ack
-ack=${ack:-$default}
+	read -p 'Reboot now? [Y/n] ' reboot_choice
+	reboot_choice="${reboot_choice:-$default}"
 
-for letter in "$ack"; do
-	if [[ "$letter" == [Yy] ]];
-	then
-			echo "Rebooting ..."
+	case "$reboot_choice" in
+		[yY])
+			echo 'Rebooting ...'
 			reboot
-	elif [[ "$letter" == [Nn] ]];
-	then
-			echo -e "\nReboot postponed, changes won't be applied until reboot"
-	else
-			wrong_key
-	fi
-done
-}
+			;;
 
-download() {
-default=y
-echo -en "\nPlease read the Software License Agreement available at: \n$dlurl\nDo you accept?: [Y/n]: "
-read ACCEPT
-ACCEPT=${ACCEPT:-$default}
-case $ACCEPT in
-		y*|Y*)
-				echo -e "\nDownloading DisplayLink Ubuntu driver:\n"
-				wget -O DisplayLink_Ubuntu_${version}.zip "${driver_url}"
-				# make sure file is downloaded before continuing
-				if [ $? -ne 0 ]
-				then
-					echo -e "\nUnable to download Displaylink driver\n"
-					exit
-				fi
-				;;
+		[nN])
+			echo -e '\nReboot postponed, changes will not be applied until reboot.'
+			;;
+
 		*)
-				echo "Can't download the driver without accepting the license agreement!"
-				exit 1
-				;;
-esac
+			invalid_option
+			;;
+	esac
 }
 
-install(){
-separator
-download
+# downloads the DisplayLink driver
+function download() {
+	local -r version="$1"
+	local -r force_accept="$2"
 
-# prep
-# Check whether prior drivers have been downloaded
-if [ -d $driver_dir ]
-then
-	echo "Removing prior: \"$driver_dir\" directory"
-	rm -r $driver_dir
-fi
+	local -r default='y'
+	local accept_license_agreement="$default"
 
-mkdir $driver_dir
+	local -r download_url="${synaptics_url}/$(wget -q -O - "$displaylink_driver_url" | grep -B 2 "${version}-Release" | perl -pe '($_)=/<a href="\/([^"]+)"[^>]+class="download-link"/')"
+	local -r driver_url="${synaptics_url}/$(wget -q -O - "$download_url" | grep '<a class="no-link"' | head -n 1 | perl -pe '($_)=/href="\/([^"]+)"/')"
 
-separator
-echo -e "\nPreparing for install\n"
-test -d $driver_dir && /bin/rm -Rf $driver_dir
-unzip -d $driver_dir DisplayLink_Ubuntu_${version}.zip
-chmod +x $driver_dir/displaylink-driver-${version}*.run
-./$driver_dir/displaylink-driver-${version}*.run --keep --noexec
-mv displaylink-driver-${version}*/ $driver_dir/displaylink-driver-${version}
-# get sysinitdaemon
-sysinitdaemon=$(sysinitdaemon_get)
+	if [ "$force_accept" = false ]; then
+		echo -en "\nPlease read the Software License Agreement available at: \n${download_url}\nDo you accept?: [Y/n]: "
+		read accept_license_agreement
+		accept_license_agreement=${accept_license_agreement:-$default}
 
+		# exit the script if the user did not accept the software license agreement
+		if [[ ! "$accept_license_agreement" =~ ^[yY]$ ]]; then
+			echo 'Cannot download the driver without accepting the license agreement!'
+			exit 1
+		fi
+	fi
 
-# modify displaylink-installer.sh
-sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$sysinitdaemon/g" $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
+	echo -e '\nDownloading DisplayLink Ubuntu driver:\n'
 
-# issue: 227
-if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "Bunsenlabs" ] || [ "$lsb" == "MX" ] || [ "$lsb" == "Uos" ];
-then
-	sed -i 's#/lib/modules/$KVER/build/Kconfig#/lib/modules/$KVER/build/scripts/kconfig/conf#g' $driver_dir/displaylink-driver-${version}/displaylink-installer.sh
-	ln -sf /lib/modules/$(uname -r)/build/Makefile /lib/modules/$(uname -r)/build/Kconfig
-fi
-
-# Patch displaylink-installer.sh to prevent reboot before our script is done.
-patchName="displaylink-installer.patch"
-finalPatchPath="$resourcesDir$patchName"
-patch -Np0 $driver_dir/displaylink-driver-${version}/displaylink-installer.sh <$finalPatchPath
-
-# run displaylink install
-echo -e "\nInstalling driver version: $version\n"
-cd $driver_dir/displaylink-driver-${version}
-./displaylink-installer.sh install
-
-
-# udlfb kernel version check
-kernel_check="$(uname -r | egrep -o '[0-9]+\.[0-9]+')"
+	# make sure file is downloaded before continuing
+	if ! wget -O "DisplayLink_Ubuntu_${version}.zip" "${driver_url}"; then
+		echo -e '\nUnable to download Displaylink driver\n'
+		exit 1
+	fi
+}
 
 # add udlfb to blacklist (issue #207)
-udl_block(){
+function udl_block() {
+	# if necessary create blacklist.conf
+	[ ! -f "$blacklist" ] && touch "$blacklist"
 
-# if necessary create blacklist.conf
-if [ ! -f $blacklist ]; then
-		touch $blacklist
-fi
+	local -r blacklist_items=(
+		'udlfb'
+		'udl' # add udl to blacklist (issue #207)
+	)
 
-if ! grep -Fxq "blacklist udlfb" $blacklist
-then
-		echo "Adding udlfb to blacklist"
-		echo "blacklist udlfb" >> $blacklist
-fi
+	for blacklist_item in "${blacklist_items[@]}"; do
+		# skip if item already blacklisted
+		if grep -Fxq "blacklist $blacklist_item" "$blacklist"; then
+			continue
+		fi
 
-# add udl to blacklist (issue #207)
-if ! grep -Fxq "blacklist udl" $blacklist
-then
-		echo "Adding udl to blacklist"
-		echo "blacklist udl" >> $blacklist
-fi
+		# add item to blacklist
+		echo "Adding $blacklist_item to blacklist"
+		echo "blacklist $blacklist_item" >> "$blacklist"
+	done
 }
 
-# add udl/udlfb to blacklist depending on kernel version (issue #207)
-if [ "$(ver2int $kernel_check)" -ge "$(ver2int '4.14.9')" ];
-then
-		udl_block
-fi
-
+# returns the integer representation of the specified version string
+function ver2int {
+	echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }'
 }
 
-# post install
-post_install(){
-separator
-echo -e "\nPerforming post install steps\n"
+# installs the displaylink driver
+function install() {
+	local -r version="$1"
+	local -r driver_dir="$2"
+	local -r default_accept=false
+	local -r force_accept="${3-:$default_accept}"
 
-if [ "$kconfig_exists" == "false" ];
-then
-  rm $kconfig_file
-fi
+	separator
+	download "$version" "$force_accept"
 
-# fix: issue #42 (dlm.service can't start)
-# note: for this to work libstdc++6 package needs to be installed from >= Stretch
-if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ];
-then
-	ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /opt/displaylink/libstdc++.so.6
-fi
+	local -r displaylink_driver_dir="${driver_dir}/displaylink-driver-${version}"
+	local -r installer_script="${displaylink_driver_dir}/displaylink-installer.sh"
+	local -r build_dir="$(dirname "$kconfig_file")"
 
-sysinitdaemon=$(sysinitdaemon_get)
-if [ "$sysinitdaemon" == "systemd" ]
-then
-    # Fix inability to enable displaylink-driver.service
-    sed -i "/RestartSec=5/a[Install]\nWantedBy=multi-user.target" /lib/systemd/system/displaylink-driver.service
+	# udlfb kernel version check
+	local -r kernel_version="$(echo "$kernel_release" | grep -Eo '[0-9]+\.[0-9]+')"
 
-    echo "Enable displaylink-driver service"
-    systemctl enable displaylink-driver.service
-elif [ "$sysinitdaemon" == "sysvinit" ]
-then
-    echo "Copying init script to /etc/init.d\n"
-    cp "$dir/$init_script" /etc/init.d/
-    chmod +x "/etc/init.d/$init_script"
-    echo "Load evdi at startup"
-    cat > "$evdi_modprobe" <<EOF
-evdi
-EOF
-    echo "Enable and start displaylink service"
-    update-rc.d "$init_script" defaults
-    /etc/init.d/$init_script start
-fi
+	# prepare for installation
+	# check if prior drivers have been downloaded
+	if [ -d "$driver_dir" ]; then
+		echo "Removing prior: '$driver_dir' directory"
+		rm -r "$driver_dir"
+	fi
 
-# setup xorg.conf depending on graphics card
-modesetting(){
-test ! -d /etc/X11/xorg.conf.d && mkdir -p /etc/X11/xorg.conf.d
-drv=$(lspci -nnk | grep -i vga -A3 | grep 'in use'|cut -d":" -f2|sed 's/ //g')
-drv_nvidia=$(lspci | grep -i '3d controller' | sed 's/^.*: //' | awk '{print $1}')
-cardsub=$(lspci -nnk | grep -i vga -A3|grep Subsystem|cut -d" " -f5)
+	mkdir -p "$driver_dir"
 
-# intel displaylink xorg.conf
-xorg_intel(){
-cat > $xorg_config_displaylink <<EOL
-Section "Device"
-    Identifier  "Intel"
-    Driver      "intel"
-EndSection
-EOL
+	separator
+	echo -e '\nPreparing for install\n'
+	test -d "$driver_dir" && /bin/rm -Rf "$driver_dir"
+	unzip -d "$driver_dir" "DisplayLink_Ubuntu_${version}.zip"
+	chmod +x $driver_dir/displaylink-driver-${version}*.run
+	$driver_dir/displaylink-driver-${version}*.run --keep --noexec
+	mv displaylink-driver-${version}*/ "$displaylink_driver_dir"
+
+	# modify displaylink-installer.sh
+	sed -i "s/SYSTEMINITDAEMON=unknown/SYSTEMINITDAEMON=$system_init_daemon/g" "$installer_script"
+
+	# issue: 227
+	local -r distros=(
+		'BunsenLabs'
+		'Bunsenlabs'
+		'Debian'
+		'Deepin'
+		'Devuan'
+		'Kali'
+		'MX'
+		'Uos'
+	)
+
+	if [[ "${distros[*]/$lsb/}" != "${distros[*]}" ]]; then
+		sed -i 's#/lib/modules/$KVER/build/Kconfig#/lib/modules/$KVER/build/scripts/kconfig/conf#g' "$installer_script"
+		ln -sf "${build_dir}/Makefile" "${build_dir}/Kconfig"
+	fi
+
+	# patch displaylink-installer.sh to prevent reboot before the script is done
+	patch -Np0 "$installer_script" < "${resources_dir}displaylink-installer.patch"
+
+	# run displaylink install
+	echo -e "\nInstalling driver version: $version\n"
+	cd "$displaylink_driver_dir"
+	./displaylink-installer.sh install
+
+	# add udl/udlfb to blacklist depending on kernel version (issue #207)
+	[ "$(ver2int "$kernel_version")" -ge "$(ver2int '4.14.9')" ] && udl_block
 }
 
-# modesetting displaylink xorg.conf
-xorg_modesetting(){
-cat > $xorg_config_displaylink <<EOL
-Section "Device"
-    Identifier  "DisplayLink"
-    Driver      "modesetting"
-    Option      "PageFlip" "false"
-EndSection
-EOL
+# issue: 204, 216
+function nvidia_hashcat() {
+	echo "Installing hashcat-nvidia, 'contrib non-free' must be enabled in apt sources"
+	apt-get install -y hashcat-nvidia
 }
 
-# modesetting displaylink xorg.conf
-xorg_modesetting_newgen(){
-cat > $xorg_config_displaylink <<EOL
-Section "OutputClass"
-    Identifier  "DisplayLink"
-    MatchDriver "evdi"
-    Driver      "modesetting"
-    Option      "AccelMethod" "none"
-EndSection
-EOL
-}
-
-nvidia_pregame(){
-xsetup_loc="/usr/share/sddm/scripts/Xsetup"
-
-nvidia_xrandr(){
-cat >> $xsetup_loc << EOL
+# appends nvidia xrandr specific script code (partial)
+function nvidia_xrandr_partial() {
+	cat >> "$1" <<_NVIDIA_XRANDR_SCRIPT_
 
 xrandr --setprovideroutputsource modesetting NVIDIA-0
 xrandr --auto
-EOL
+_NVIDIA_XRANDR_SCRIPT_
 }
 
-nvidia_xrandr_full(){
-cat >> $xsetup_loc << EOL
+# writes nvidia xrandr specific script code (full)
+function nvidia_xrandr_full() {
+	cat > "$1" <<_NVIDIA_XRANDR_FULL_SCRIPT_
 #!/bin/sh
 # Xsetup - run as root before the login dialog appears
 
 if [ -e /sbin/prime-offload ]; then
-    echo running NVIDIA Prime setup /sbin/prime-offload
+    echo 'running NVIDIA Prime setup /sbin/prime-offload'
     /sbin/prime-offload
 fi
+_NVIDIA_XRANDR_FULL_SCRIPT_
 
-xrandr --setprovideroutputsource modesetting NVIDIA-0
-xrandr --auto
-EOL
+	nvidia_xrandr_partial "$1"
 }
 
-# create Xsetup file if not there + make necessary changes (issue: #201, #206)
-if [ ! -f $xsetup_loc ];
-then
-    echo "$xsetup_loc not found, creating"
+# performs nvidia specific pre-setup operations
+function nvidia_pregame() {
+	local -r xsetup_loc='/usr/share/sddm/scripts/Xsetup'
+
+	# xorg.conf ops
+	local -r xorg_config='/etc/x11/xorg.conf'
+	local -r usr_xorg_config_displaylink='/usr/share/X11/xorg.conf.d/20-displaylink.conf'
+
+	# create Xsetup file if not there + make necessary changes (issue: #201, #206)
+	if [ ! -f "$xsetup_loc" ]; then
+		echo "$xsetup_loc not found, creating"
 		mkdir -p /usr/share/sddm/scripts/
-		touch $xsetup_loc
-		nvidia_xrandr_full
-		chmod +x $xsetup_loc
+		touch "$xsetup_loc"
+		nvidia_xrandr_full "$xsetup_loc"
+		chmod +x "$xsetup_loc"
 		echo -e "Wrote changes to $xsetup_loc"
-fi
+	fi
 
-# make necessary changes to Xsetup
-if ! grep -q "setprovideroutputsource modesetting" $xsetup_loc
-then
-		mv $xsetup_loc $xsetup_loc.org.bak
-		echo -e "\nMade backup of: $xsetup_loc file"
-		echo -e "\nLocation: $xsetup_loc.org.bak"
-		nvidia_xrandr
-		chmod +x $xsetup_loc
+	# make necessary changes to Xsetup
+	if ! grep -q 'setprovideroutputsource modesetting' "$xsetup_loc"; then
+		backup_file "$xsetup_loc"
+		nvidia_xrandr_partial "$xsetup_loc"
+		chmod +x "$xsetup_loc"
 		echo -e "Wrote changes to $xsetup_loc"
-fi
+	fi
 
-# xorg.conf ops
-xorg_config="/etc/x11/xorg.conf"
-usr_xorg_config_displaylink="/usr/share/X11/xorg.conf.d/20-displaylink.conf"
+	# config files to backup
+	local -r configs=(
+		"$xorg_config"
+		"$xorg_config_displaylink"
+		"$usr_xorg_config_displaylink"
+	)
 
-if [ -f $xorg_config ];
-then
-		mv $xorg_config $xorg_config.org.bak
-		echo -e "\nMade backup of: $xorg_config file"
-		echo -e "\nLocation: $xorg_config.org.bak"
-fi
+	for config_file in "${configs[@]}"; do
+		# skip if config file does not exist
+		[ ! -f "$config_file" ] && continue
 
-if [ -f $xorg_config_displaylink ];
-then
-		mv $xorg_config_displaylink $xorg_config_displaylink.org.bak
-		echo -e "\nMade backup of: $xorg_config_displaylink file"
-		echo -e "\nLocation: $xorg_config_displaylink.org.bak"
-fi
+		# backup config file
+		backup_file "$config_file"
+	done
+}
 
-if [ -f $usr_xorg_config_displaylink ];
-then
-		mv $usr_xorg_config_displaylink $usr_xorg_config_displaylink.org.bak
-		echo -e "\nMade backup of: $usr_xorg_config_displaylink file"
-		echo -e "\nLocation: $usr_xorg_config_displaylink.org.bak"
-fi
+# amd displaylink xorg.conf
+function xorg_amd() {
+	cat > "$xorg_config_displaylink" <<_XORG_AMD_CONFIG_
+Section "Device"
+	Identifier "AMDGPU"
+	Driver     "amdgpu"
+	Option     "PageFlip" "false"
+EndSection
+_XORG_AMD_CONFIG_
+}
+
+# intel displaylink xorg.conf
+function xorg_intel() {
+	cat > "$xorg_config_displaylink" <<_XORG_INTEL_CONFIG_
+Section "Device"
+	Identifier  "Intel"
+	Driver      "intel"
+EndSection
+_XORG_INTEL_CONFIG_
+}
+
+# modesetting displaylink xorg.conf
+function xorg_modesetting() {
+	cat > "$xorg_config_displaylink" <<_XORG_MODESETTING_CONFIG_
+Section "Device"
+	Identifier  "DisplayLink"
+	Driver      "modesetting"
+	Option      "PageFlip" "false"
+EndSection
+_XORG_MODESETTING_CONFIG_
+}
+
+# modesetting displaylink xorg.conf
+function xorg_modesetting_newgen() {
+	cat > "$xorg_config_displaylink" <<_XORG_EVDI_CONFIG_
+Section "OutputClass"
+	Identifier  "DisplayLink"
+	MatchDriver "evdi"
+	Driver      "modesetting"
+	Option      "AccelMethod" "none"
+EndSection
+_XORG_EVDI_CONFIG_
 }
 
 # nvidia displaylink xorg.conf (issue: 176)
-xorg_nvidia(){
-cat > $xorg_config_displaylink <<EOL
+function xorg_nvidia() {
+	cat > "$xorg_config_displaylink" <<_XORG_NVIDIA_CONFIG_
 Section "ServerLayout"
     Identifier "layout"
     Screen 0 "nvidia"
@@ -597,284 +625,498 @@ Section "Screen"
     Option "AllowEmptyInitialConfiguration" "on"
     Option "IgnoreDisplayDevices" "CRT"
 EndSection
-EOL
+_XORG_NVIDIA_CONFIG_
 }
 
-# issue: 204, 216
-nvidia_hashcat(){
-echo "Installing hashcat-nvidia, 'contrib non-free' must be enabled in apt sources"
-apt-get install hashcat-nvidia
-}
+# setup xorg.conf depending on graphics card
+function modesetting() {
+	test ! -d /etc/X11/xorg.conf.d && mkdir -p /etc/X11/xorg.conf.d
 
-# amd displaylink xorg.conf
-xorg_amd(){
-cat > $xorg_config_displaylink <<EOL
-Section "Device"
-    Identifier "AMDGPU"
-    Driver     "amdgpu"
-    Option     "PageFlip" "false"
-EndSection
-EOL
-}
+	local -r driver=$(lspci -nnk | grep -i vga -A3 | grep 'in use' | cut -d':' -f2 | sed 's/ //g')
+	local -r driver_nvidia=$(lspci | grep -i '3d controller' | sed 's/^.*: //' | awk '{print $1}')
+	local -r card_subsystem=$(lspci -nnk | grep -i vga -A3 | grep Subsystem | cut -d' ' -f5)
 
-# set xorg for Nvidia cards (issue: 176, 179, 211, 217, 596)
-if [ "$drv_nvidia" == "NVIDIA" ] || [[ $drv == *"nvidia"* ]];
-then
+	# set xorg for Nvidia cards (issue: 176, 179, 211, 217, 596)
+	if [ "$driver_nvidia" == 'NVIDIA' ] || [[ $driver == *"nvidia"* ]]; then
 		nvidia_pregame
 		xorg_nvidia
 		#nvidia_hashcat
-# set xorg for AMD cards (issue: 180)
-elif [ "$drv" == "amdgpu" ];
-then
+	# set xorg for AMD cards (issue: 180)
+	elif [ "$driver" == 'amdgpu' ]; then
 		xorg_amd
-# set xorg for Intel cards
-elif [ "$drv" == "i915" ];
-then
+	# set xorg for Intel cards
+	elif [ "$driver" == 'i915' ]; then
 		# set xorg modesetting for Intel cards (issue: 179, 68, 88, 192)
-		if [ "$cardsub" == "v2/3rd" ] || [ "$cardsub" == "HD" ] || [ "$cardsub" == "620" ] || [ "$cardsub" == "530" ] || [ "$cardsub" == "540" ] || [ "$cardsub" == "UHD" ] || [ "$cardsub" == "GT2" ];
-		then
-				if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $newgen_xorg)" ];
-				then
-						# reference: issue #200
-						xorg_modesetting_newgen
-				else
-						xorg_modesetting
-				fi
-		# generic intel
-		else
-				xorg_intel
-		fi
-# default xorg modesetting
-else
-		if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $newgen_xorg)" ];
-		then
+		local -r supported_subsystems=(
+			'530'
+			'540'
+			'620'
+			'GT2'
+			'HD'
+			'UHD'
+			'v2/3rd'
+		)
+
+		if [ "${supported_subsystems[*]/$card_subsystem/}" != "${supported_subsystems[*]}" ]; then
+			if [ "$(ver2int "$xorg_vcheck")" -gt "$(ver2int "$newgen_xorg")" ]; then
 				# reference: issue #200
 				xorg_modesetting_newgen
-		else
+			else
 				xorg_modesetting
+			fi
+		# generic intel
+		else
+			xorg_intel
 		fi
-fi
-
-echo -e "Wrote X11 changes to: $xorg_config_displaylink"
-chown root: $xorg_config_displaylink
-chmod 644 $xorg_config_displaylink
-}
-
-function ver2int {
-echo "$@" | awk -F "." '{ printf("%03d%03d%03d\n", $1,$2,$3); }';
-}
-
-# depending on X11 version start modesetting func
-if [ "$(ver2int $xorg_vcheck)" -gt "$(ver2int $min_xorg)" ];
-then
-	echo "Setup DisplayLink xorg.conf depending on graphics card"
-	modesetting
-else
-	echo "No need to disable PageFlip for modesetting"
-fi
-}
-
-# uninstall
-uninstall(){
-separator
-echo -e "\nUninstalling ...\n"
-
-# displaylink-installer uninstall
-if [ "$lsb" == "Debian" ] || [ "$lsb" == "Devuan" ] || [ "$lsb" == "Kali" ] || [ "$lsb" == "Deepin" ] || [ "$lsb" == "BunsenLabs" ] || [ "$lsb" == "Bunsenlabs" ] || [ "$lsb" == "Uos" ];
-then
-	if [ -f /lib/modules/$(uname -r)/build/Kconfig ]; then
-		rm /lib/modules/$(uname -r)/build/Kconfig
+	# default xorg modesetting
+	else
+		if [ "$(ver2int "$xorg_vcheck")" -gt "$(ver2int "$newgen_xorg")" ]; then
+			# reference: issue #200
+			xorg_modesetting_newgen
+		else
+			xorg_modesetting
+		fi
 	fi
-fi
 
-if [ "$(sysinitdaemon_get)" == "sysvinit" ]
-then
-    update-rc.d "$init_script" remove
-    rm -f "/etc/init.d/$init_script"
-    rm -f "$evdi_modprobe"
-fi
+	echo -e "Wrote X11 changes to: $xorg_config_displaylink"
+	chown root: "$xorg_config_displaylink"
+	chmod 644 "$xorg_config_displaylink"
+}
 
-# run unintsall script
-bash /opt/displaylink/displaylink-installer.sh uninstall && 2>&1>/dev/null
+# performs post-installation steps
+function post_install() {
+	separator
+	echo -e '\nPerforming post-install steps\n'
 
-# remove modesetting file
-if [ -f $xorg_config_displaylink ]
-then
-		echo "Removing Displaylink Xorg config file"
-		rm $xorg_config_displaylink
-fi
+	# remove Kconfig file if it does not exist?
+	[ "$kconfig_exists" = false ] && rm "$kconfig_file"
 
-# delete udl/udlfb from blacklist (issue #207)
-sed -i '/blacklist udlfb/d' $blacklist
-sed -i '/blacklist udl/d' $blacklist
+	# fix: issue #42 (dlm.service can't start)
+	# note: for this to work libstdc++6 package needs to be installed from >= Stretch
+	if [[ "$lsb" =~ ^(Debian|Devuan|Kali)$ ]]; then
+		# partially addresses meta issue #931
+		[ ! -d "$opt_displaylink_dir" ] && mkdir -p "$opt_displaylink_dir"
 
+		ln -sf /usr/lib/x86_64-linux-gnu/libstdc++.so.6 "${opt_displaylink_dir}/libstdc++.so.6"
+	fi
+
+	case "$system_init_daemon" in
+		'systemd')
+			# partially addresses meta issue #931
+			local -r displaylink_driver_service='/lib/systemd/system/displaylink-driver.service'
+			if [ ! -f "$displaylink_driver_service" ]; then
+				echo -e 'DisplayLink driver service not found!\nInstallation failed!\nExiting...'
+				exit 1
+			fi
+
+			# Fix inability to enable displaylink-driver.service
+			sed -i '/RestartSec=5/a[Install]\nWantedBy=multi-user.target' "$displaylink_driver_service"
+
+			echo 'Enabling displaylink-driver service ...'
+			systemctl enable displaylink-driver.service
+			;;
+
+		'sysvinit')
+			local -r init_script_path="${etc_init_dir}/${init_script}"
+
+			echo -e "Copying init script to ${etc_init_dir}\n"
+			cp "${dir}/${init_script}" "${etc_init_dir}/"
+			chmod +x "$init_script_path"
+
+			echo 'Load evdi at startup'
+			cat > "$evdi_modprobe" <<_EVDI_MODPROBE_
+evdi
+_EVDI_MODPROBE_
+			echo 'Enabling displaylink service ...'
+			update-rc.d "$init_script" defaults
+
+			echo 'Starting displaylink service ...'
+			"$init_script_path" start
+			;;
+	esac
+
+	# depending on X11 version start modesetting func
+	if [ "$(ver2int "$xorg_vcheck")" -gt "$(ver2int "$min_xorg")" ]; then
+		echo 'Setup DisplayLink xorg.conf depending on graphics card'
+		modesetting
+	else
+		echo 'No need to disable PageFlip for modesetting'
+	fi
+}
+
+# uninstalls the displaylink driver
+function uninstall() {
+	separator
+	echo -e '\nUninstalling ...\n'
+
+	# displaylink-installer uninstall
+	local -r installer_script="${opt_displaylink_dir}/displaylink-installer.sh"
+
+	local -r distros=(
+		'BunsenLabs'
+		'Bunsenlabs'
+		'Debian'
+		'Devuan'
+		'Deepin'
+		'Kali'
+		'Uos'
+	)
+
+	if [ -f "$kconfig_file" ] && [[ "${distros[*]/$lsb/}" != "${distros[*]}" ]]; then
+		rm "$kconfig_file"
+	fi
+
+	if [ "$system_init_daemon" == 'sysvinit' ]; then
+		update-rc.d "$init_script" remove
+		rm -f "${etc_init_dir}/${init_script}"
+		rm -f "$evdi_modprobe"
+	fi
+
+	# run uninstall script if it exists
+	if [ ! -f "$installer_script" ]; then
+		echo -e "\nDisplayLink installer script not found: ${installer_script}\nAborting ..."
+		exit 1
+	fi
+
+	bash "$installer_script" uninstall && 2>&1>/dev/null
+
+	# remove modesetting file
+	if [ -f "$xorg_config_displaylink" ]; then
+		echo 'Removing Displaylink Xorg config file ...'
+		rm "$xorg_config_displaylink"
+	fi
+
+	# delete udl/udlfb from blacklist (issue #207)
+	sed -i '/blacklist udlfb/d' "$blacklist"
+	sed -i '/blacklist udl/d' "$blacklist"
 }
 
 # debug: get system information for issue debug
-debug(){
-separator
-echo -e "\nStarting Debug ...\n"
+function debug() {
+    local -r default_accept=false
+    local -r force_accept="${1:-$default_accept}"
 
-default=N
-ack=${ack:-$default}
+	separator
+	echo -e '\nStarting Debug ...\n'
 
-read -p "Did you read Post Installation Guide? https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md [y/N] " ack
-ack=${ack:-$default}
+	if [ "$force_accept" = false ]; then
+		local -r default='N'
+		local answer="$default"
 
-for letter in "$ack"; do
-	if [[ "$letter" == [Yy] ]];
-	then
-			echo ""
-			continue
-	elif [[ "$letter" == [Nn] ]];
-	then
-			echo -e "\nPlease read Post Installation Guide: https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md\n"
-			exit 1
-	else
-			wrong_key
+		local -A subject_urls=(
+			['Post Installation Guide']="$post_install_guide_url"
+			['Troubleshooting most common issues']="${repo_url}/blob/master/docs/common-issues.md"
+		)
+
+		# array contains subject types in their original order
+		local -r subjects=(
+			'Post Installation Guide'
+			'Troubleshooting most common issues'
+		)
+
+		local url=''
+
+		for subject in "${subjects[@]}"; do
+			url="${subject_urls[$subject]}"
+
+			read -p "Did you read ${subject}? ${url} [y/N] " answer
+			answer="${answer:-$default}"
+
+			case "$answer" in
+				[yY])
+					echo ''
+					continue
+					;;
+
+				[nN])
+					echo -e "\nPlease read ${subject}: ${url}\n"
+					exit 1
+					;;
+
+				*)
+					invalid_option
+					;;
+			esac
+		done
 	fi
-done
 
-read -p "Did you read Troubleshooting most common issues? https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/common-issues.md [y/N] " ack
-ack=${ack:-$default}
+	local -r evdi_version="$(
+		[ -f "$evdi_version_file" ] && \
+			cat "$evdi_version_file" || \
+			echo "$evdi_version_file not found"
+	)"
 
-for letter in "$ack"; do
-	if [[ "$letter" == [Yy] ]];
-	then
-			echo -e ""
-			continue
-	elif [[ "$letter" == [Nn] ]];
-	then
-			echo -e "\nPlease read Troubleshooting most common issues: https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/common-issues.md\n"
-			exit 1
-	else
-			wrong_key
-	fi
-done
+    # render debug info
+    cat <<_DEBUG_INFO_
+--------------- Linux system info ----------------
 
-if [ -f /sys/devices/evdi/version ]
-then
-	evdi_version="$(cat /sys/devices/evdi/version)"
-else
-	evdi_version="/sys/devices/evdi/version not found"
-fi
+Distro:  $lsb
+Release: $codename
+Kernel:  $kernel_release
 
-echo -e "--------------- Linux system info ----------------\n"
-echo -e "Distro: $lsb"
-echo -e "Release: $codename"
-echo -e "Kernel: $kernel"
-echo -e "\n---------------- DisplayLink info ----------------\n"
-echo -e "Driver version: $sys_driver_version"
-echo -e "DisplayLink service status: $(displaylink_service_check)"
-echo -e "EVDI service version: $evdi_version"
-echo -e "\n------------------ Graphics card -----------------\n"
-echo -e "Vendor: $graphics_vendor"
-echo -e "Subsystem: $graphics_subcard"
-echo -e "VGA: $vga_info"
-echo -e "VGA (3D): $vga_info_3d"
-echo -e "X11 version: $xorg_vcheck"
-xconfig_list
-echo -e "\n-------------- DisplayLink xorg.conf -------------\n"
-echo -e "File: $xorg_config_displaylink"
-echo -e "Contents:\n $(cat $xorg_config_displaylink)"
-echo -e "\n-------------------- Monitors --------------------\n"
-echo -e "$providers"
+---------------- DisplayLink info ----------------
+
+Driver version:             $sys_driver_version
+DisplayLink service status: $(displaylink_service_check || echo '[SERVICE NOT FOUND]')
+EVDI service version:       $evdi_version
+
+------------------ Graphics card -----------------
+
+Vendor:      $graphics_vendor
+Subsystem:   $graphics_subcard
+VGA:         $vga_info
+VGA (3D):    ${vga_info_3d:-N/A}
+X11 version: $xorg_vcheck
+
+_DEBUG_INFO_
+
+	# render xorg config file paths
+    get_xconfig_list
+
+    # render more debug info
+    cat <<_DEBUG_INFO_
+-------------- DisplayLink xorg.conf -------------
+
+File:     $xorg_config_displaylink
+Contents: $(
+	[ -f "$xorg_config_displaylink" ] && \
+		echo -e "\n$(cat "$xorg_config_displaylink")" || \
+		echo '[CONFIG FILE NOT FOUND]'
+)
+
+-------------------- Monitors --------------------
+
+$providers
+_DEBUG_INFO_
 }
 
-# interactively asks for operation
-ask_operation(){
-echo -e "\n--------------------------- displaylink-debian -------------------------------"
-echo -e "\nDisplayLink driver installer for Debian and Ubuntu based Linux distributions:\n"
-echo -e "* Debian, Ubuntu, Elementary OS, Mint, Kali, Deepin and many more!"
-echo -e "* Full list of all supported platforms: http://bit.ly/2zrwz2u"
-echo -e "* When submitting a new issue, include Debug information"
-echo -e "\nOptions:\n"
-read -p "[I]nstall
+# Prints the help menu to the terminal.
+function show_help_menu() {
+	local -r omit_script_description="$1"
+
+	if [ -z "$omit_script_description" ] || [ "$omit_script_description" = false ]; then
+		echo "$script_description"
+	else
+		separator
+		echo -e '\nViewing help menu...'
+		separator
+	fi
+
+    cat <<_HELP_TEXT_
+NOTES:
+    - This script must be executed by the root user.
+    - All options are optional.
+    - If no options are specfied, then an options menu will be presented.
+
+USAGE:
+    sudo $0 [OPTIONS]
+
+OPTIONS:
+    -d,  --debug
+        Prints debug information to the terminal.
+
+    -f,  --force
+        >> USE WITH CAUTION! <<
+            Skips all questions and accepts all license agreements.
+            Works with the --debug, --install, and --reinstall options.
+            Does not work with the options menu!
+
+    -h,  --help
+        Prints this help menu.
+
+    -u,  --install
+        Installs the DisplayLink driver.
+
+    -r,  --reinstall
+        Re-installs the DisplayLink driver.
+
+    -u,  --uninstall
+        Uninstalls the DisplayLink driver.
+
+_HELP_TEXT_
+}
+
+# script entry-point
+function main() {
+	local interactive_menu=false
+	local force_accept=false
+	local script_option=''
+
+    # render interactive menu if no script parameter is specified
+	if [[ "$#" -lt 1 ]]; then
+		interactive_menu=true
+
+		cat <<_INTERACTIVE_MENU_HEADER_
+$script_description
+Options:
+_INTERACTIVE_MENU_HEADER_
+
+        read -p "
+[I]nstall
 [D]ebug
+[H]elp
 [R]e-install
 [U]ninstall
 [Q]uit
 
-Select a key: [i/d/r/u/q]: " answer
+Select a key: [i/d/h/r/u/q]: " script_option
+
+	# parse script parameters
+	else
+		while [ "$#" -gt 0 ]; do
+			# process parameter if script option is already set
+			if [ -n "$script_option" ]; then
+				# process --force flag
+				[[ "$1" =~ ^-(f|-force)$ ]] && force_accept=true
+
+				# shift pass current parameter because script option is already set
+				shift
+				continue
+			fi
+
+			case "$1" in
+				'-d'|'--debug')
+					script_option='d'
+					shift
+					;;
+
+				'-f'|'--force')
+					force_accept=true
+					shift
+					;;
+
+				'-h'|'--help')
+					script_option='h'
+					shift
+					;;
+
+				'-i'|'--install')
+					script_option='i'
+					shift
+					;;
+
+				'-r'|'--reinstall')
+					script_option='r'
+					shift
+					;;
+
+				'-u'|'--uninstall')
+					script_option='u'
+					shift
+					;;
+				*)
+					echo -e "\nInvalid option, exiting ...\n"
+					exit 1
+					;;
+			esac
+		done
+	fi
+
+	# exit early if the user decided to quit the script
+	[[ "$script_option" =~ ^[qQ]$ ]] && echo -e '\nExiting...\n' && exit 0
+
+	# check if script is executed by root user (skip check for help menu)
+	[[ ! "$script_option" =~ ^[hH]$ ]] && root_check
+
+	# run distro check for debug, install, reinstall, and uninstall options
+	[[ "$script_option" =~ ^[dDiIrRuU]$ ]] && distro_check
+
+	local driver_dir=''
+	local version=''
+
+	# get the latest DisplayLink driver version for installs, reinstalls, and uninstalls only
+	# TODO: detect version for uninstalls instead of downloading version details
+	if [[ "$script_option" =~ ^[iIrRuU]$ ]]; then
+		version="$(get_latest_displaylink_driver_version)"
+		driver_dir="$(realpath "./${version}")"
+	fi
+
+	if [ "$force_accept" = true ]; then
+		# render warning message for options that do not support the force option
+		if [[ ! "$script_option" =~ ^[dDiIrR]$ ]]; then
+        	echo -e "\nNOTICE: '--force' parameter is only available for debug, install, and re-install options!"
+		else
+			separator
+			echo -e "\n>> CAUTION: force flag detected, you better know what you are doing! <<"
+			# provide the user with a couple of seconds to change their mind
+			sleep 5s
+		fi
+	fi
+
+	local -r installation_completed_message="
+
+Installation completed, please reboot to apply the changes.
+After reboot, make sure to consult post-install guide! $post_install_guide_url"
+
+	case "$script_option" in
+		# Debug
+		# > Prints debug information (system info, driver info, etc) to the terminal.
+		[dD])
+			debug "$force_accept"
+			separator
+			echo -e "\nUse this information when submitting an issue ($repo_issue_url)"
+			separator
+			echo ''
+			;;
+
+		# Help
+		# > Prints the script help menu to the terminal.
+		[hH])
+			show_help_menu "$interactive_menu"
+			exit 0
+			;;
+
+		# Install
+		# > Installs the DisplayLink driver.
+		[iI])
+			pre_install
+			install "$version" "$driver_dir" "$force_accept"
+			post_install
+			clean_up "$version" "$driver_dir"
+			separator
+			echo "$installation_completed_message"
+			setup_complete
+			separator
+			echo ''
+			;;
+
+		# Re-Install
+		# > Re-installs the DisplayLink driver.
+		[rR])
+			uninstall
+			clean_up "$version" "$driver_dir"
+			pre_install
+			install "$version" "$driver_dir" "$force_accept"
+			post_install
+			clean_up "$version" "$driver_dir"
+			separator
+			echo "$installation_completed_message"
+			setup_complete
+			separator
+			echo ''
+			;;
+
+		# Uninstall
+		# > Uninstalls the DisplayLink driver.
+		[uU])
+			uninstall
+			clean_up "$version" "$driver_dir"
+			separator
+			echo -e '\nUninstall complete, please reboot to apply the changes.'
+			setup_complete
+			separator
+			echo ''
+			;;
+
+		# Unknown option
+		*)
+			echo -e '\nUnknown option selected.  Exiting...'
+			echo ''
+			exit 1
+			;;
+	esac
 }
 
-root_check
+# run script entry-point
+main "$@"
 
-if [[ "$#" -lt 1 ]];
-then
-  ask_operation
-else
-  case "${1}" in
-    "--install")
-        answer="i"
-        ;;
-    "--uninstall")
-        answer="u"
-        ;;
-    "--reinstall")
-        answer="r"
-        ;;
-    "--debug")
-        answer="d"
-        ;;
-    *)
-        answer="n"
-        ;;
-  esac
-fi
-
-if [[ $answer == [Ii] ]];
-then
-	distro_check
-        pre_install
-	install
-	post_install
-	clean_up
-	separator
-	echo -e "\nInstall complete, please reboot to apply the changes"
-	echo -e "After reboot, make sure to consult post-install guide! https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md"
-	setup_complete
-	separator
-	echo ""
-elif [[ $answer == [Uu] ]];
-then
-	distro_check
-	uninstall
-	clean_up
-	separator
-	echo -e "\nUninstall complete, please reboot to apply the changes"
-	setup_complete
-	separator
-	echo ""
-elif [[ $answer == [Rr] ]];
-then
-	distro_check
-	uninstall
-	clean_up
-	distro_check
-	pre_install
-	install
-	post_install
-	clean_up
-	separator
-	echo -e "\nInstall complete, please reboot to apply the changes"
-	echo -e "After reboot, make sure to consult post-install guide! https://github.com/AdnanHodzic/displaylink-debian/blob/master/docs/post-install-guide.md"
-	setup_complete
-	separator
-	echo ""
-elif [[ $answer == [Dd] ]];
-then
-	debug
-	separator
-	echo -e "\nUse this information when submitting an issue (http://bit.ly/2GLDlpY)"
-	separator
-	echo ""
-elif [[ $answer == [Qq] ]];
-then
-	separator
-	echo ""
-	exit 0
-else
-	echo -e "\nWrong key, aborting ...\n"
-	exit 1
-fi
