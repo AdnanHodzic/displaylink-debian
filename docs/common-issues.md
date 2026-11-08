@@ -87,6 +87,25 @@ sudo ./displaylink-debian.sh
 
 References: [#111](https://github.com/AdnanHodzic/displaylink-debian/issues/111), [#102](https://github.com/AdnanHodzic/displaylink-debian/issues/102), [#89](https://github.com/AdnanHodzic/displaylink-debian/issues/89), [#65](https://github.com/AdnanHodzic/displaylink-debian/issues/65) 
 
+## Blank / flashing monitors on Dell UD22 (and similar hybrid DisplayLink docks)
+
+**Hardware fingerprint:**
+* `lsusb` shows something like `413c:f6d0` (Dell Universal Dock UD22) and/or `17e9:6013` (DisplayLink / “Dell Universal Hybrid Video Dock”)
+* Dual external monitors (e.g. 1440p); setup works on Windows
+
+**Symptoms when DisplayLink/EVDI is missing or not running:**
+* One monitor blank, another flashing or stuck at very low resolution (640×480 / 1024×768)
+* DRM connectors appear under the laptop GPU as `DP-*` (MST), with kernel messages such as `failed to lookup MSTB` or `Failed to read DPCD register`
+* Easy to misread as an Intel/NVIDIA driver problem
+
+**Fix:**
+1. Install DisplayLink properly for your distro (this project’s installer, or Synaptics’ official Ubuntu APT packages: `displaylink-driver` + `evdi`).
+2. Ensure `evdi` is loaded (`lsmod | grep evdi`) and the DisplayLink service is active.
+3. Prefer EVDI outputs named `DVI-I-*`. Hybrid docks may keep one panel on an i915/amdgpu `DP-*` connector and the other on `DVI-I-*` once DisplayLink is running.
+4. On custom kernels (e.g. Pop!_OS / System76), distro prebuilt `linux-modules-evdi-*` packages may not match your running kernel; DKMS `evdi` from Synaptics/displaylink-debian is the reliable path.
+
+**Verified working example (reference):** Pop!_OS 24.04 (COSMIC/Wayland), kernel `7.0.11-76070011-generic`, Dell XPS 15 9570, UD22, two ASUS PA278QV @ 2560×1440 with `displaylink-driver` 6.3.0 + `evdi` 1.15.0 (DKMS).
+
 ## Having a different problem?
 
 When submitting a new [issue](https://github.com/AdnanHodzic/displaylink-debian/issues), include debug information by running: `sudo ./displaylink-debian.sh --debug`
